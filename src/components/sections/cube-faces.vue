@@ -5,14 +5,34 @@
             <div class="cube-faces-svg-wrapper">
 
                 <div class="cube-faces-dimensions __isWidth">
-                    <span class="cube-faces-dimensions-button" @click="updateDimension('width', '-')">-</span>
-                    <span>Width</span>
-                    <span class="cube-faces-dimensions-button" @click="updateDimension('width', '+')">+</span>
+                    <span 
+                        class="cube-faces-dimensions-button"
+                        @click="updateDimension($event,'width', '-')"
+                        :class="{'__isDisabled': width <= 2}">
+                        <icon type="chevronLeft" />
+                    </span>
+                    <span class="cube-faces-dimensions-value">{{width}}</span>
+                    <span 
+                        class="cube-faces-dimensions-button" 
+                        @click="updateDimension($event,'width', '+')"
+                        :class="{'__isDisabled': width >= 16}">
+                        <icon type="chevronRight" />
+                    </span>
                 </div>
                 <div class="cube-faces-dimensions __isHeight">
-                    <span class="cube-faces-dimensions-button" @click="updateDimension('height', '-')">-</span>
-                    <span>Height</span>
-                    <span class="cube-faces-dimensions-button" @click="updateDimension('height', '+')">+</span>
+                    <span 
+                        class="cube-faces-dimensions-button"
+                        @click="updateDimension($event,'height', '+')"
+                        :class="{'__isDisabled': height >= 16}">
+                        <icon type="chevronUp" />
+                    </span>
+                    <span class="cube-faces-dimensions-value">{{height}}</span>
+                    <span 
+                        class="cube-faces-dimensions-button" 
+                        @click="updateDimension($event, 'height', '-')"
+                        :class="{'__isDisabled': height <= 2}">
+                        <icon type="chevronDown" style="translate: 0 -2px;" />
+                    </span>
                 </div>
                 <vpg-svg :vpg-pattern="phygital.surfaces[selectedSurface]" v-if="phygital.surfaces[selectedSurface]"/>
             </div>
@@ -31,12 +51,14 @@
 import { defineComponent } from "vue"
 import Phygital from "@/stores/phygital"
 import vpgSvg from "@/components/vpg-svg.vue"
+import Icon from "@/components/icon.vue"
+import gsap from "gsap"
 
 
 export default defineComponent({
     name: "cube-faces",
     components: {
-        vpgSvg
+        vpgSvg, Icon
     },
     props: {
         character: {
@@ -55,25 +77,124 @@ export default defineComponent({
     data: () => {
         return {
             selectedSurface: "top",
-            surfaces: ["top", "bottom", "left", "right", "front", "back"]
+            surfaces: ["top", "bottom", "left", "right", "front", "back"],
+            clickTimeout: 0
         }
     },
     computed: {
         line() {
             return this.character.repeat(512)
-        }
+        },
+        height() {
+            return this.phygital.surfaces[this.selectedSurface].height
+        },
+        width() {
+            return this.phygital.surfaces[this.selectedSurface].width
+        },
+        
     },
     mounted() {
         
     },
     methods: {
-        updateDimension(dimension: string, operator: string) {
+        updateDimension(event: MouseEvent, dimension: string, operator: string) {
+            let oppositeSurface = ""
+            let side1 = {surface: "", dimension: ""}
+            let side2 = {surface: "", dimension: ""}
+
+            // First define opposite surface
+            if (this.selectedSurface == "top") {
+                oppositeSurface = "bottom"
+            } else if (this.selectedSurface == "bottom") {
+                oppositeSurface = "top"
+            } else if (this.selectedSurface == "left") {
+                oppositeSurface = "right"
+            } else if (this.selectedSurface == "right") {
+                oppositeSurface = "left"
+            } else if (this.selectedSurface == "front") {
+                oppositeSurface = "back"
+            } else if (this.selectedSurface == "back") {
+                oppositeSurface = "front"
+            }
+
+            // Than define side surfaces
+            if (this.selectedSurface == "top" || this.selectedSurface == "bottom") {
+                if (dimension == "height") {
+                    side1.surface = "left"
+                    side1.dimension = "width"
+                    side2.surface = "right"
+                    side2.dimension = "width"
+                } else {
+                    side1.surface = "front"
+                    side1.dimension = "width"
+                    side2.surface = "back"
+                    side2.dimension = "width"
+                }
+            } else if (this.selectedSurface == "left" || this.selectedSurface == "right") {
+                if (dimension == "height") {
+                    side1.surface = "front"
+                    side1.dimension = "height"
+                    side2.surface = "back"
+                    side2.dimension = "height"
+                } else {
+                    side1.surface = "top"
+                    side1.dimension = "height"
+                    side2.surface = "bottom"
+                    side2.dimension = "height"
+                }
+            } else if (this.selectedSurface == "front" || this.selectedSurface == "back") {
+                if (dimension == "height") {
+                    side1.surface = "left"
+                    side1.dimension = "height"
+                    side2.surface = "right"
+                    side2.dimension = "height"
+                } else {
+                    side1.surface = "top"
+                    side1.dimension = "width"
+                    side2.surface = "bottom"
+                    side2.dimension = "width"
+                }
+            } 
+
             if (operator === "+") {
                 this.phygital.surfaces[this.selectedSurface][dimension]++
+                this.phygital.surfaces[oppositeSurface][dimension]     = this.phygital.surfaces[this.selectedSurface][dimension]
+                this.phygital.surfaces[side1.surface][side1.dimension] = this.phygital.surfaces[this.selectedSurface][dimension]
+                this.phygital.surfaces[side2.surface][side2.dimension] = this.phygital.surfaces[this.selectedSurface][dimension]
             } else {
                 this.phygital.surfaces[this.selectedSurface][dimension]--
+                this.phygital.surfaces[oppositeSurface][dimension]     = this.phygital.surfaces[this.selectedSurface][dimension]
+                this.phygital.surfaces[side1.surface][side1.dimension] = this.phygital.surfaces[this.selectedSurface][dimension]
+                this.phygital.surfaces[side2.surface][side2.dimension] = this.phygital.surfaces[this.selectedSurface][dimension]
             }
-            this.phygital.updateSurfaces()
+            clearTimeout(this.clickTimeout)
+            
+            
+            
+            this.clickTimeout = setTimeout(() => {
+                this.phygital.updateSurfaces()
+                this.phygital.update3DSurface(this.selectedSurface)
+                this.phygital.update3DSurface(oppositeSurface)
+            }, 200)
+
+
+            const currentTarget = event.currentTarget
+            const direction = operator === "+" ? -1 : 1
+            gsap.timeline()
+                .to(currentTarget, {
+                    scale: 1.1,
+                    y: dimension === "height" ? 16 * direction : 0,
+                    x: dimension === "width" ? 16 * direction : 0,
+                    duration: .16,
+                    ease: "power1.inOut"
+                })
+                .to(currentTarget, {
+                    scale: 1,
+                    y: 0,
+                    x: 0,
+                    duration: 0.12,
+                    ease: "elastic.out(1, 0.3)"
+                })
         },
     }
 })
@@ -88,6 +209,21 @@ export default defineComponent({
     height: 100%;
     justify-items: center;
     align-items: center;
+    position: relative;
+    &:before {
+        transition:.24 ease opacity;
+        pointer-events: none;
+        position: absolute;
+        content: "";
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background-image: url("/images/bg-pattern1.svg");
+        background-repeat: repeat;
+        background-size: 72px;
+        opacity: 0;
+    }
 
     .vpg-svg {
         justify-content: center;
@@ -109,9 +245,12 @@ export default defineComponent({
         }
         
         .cube-faces-svg-container {
-            margin: 96px;
-            height: calc(100% - 192px);
-            width: calc(100% - 192px);
+            margin: 120px 120px calc(120px - 48px) 120px;
+            height: calc(100% - 120px * 2 - 48px);
+            width: calc(100% - 120px * 2);
+        }
+        &:before {
+            opacity: 0.008;
         }
     }
 }
@@ -170,30 +309,45 @@ export default defineComponent({
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 16px;
     z-index: 1;
 
     &.__isWidth {
-        top: -48px;
+        top: -104px;
         width: 100%;
-        padding-bottom: 8px;
     }
     &.__isHeight {
-        right: -76px;
+        right: -80px;
         height: 100%;
-        padding-left: 8px;
         flex-flow: column;
+        .cube-faces-dimensions-value {
+            // translate: 0 4px;
+        }
     }
 }
 
+
 .cube-faces-dimensions-button {
-    font-size: 24px;
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
-    background-color: #fff;
     cursor: pointer;
+    height: 48px;
+    width: 48px;
+    line-height: 48px;
+    transition: .32s ease all;
+    display: flex;
+    &.__isDisabled {
+        pointer-events: none;
+        opacity: 0;
+    }
+}
+
+.cube-faces-dimensions-value {
+    font-family: $accentFont;
+    font-size: 32px;
+    font-weight: normal;
+    height: 48px;
+    width: 48px;
+    line-height: 48px;
+    text-align: center;
+    display: inline-block;
 }
 
 @media all and (orientation: landscape) {

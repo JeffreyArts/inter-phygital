@@ -9,7 +9,7 @@ import threeDView from "@/services/3d-view.js"
 
 
 export default {
-    props: ["cameraFocalLength", "datamodel"],
+    props: ["cameraFocalLength", "datamodel", "modelChanged"],
     data() {
         return {
             scene: false,
@@ -18,31 +18,21 @@ export default {
                 height: 256,
             },
             renderer: null,
-            scene: null
+            camera: null,
+            orbitControls: null,
         }
     },
     watch: {
-        datamodel: {
+        "modelChanged": {
             handler(val, oldVal) {
-                _.each(this.scene.children, childObject => {
-                    if (childObject.datamodel == true) {
-                        this.removeObject(childObject)
-                    }
-                })
-
-                if (this.datamodel && this.datamodel.uuid) {
-                    var internalDatamodel = this.datamodel.clone()
-                    internalDatamodel.datamodel = true
-                    this.scene.add(internalDatamodel)
-                }
+                this.updateModel()
             },
-            deep: true
-        },
-        cameraFocalLength: {
-            handler(val) {
-                this.camera.setFocalLength(val)
-            }
         }
+        // cameraFocalLength: {
+        //     handler(val) {
+        //         this.camera.setFocalLength(val)
+        //     }
+        // }
     },
 
     mounted() {
@@ -50,9 +40,12 @@ export default {
         this.container.height = this.$el.clientWidth
 
         var o = threeDView.init({orbitControls: true})
+        // Update the controls target to the origin point
         this.scene      = o.scene
         this.renderer   = o.renderer
         this.camera     = o.camera
+        this.orbitControls = o.orbitControls
+
         this.$emit("camera", this.camera)
 
         this.$el.append( this.renderer.domElement )
@@ -88,6 +81,26 @@ export default {
 
             this.camera.updateProjectionMatrix()
         },
+        updateModel() {
+            _.each(this.scene.children, childObject => {
+                if (childObject.datamodel == true) {
+                    this.removeObject(childObject)
+                }
+            })
+
+            if (this.datamodel && this.datamodel.uuid) {
+                var internalDatamodel = this.datamodel.clone()
+                internalDatamodel.datamodel = true
+                this.scene.add(internalDatamodel)
+            }
+            
+            this.camera.position.set( this.datamodel.width*4, this.datamodel.height*1.6, this.datamodel.depth*4)
+            const target = new THREE.Vector3(this.datamodel.width/4, this.datamodel.height/2, this.datamodel.depth/4)
+            this.camera.lookAt( target)
+            if (this.orbitControls) {
+                this.orbitControls.target =  target
+            }
+        }
     }
 
 }
@@ -96,11 +109,16 @@ export default {
 <style lang="scss" >
 
 .sandbox-view {
-    display: block;
     width: 100%;
-    min-width: 320px;
     color: #333;
     font-size: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 100%;
+    max-width: 100%;
+    position: relative;
+
     canvas {
         max-width: 100%;
         max-height: 100%;

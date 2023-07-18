@@ -46,7 +46,6 @@ export default defineComponent({
     },
     methods: {
         updateSVG() {
-            console.log("Update SVG")
             var svgContainer = this.$refs["vpgSVG"] as SVGElement
             this.svg = SVG()
             this.svg.viewbox(0,0,this.width - .5, this.height- .5)

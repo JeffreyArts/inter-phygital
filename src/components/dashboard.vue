@@ -35,30 +35,30 @@ export default defineComponent({
     
     },
     mounted() {
-        const observer = new MutationObserver(this.updateDashboard)
+        // const observer = new MutationObserver(this.updateDashboard)
         if (this.$refs["container"] instanceof HTMLElement) {
             this.dashboard.setContainer(this.$refs["container"] as HTMLElement)
-            observer.observe(this.$refs["container"], {
-                childList: true,
-                subtree: true 
-            })
-            this.observer = observer
+            // observer.observe(this.$refs["container"], {
+            //     childList: true,
+            //     subtree: true 
+            // })
+            // this.observer = observer
         }
 
         this.updateDashboard()
-        window.dispatchEvent(new Event("resize"))
-        window.addEventListener("resize", this.updateDashboard)
+        // window.addEventListener("resize", this.updateDashboard)
     },
     beforeUnmount() {
-        window.removeEventListener("resize", this.updateDashboard)
-        this.dashboard.container = null 
-        if (this.observer) {
-            this.observer.disconnect()
-        }
+        // window.removeEventListener("resize", this.updateDashboard)
+        // this.dashboard.container = null 
+        // if (this.observer) {
+        //     this.observer.disconnect()
+        // }
     },
     methods: {
         updateDashboard() {
             this.dashboard.updatePositions()
+            window.dispatchEvent(new Event("resize"))
         },
         
     }

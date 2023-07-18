@@ -2,7 +2,7 @@
     <div class="home">
         <dashboard>
             <cube-faces class="section"/>
-            <cube-config class="section"/>
+            <cube-config class="section" disabled/>
             <cube3d class="section"/>
           <section></section>
       </dashboard>
@@ -59,6 +59,7 @@ export default defineComponent ({
   .dashboard {
       height: 100vh;
       width: 100vw;
+      overflow: hidden;
   }
   .layout-modifiers {
       position: absolute;

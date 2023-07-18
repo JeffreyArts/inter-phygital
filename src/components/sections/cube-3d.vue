@@ -1,8 +1,6 @@
 <template>
     <div class="cube-3d-container" ref="container">
-        <sandbox-view v-bind:datamodel="pattern3D" v-bind:camera-focal-length="128"></sandbox-view>
-
-        <!-- pattern3D:{{ pattern3D }} -->
+        <sandbox-view v-bind:datamodel="pattern3D" v-bind:camera-focal-length="128" :model-changed="pattern3D.update"></sandbox-view>
     </div>
 </template>
 
@@ -13,6 +11,7 @@ import Phygital from "@/stores/phygital"
 import * as THREE from "three"
 import { CSG } from "three-csg-ts"
 import patternToThreejs from "@/services/pattern-to-threejs.js"
+import objectHash from "object-hash"
 import SandboxView from "@/components/sandbox-view.vue"
 import _ from "lodash"
 
@@ -70,173 +69,94 @@ export default defineComponent({
             return this.character.repeat(512)
         }
     },
+    watch: {
+        "phygital.surfaces.top.update3D":       { handler() { this.update3DModel("top") } },
+        "phygital.surfaces.bottom.update3D":    { handler() { this.update3DModel("bottom")} },
+        "phygital.surfaces.left.update3D":      { handler() { this.update3DModel("left") } },
+        "phygital.surfaces.right.update3D":     { handler() { this.update3DModel("right") } },
+        "phygital.surfaces.front.update3D":     { handler() { this.update3DModel("front") } },
+        "phygital.surfaces.back.update3D":      { handler() { this.update3DModel("back") } },
+    },
     mounted() {
-        this.phygital.generateSeed()
-        this.create3DPattern()
+        // this.create3DPattern()
     },
     methods: {
-        regenerateSeed() {
-            this.phygital.generateSeed()
-        },
-        create3DPattern(side: "top" | "bottom" | "left" | "right" | "front" | "back"){
-            const diameter = .5
-            _.forEach(this.phygital.surfaces, (surface, surfaceSide) => {
-
-                _.remove(this.pattern3D.children, childObject => {
-                    if (childObject.name == `face-${surfaceSide}`) {
-                        removeObject(this.cube[surfaceSide])
-                        removeObject(childObject)
-                        return true
-                    }
-                })
-                console.log(surface)
-                this.pattern3D.add(surface.object)
-                // const pattern3D = patternToThreejs(surface.polylines, {
-                //     width: surface.width,
-                //     height: surface.height,
-                //     type: "box",
-                //     diameter: diameter,
-                //     beamWidth: diameter,
-                //     beamHeight: diameter,
-                //     tube: false,
-                //     color: "#444",
-                //     tubeThickness: .0125,
-                // })
-                
-                // let mergedObject = pattern3D[0]
-                // for (var i = 1; i < pattern3D.length; i++) {
-                //     mergedObject = CSG.toMesh(CSG.fromMesh(mergedObject).union(CSG.fromMesh(pattern3D[i])), mergedObject.matrix)
-                // }
-
-                // if (surfaceSide === "top") {
-                //     _.remove(this.pattern3D.children, childObject => {
-                //         if (childObject.name == "face-top") {
-                //             removeObject(this.cube.top)
-                //             removeObject(childObject)
-                //             return true
-                //         }
-                //     })
-                //     this.cube.top = mergedObject.clone()
-                //     this.cube.top.material = pattern3D[0].material
-                //     this.cube.top.name = "face-top"
-                //     this.cube.bottom.rotateY(Math.PI/180* 90)
-                //     this.cube.top.position.y = this.phygital.surfaces.top.height-1
-                //     this.cube.top.updateMatrix()
-                //     this.pattern3D.add(this.cube.top)
-                // }
-
-                // if (surfaceSide === "bottom") {
-                //     _.remove(this.pattern3D.children, childObject => {
-                //         if (childObject.name == "face-bottom") {
-                //             removeObject(this.cube.bottom)
-                //             removeObject(childObject)
-                //             return true
-                //         }
-                //     })
-                //     this.cube.bottom = mergedObject.clone()
-                //     this.cube.bottom.material = pattern3D[0].material
-                //     this.cube.bottom.name = "face-bottom"
-                //     this.cube.bottom.rotateZ(Math.PI/180* 180)
-                //     this.cube.bottom.rotateY(Math.PI/180* 180)
-                //     this.cube.bottom.position.z += this.phygital.surfaces.bottom.height-1 
-                //     this.cube.bottom.position.y = diameter
-                //     this.cube.bottom.updateMatrix()
-                //     this.pattern3D.add(this.cube.bottom)
-                // }
-                
-                // this.pattern3D.add(this.cube.bottom)
-
-                // if (surfaceSide === "front") {
-                //     _.remove(this.pattern3D.children, childObject => {
-                //         if (childObject.name == "face-front") {
-                //             removeObject(this.cube.front)
-                //             removeObject(childObject)
-                //             return true
-                //         }
-                //     })
-                //     this.cube.front = mergedObject.clone()
-                //     this.cube.front.material = pattern3D[0].material
-                //     this.cube.front.name = "face-front"
-                //     this.cube.front.rotateY(Math.PI/180* 180)
-                //     this.cube.front.position.x += this.phygital.surfaces.front.width-1
-                //     this.cube.front.position.z += diameter/2
-                //     this.cube.front.position.y += diameter/2 + this.phygital.surfaces.front.height -1
-                //     this.cube.front.rotateX(Math.PI/180* 90)
-                //     this.cube.front.updateMatrix()
-                //     this.pattern3D.add(this.cube.front)
-                // }
-
-                // if (surfaceSide === "back") {
-                //     _.remove(this.pattern3D.children, childObject => {
-                //         if (childObject.name == "face-back") {
-                //             removeObject(this.cube.back)
-                //             removeObject(childObject)
-                //             return true
-                //         }
-                //     })
-                //     this.cube.back = mergedObject.clone()
-                //     this.cube.back.material = pattern3D[0].material
-                //     this.cube.back.name = "face-back"
-                //     this.cube.back.position.z += this.phygital.surfaces.back.height-1 - diameter/2
-                //     this.cube.back.position.y += diameter/2 + this.phygital.surfaces.back.height-1
-                //     this.cube.back.rotateX(Math.PI/180* 90)
-                //     this.cube.back.updateMatrix()
-                //     this.pattern3D.add(this.cube.back)
-                // }
-
-                // if (surfaceSide === "left") {
-                //     _.remove(this.pattern3D.children, childObject => {
-                //         if (childObject.name == "face-left") {
-                //             removeObject(this.cube.left)
-                //             removeObject(childObject)
-                //             return true
-                //         }
-                //     })
-                //     this.cube.left = mergedObject.clone()
-                //     this.cube.left.material = pattern3D[0].material
-                //     this.cube.left.name = "face-left"
-                //     this.cube.left.rotateX(Math.PI/180* 90)
-                //     this.cube.left.rotateZ(Math.PI/180* 90)
-                //     this.cube.left.position.x += diameter/2
-                //     this.cube.left.position.y += diameter/2 + this.phygital.surfaces.left.height-1
-                //     this.cube.left.updateMatrix()
-                //     this.pattern3D.add(this.cube.left)
-                // }
-
-                // if (surfaceSide === "right") {
-                //     _.remove(this.pattern3D.children, childObject => {
-                //         if (childObject.name == "face-right") {
-                //             removeObject(this.cube.right)
-                //             removeObject(childObject)
-                //             return true
-                //         }
-                //     })
-                //     this.cube.right = mergedObject.clone()
-                //     this.cube.right.material = pattern3D[0].material
-                //     this.cube.right.name = "face-right"
-                //     this.cube.right.rotateY(Math.PI/180* 180)
-                //     this.cube.right.position.x += this.phygital.surfaces.right.width-1 - diameter/2
-                //     this.cube.right.position.y += this.phygital.surfaces.right.height-1 + diameter/2 
-                //     this.cube.right.position.z += this.phygital.surfaces.right.height-1
-
-                //     this.cube.right.rotateX(Math.PI/180* 90)
-                //     this.cube.right.rotateZ(Math.PI/180* 90)
-                //     this.cube.right.updateMatrix()
-                //     this.pattern3D.add(this.cube.right)
-                // }
+        // regenerateSeed() {
+        //     this.phygital.generateSeed()
+        // },
+        update3DModel(side: "top" | "bottom" | "left" | "right" | "front" | "back"){
+            _.remove(this.pattern3D.children, childObject => {
+                if (childObject.name == `face-${side}`) {
+                    removeObject(this.cube[side])
+                    removeObject(childObject)
+                    return true
+                }
             })
-        }
+            
+            this.pattern3D.add(this.phygital.surfaces[side].model3D)
+            if (_.isUndefined(this.pattern3D.update)) {
+                this.pattern3D.update = 0
+            } else {
+                this.pattern3D.update ++
+            }
+
+            this.pattern3D.width = this.phygital.surfaces.top.width
+            this.pattern3D.depth = this.phygital.surfaces.top.height
+            this.pattern3D.height = this.phygital.surfaces.left.height
+        },
+        oppositeSurface(side: "top" | "bottom" | "left" | "right" | "front" | "back") {
+            switch (side) {
+            case "top":
+                return "bottom"
+            case "bottom":
+                return "top"
+            case "left":
+                return "right"
+            case "right":
+                return "left"
+            case "front":
+                return "back"
+            case "back":
+                return "front"
+            }
+        },
+        hash (object) {
+            return objectHash(object)
+        },
     },
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "./../../assets/scss/variables.scss";
 .cube-3d-container {
-    sandbox-view {
-        width: 100%;
-        height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    > * {
+        pointer-events: none;
     }
-}
+    
+    &.__isActive {
+        padding: 64px;
+        > * {
+            pointer-events: visible;
+        }
 
+        .sandbox-view canvas {
+            max-width: calc(100% - 128px);
+            max-height: calc(100% - 128px);
+        }
+    }
+
+    
+
+    .sandbox-view canvas {
+        // position: absolute;
+        max-width: calc(100% - 32px);
+        max-height: calc(100% - 32px);
+    }
+
+}
 </style>

@@ -21,7 +21,7 @@ const view3D  = {
 
         const scene             = new THREE.Scene()
         const camera            = new THREE.PerspectiveCamera( 35, 1, 0.1, 1000 )
-        camera.position.set( 0, 20, 0)
+        camera.position.set( 16, 20, 0)
         camera.lookAt( 0, 0, 0)
 
         const cameraHelper = new THREE.CameraHelper(camera)
@@ -48,20 +48,27 @@ const view3D  = {
 
 
         function animate() {
+            // if mouse down
+
             requestAnimationFrame( animate )
             renderer.render(scene, camera)
         }
         animate()
-
+        let orbitControls = undefined
+        
         if (opts.orbitControls) {
-            new OrbitControls( camera, renderer.domElement )
+            orbitControls = new OrbitControls( camera, renderer.domElement )
         }
 
-        return {
+        const results = {
             scene: scene,
             renderer:renderer,
             camera: camera,
         }
+        if (orbitControls) {
+            results.orbitControls = orbitControls
+        }
+        return results
     },
 }
 

@@ -27,3 +27,4 @@ dist-ssr
 # Other relevant files
 .env
 *.log
+*.ai

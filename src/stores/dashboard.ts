@@ -61,6 +61,11 @@ export const dashboard = defineStore({
             }
             
             const target = event.currentTarget as HTMLElement
+
+            if (target.hasAttribute("disabled")) {
+                return
+            }
+
             if (target.classList.contains("__isActive")) {
                 return
             }
