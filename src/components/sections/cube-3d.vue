@@ -86,12 +86,28 @@ export default defineComponent({
         // },
         update3DModel(side: "top" | "bottom" | "left" | "right" | "front" | "back"){
             _.remove(this.pattern3D.children, childObject => {
+                if (childObject.name == "innerCube") {
+                    removeObject(childObject)
+                    return true
+                }
                 if (childObject.name == `face-${side}`) {
                     removeObject(this.cube[side])
                     removeObject(childObject)
                     return true
                 }
             })
+
+            this.pattern3D.width = this.phygital.surfaces.top.width
+            this.pattern3D.depth = this.phygital.surfaces.top.height
+            this.pattern3D.height = this.phygital.surfaces.left.height
+
+            if (!this.phygital.openCube) {
+                const box = new THREE.BoxGeometry(this.pattern3D.width-1.5, this.pattern3D.height-1.5, this.pattern3D.depth-1.5)
+                const mesh = new THREE.Mesh(box, this.phygital.surfaces.top.model3D.material)
+                mesh.name = "innerCube"
+                mesh.position.set((this.pattern3D.width-1.5)/2, (this.pattern3D.height-1.5)/2 + 1.25, (this.pattern3D.depth-1.5)/2)
+                this.pattern3D.add(mesh)   
+            }
             
             this.pattern3D.add(this.phygital.surfaces[side].model3D)
             if (_.isUndefined(this.pattern3D.update)) {
@@ -100,9 +116,6 @@ export default defineComponent({
                 this.pattern3D.update ++
             }
 
-            this.pattern3D.width = this.phygital.surfaces.top.width
-            this.pattern3D.depth = this.phygital.surfaces.top.height
-            this.pattern3D.height = this.phygital.surfaces.left.height
         },
         oppositeSurface(side: "top" | "bottom" | "left" | "right" | "front" | "back") {
             switch (side) {

@@ -58,7 +58,9 @@ export default defineComponent({
     methods: {
         updateDashboard() {
             this.dashboard.updatePositions()
-            window.dispatchEvent(new Event("resize"))
+            setTimeout(() => {
+                window.dispatchEvent(new Event("resize"))
+            }, 800)
         },
         
     }

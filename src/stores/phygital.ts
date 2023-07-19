@@ -67,6 +67,7 @@ export const phygitalFace = defineStore({
             }
         },
         selectedSurface: "top",
+        openCube: true,
         seed: null as null | string,
         blockSize: 1, // in cm
     }),
@@ -126,6 +127,8 @@ export const phygitalFace = defineStore({
             // mirroringOptionsArray.length = surfaces.length 
 
             _.forEach(surfaces, (surface, index) => {
+
+                // Set mirror options
                 const mirroringOptionValues = ["11"] //first digit is boolean for mirrorX, second digit is boolean for mirrorY
                 if (surface === "left") {
                     mirroringOptionValues.push("10")
@@ -135,6 +138,18 @@ export const phygitalFace = defineStore({
                 }
                 const mirroringOptions = shuffleSeed(mirroringOptionValues, this.seed)
                 const mirroringOption = mirroringOptions[0]
+                
+                
+                // Set starting points
+                const startPoints = []
+                for (let x = 0; x < this.surfaces[surface].width/2; x++) {
+                    for (let y = 0; y < this.surfaces[surface].height/2; y++) {
+                        startPoints.push({x,y})
+                    }
+                }
+                const startPointsFiltered = shuffleSeed(startPoints, this.seed)
+                const startPoint = startPointsFiltered[index % startPointsFiltered.length]
+                
                 const vpgOptions = _.cloneDeep(vpgBaseOptions)
 
                 let seedOffset = 0 as number
@@ -155,6 +170,8 @@ export const phygitalFace = defineStore({
                 vpgOptions.height = this.surfaces[surface].height
                 vpgOptions.algorithm.mirrorX = parseInt(mirroringOption[0], 10)
                 vpgOptions.algorithm.mirrorY = parseInt(mirroringOption[1], 10)
+                vpgOptions.algorithm.startPoint = startPoint
+
                 this.surfaces[surface].polylines = Algorithm(vpgOptions).polylines
                 this.surfaces[oppositeSurface].polylines = _.cloneDeep(this.surfaces[surface].polylines)
                 
