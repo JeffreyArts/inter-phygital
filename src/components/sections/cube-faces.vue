@@ -219,9 +219,9 @@ export default defineComponent({
         right: 0;
         top: 0;
         bottom: 0;
-        background-image: url("/images/bg-pattern1.svg");
+        background-image: url("/images/bg-pattern2.svg");
         background-repeat: repeat;
-        background-size: 72px;
+        background-size: 20%;
         opacity: 0;
     }
 
@@ -314,13 +314,20 @@ export default defineComponent({
     &.__isWidth {
         top: -104px;
         width: 100%;
+        
+        .cube-faces-dimensions-value {
+            width: auto;
+            padding-left: 16px;
+            padding-right: 16px;
+        }
     }
     &.__isHeight {
         right: -80px;
         height: 100%;
         flex-flow: column;
         .cube-faces-dimensions-value {
-            // translate: 0 4px;
+            width: 48px;
+            padding: 0;
         }
     }
 }
@@ -344,7 +351,6 @@ export default defineComponent({
     font-size: 32px;
     font-weight: normal;
     height: 48px;
-    width: 48px;
     line-height: 48px;
     text-align: center;
     display: inline-block;

@@ -15,7 +15,13 @@ const view3D  = {
             powerPreference: "low-power",
             antialias: true
         })
-        renderer.setSize( window.innerWidth*.8, window.innerHeight*.8 )
+        // if (window.innerWidth > window.innerHeight) {
+            
+        //     renderer.setSize( window.innerWidth*.8, window.innerHeight*.8 )
+        // } else {
+
+        //     renderer.setSize( window.innerWidth*.8, window.innerHeight*.8 )
+        // }
         // renderer.shadowMapEnabled = true;
         // renderer.shadowMapType = THREE.PCFSoftShadowMap;
 

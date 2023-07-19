@@ -145,8 +145,8 @@ export default defineComponent({
         }
 
         .sandbox-view canvas {
-            max-width: calc(100% - 128px);
-            max-height: calc(100% - 128px);
+            // max-width: calc(100% - 128px);
+            // max-height: calc(100% - 128px);
         }
     }
 
@@ -154,8 +154,8 @@ export default defineComponent({
 
     .sandbox-view canvas {
         // position: absolute;
-        max-width: calc(100% - 32px);
-        max-height: calc(100% - 32px);
+        // max-width: calc(100% - 32px);
+        // max-height: calc(100% - 32px);
     }
 
 }

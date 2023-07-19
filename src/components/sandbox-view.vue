@@ -50,6 +50,9 @@ export default {
 
         this.$el.append( this.renderer.domElement )
         window.addEventListener("resize", this.updateCanvasSize)
+        setTimeout(() => {
+            window.dispatchEvent(new Event("resize"))
+        })
     },
     methods: {
         removeObject(object) {
@@ -70,8 +73,12 @@ export default {
             this.scene.remove(object)
         },
         updateCanvasSize() {
-            this.container.width = this.$el.clientWidth
-            this.container.height = this.$el.clientWidth
+            let size = this.$el.clientWidth
+            if (size < this.$el.clientHeight) {
+                size = this.$el.clientHeight
+            }
+            this.container.width = size
+            this.container.height = size
 
             this.renderer.setSize( this.container.width, this.container.height)
             this.camera.bottom = -this.container.height/this.scale
@@ -94,8 +101,8 @@ export default {
                 this.scene.add(internalDatamodel)
             }
             
-            this.camera.position.set( this.datamodel.width*4, this.datamodel.height*1.6, this.datamodel.depth*4)
-            const target = new THREE.Vector3(this.datamodel.width/4, this.datamodel.height/2, this.datamodel.depth/4)
+            this.camera.position.set( this.datamodel.width*4, this.datamodel.height*1.72, this.datamodel.depth*4)
+            const target = new THREE.Vector3(this.datamodel.width/2-.75, this.datamodel.height/2 + .5, this.datamodel.depth/2-.75)
             this.camera.lookAt( target)
             if (this.orbitControls) {
                 this.orbitControls.target =  target
@@ -110,6 +117,7 @@ export default {
 
 .sandbox-view {
     width: 100%;
+    height: 100%;
     color: #333;
     font-size: 8px;
     display: flex;
