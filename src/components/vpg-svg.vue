@@ -83,7 +83,7 @@ export default defineComponent({
         max-height: 100%;
         
         polyline {
-            stroke: #111;
+            stroke: #333;
             stroke-width: .5;
             stroke-type: solid;
             stroke-linecap: square;

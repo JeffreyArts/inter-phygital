@@ -219,7 +219,7 @@ export default defineComponent({
         right: 0;
         top: 0;
         bottom: 0;
-        background-image: url("/images/bg-pattern2.svg");
+        // background-image: url("/images/bg-pattern2.svg");
         background-repeat: repeat;
         background-size: 20%;
         opacity: 0;

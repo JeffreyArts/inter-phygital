@@ -2,9 +2,9 @@
     <div class="home">
         <dashboard>
             <cube-faces class="section"/>
+            <section></section>
             <cube-config class="section" disabled/>
             <cube3d class="section"/>
-          <section></section>
       </dashboard>
     </div>
 </template>
@@ -72,11 +72,12 @@ export default defineComponent ({
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: #eee; 
         
-        &:nth-child(1) { background-color: #eee; }
-        &:nth-child(2) { background-color: #ddd; opacity: 0.8;}
-        &:nth-child(3) { background-color: #ccc; opacity: .8; }
-        &:nth-child(4) { background-color: #bbb; opacity: .8;}
+        // &:nth-child(1) { background-color: #eee; }
+        // &:nth-child(2) { background-color: #ddd; opacity: 0.8;}
+        // &:nth-child(3) { background-color: #ccc; opacity: .8; }
+        // &:nth-child(4) { background-color: #bbb; opacity: .8;}
   }
 }
 </style>

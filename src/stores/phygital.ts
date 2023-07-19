@@ -192,7 +192,7 @@ export const phygitalFace = defineStore({
                 beamWidth: diameter,
                 beamHeight: diameter,
                 tube: false,
-                color: "#444",
+                color: "#777",
                 tubeThickness: .0125,
             })
             
