@@ -44,6 +44,11 @@ export default defineComponent({
         }
         
     },
+    mounted() {
+        this.width = this.vpgPattern.width
+        this.height = this.vpgPattern.height
+        this.updateSVG()
+    },
     methods: {
         updateSVG() {
             var svgContainer = this.$refs["vpgSVG"] as SVGElement

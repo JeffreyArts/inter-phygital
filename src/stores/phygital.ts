@@ -2,7 +2,8 @@ import { defineStore } from "pinia"
 import shuffleSeed from "@/services/shuffle-seed"
 import { Algorithm } from "visual-pattern-generator"
 import _ from "lodash"
-import gsap from "gsap"
+import { saveAs } from "file-saver"
+import * as exportSTL  from "threejs-export-stl"
 import { CSG } from "three-csg-ts"
 import patternToThreejs from "@/services/pattern-to-threejs.js"
 import * as THREE from "three"
@@ -70,6 +71,7 @@ export const phygitalFace = defineStore({
         openCube: true,
         seed: null as null | string,
         blockSize: 1, // in cm
+        model3D: new THREE.Object3D()
     }),
     actions: {
         generateSeed() {
@@ -279,7 +281,29 @@ export const phygitalFace = defineStore({
             }
 
             this.surfaces[surfaceSide].update3D++
-        }
+        },
+        downloadSTL(filename: string) { 
+            return new Promise((resolve, reject)=> {
+                
+                let mergedObject = this.model3D.children[0]
+                if (!mergedObject) {
+                    console.error("No object available")
+                    return new Error("noObjectAvailable")
+                }
+            
+                for (let i = 0; i < this.model3D.children.length; i++) {
+            
+                    mergedObject.updateMatrix()
+                    mergedObject = CSG.toMesh(CSG.fromMesh(mergedObject).union(CSG.fromMesh(this.model3D.children[i])), mergedObject.matrix)
+                }
+            
+                const buffer = exportSTL.fromMesh(mergedObject)
+                const blob = new Blob([buffer], { type: exportSTL.mimeType })
+
+                saveAs(blob, `${filename}.stl`)
+                return resolve(blob)
+            })
+        },
     },
     getters: {
     }

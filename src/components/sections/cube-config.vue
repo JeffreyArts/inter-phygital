@@ -2,17 +2,19 @@
     <div class="cube-config-container" ref="container">
         <label class="seed-container">
             <span class="seed-value">
+                {{ seed }}
                 <span class="seed-label-container">
                     <AztechUnderline label="seed" :slots="8" />
                 </span>
-                {{ seed }}
             </span>
             
             <icon type="loader" class="seed-button" label="regenerate" @click="regenerateSeed"/>
-            
         </label>
-        
-        <!-- Block size: {{ phygital.blockSize }}cm -->
+
+        <div class="download-container" @click="downloadModel">
+            <icon class="download-icon" type="save"></icon>
+            <label class="download-label">download model</label>
+        </div>
     </div>
 </template>
 
@@ -95,6 +97,9 @@ export default defineComponent({
                     })
                 }
             })
+        },
+        downloadModel() {
+            this.phygital.downloadSTL(this.seed)
         }
     }
 })
@@ -105,6 +110,8 @@ export default defineComponent({
 .cube-config-container {
     position: relative;
     display: flex;
+    flex-flow: column;
+    width: 100%;
     // > * {
     //     pointer-events: none;
     // }
@@ -122,17 +129,13 @@ export default defineComponent({
     gap: 8px;
     color: $black;
     position: relative;
+    justify-content: space-between;
 }
 
 .seed-label-container {
-    position: absolute;
-    bottom: -8px;
-    right: 0;
-    left: 0;
-    font-size: 14px;
-    font-family: Fixedsys;
-    font-weight: normal;
-
+    margin-top: 8px;
+    display: block;
+    
     svg {
         width: 100%;
         position: absolute;
@@ -152,7 +155,7 @@ export default defineComponent({
     font-weight: normal;
 }
 .seed-value {
-    width: 180px;
+    width: 100%;
     text-align: right;
     position: relative;
 }
@@ -194,6 +197,45 @@ export default defineComponent({
         font-size: 10px;
         transition: .24s opacity ease;
     }
+}
+
+.download-container {
+    width: 100%;
+    display: flex;
+    flex-flow: row;
+    gap: 12px;
+    font-size: 14px;
+    justify-content: start;
+    align-items: center;
+    font-family: $accentFont;
+    margin-top: 16px;
+    
+    &:hover {
+        cursor: pointer;
+        .icon-bg {
+            fill: #fff;
+            stroke: #fff;
+        }
+        .download-label {
+            translate: 0 0;
+            scale: 1.1;
+        }
+    }
+    
+    .icon {
+        height: 32px;
+    }
+
+
+    .icon-bg {
+        transition: ease .24s all;
+    }
+}
+
+.download-label {
+    transition: ease .24s all;
+    transform-origin: left center;
+    cursor: pointer;
 }
 
 </style>

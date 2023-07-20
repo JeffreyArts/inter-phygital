@@ -8,12 +8,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import loaderCross from "./../assets/icons/loader.svg?raw"
-import chevronDown from "./../assets/icons/chevron-down.svg?raw"
-import chevronUp from "./../assets/icons/chevron-up.svg?raw"
-import chevronLeft from "./../assets/icons/chevron-left.svg?raw"
-import chevronRight from "./../assets/icons/chevron-right.svg?raw"
-import iconCalendar from "./../assets/icons/calendar.svg?raw"
+import save from "@/assets/icons/save.svg?raw"
+import loaderCross from "@/assets/icons/loader.svg?raw"
+import chevronDown from "@/assets/icons/chevron-down.svg?raw"
+import chevronUp from "@/assets/icons/chevron-up.svg?raw"
+import chevronLeft from "@/assets/icons/chevron-left.svg?raw"
+import chevronRight from "@/assets/icons/chevron-right.svg?raw"
+import iconCalendar from "@/assets/icons/calendar.svg?raw"
 
 export default defineComponent({
     name: "icon",
@@ -30,6 +31,7 @@ export default defineComponent({
     data: () => {
         return {
             iconList: {
+                save: save,
                 loader: loaderCross,
                 arrowDown: chevronDown,
                 chevronDown: chevronDown,
@@ -54,7 +56,9 @@ export default defineComponent({
     justify-content: center;
     flex-direction: column;
     text-decoration: none;
-
+    .icon-bg {
+        fill: transparent;   
+    }
     .icon-svg {
         display: inline-block;
         height: 100%;

@@ -9,8 +9,6 @@
 import { defineComponent } from "vue"
 import Phygital from "@/stores/phygital"
 import * as THREE from "three"
-import { CSG } from "three-csg-ts"
-import patternToThreejs from "@/services/pattern-to-threejs.js"
 import objectHash from "object-hash"
 import SandboxView from "@/components/sandbox-view.vue"
 import _ from "lodash"
@@ -78,7 +76,14 @@ export default defineComponent({
         "phygital.surfaces.back.update3D":      { handler() { this.update3DModel("back") } },
     },
     mounted() {
-        // this.create3DPattern()
+        setTimeout(() => {
+            this.update3DModel("top")
+            this.update3DModel("bottom")
+            this.update3DModel("left")
+            this.update3DModel("right")
+            this.update3DModel("front")
+            this.update3DModel("back")
+        })
     },
     methods: {
         // regenerateSeed() {
@@ -97,6 +102,7 @@ export default defineComponent({
                 }
             })
 
+            this.pattern3D.name = Math.floor(Math.random()*1000)
             this.pattern3D.width = this.phygital.surfaces.top.width
             this.pattern3D.depth = this.phygital.surfaces.top.height
             this.pattern3D.height = this.phygital.surfaces.left.height
@@ -109,12 +115,14 @@ export default defineComponent({
                 this.pattern3D.add(mesh)   
             }
             
-            this.pattern3D.add(this.phygital.surfaces[side].model3D)
+            this.pattern3D.add(_.cloneDeep(this.phygital.surfaces[side].model3D))
             if (_.isUndefined(this.pattern3D.update)) {
                 this.pattern3D.update = 0
             } else {
                 this.pattern3D.update ++
             }
+
+            this.phygital.model3D = _.cloneDeep(this.pattern3D)
 
         },
         oppositeSurface(side: "top" | "bottom" | "left" | "right" | "front" | "back") {
@@ -141,29 +149,29 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import "./../../assets/scss/variables.scss";
+@import "@/assets/scss/variables.scss";
+.main {
+    .cube-3d-container {
+        padding: 0;
+        > * {
+            pointer-events: visible;
+        }
+    }
+}
+
+
+
 .cube-3d-container {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 16px;
+    height: 100%;
     > * {
         pointer-events: none;
     }
     
-    &.__isActive {
-        padding: 64px;
-        > * {
-            pointer-events: visible;
-        }
-
-        .sandbox-view canvas {
-            // max-width: calc(100% - 128px);
-            // max-height: calc(100% - 128px);
-        }
-    }
-
-    
+        
 
     .sandbox-view canvas {
         // position: absolute;

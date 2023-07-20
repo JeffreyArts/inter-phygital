@@ -14,6 +14,7 @@
     "axios": "^1.4.0",
     "dayjs": "^1.11.7",
     "events": "^3.3.0",
+    "file-saver": "^2.0.5",
     "gsap": "^3.11.5",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
@@ -25,6 +26,7 @@
     "socket.io-client": "^4.5.4",
     "three": "^0.154.0",
     "three-csg-ts": "^3.1.13",
+    "threejs-export-stl": "^0.0.4",
     "visual-pattern-generator": "^1.2.7",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"

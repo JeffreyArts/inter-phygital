@@ -11,7 +11,7 @@ export const dashboard = defineStore({
         orientation: "portrait" as "portrait" | "landscape",
         layoutType: "A",
         inTransition: false,
-        activeIndex: null as null | number,
+        activeIndex: 0 as null | number,
         activeElement: null as null | HTMLElement,
         animationDuration: .8,
         animationEasing: "elastic.out(1.1, 0.9)",
@@ -39,15 +39,16 @@ export const dashboard = defineStore({
                 return
             } 
             
-            _.forEach(this.elements, (element, index) => {
-                element.removeEventListener("click",this.focusElement)
-                element.addEventListener("click", this.focusElement)
-            })
+            // _.forEach(this.elements, (element, index) => {
+            //     element.removeEventListener("click",this.focusElement)
+            //     element.addEventListener("click", this.focusElement)
+            // })
                 
             
             if (this.elements.length == 2) {
                 this.update2ElementsDashboard(this.layoutType)
             }
+
             if (this.elements.length == 3) {
                 this.update3ElementsDashboard(this.layoutType)
             }
@@ -94,7 +95,7 @@ export const dashboard = defineStore({
 
             const positions = _.map(this.elements, (el, index) => {
 
-                const size = 128
+                const size = 140*2
                 const position = {
                     width:  0,
                     height: 0,
@@ -103,6 +104,7 @@ export const dashboard = defineStore({
                     unit: "px",
                     element: el,
                 } as DashboardPosition
+
                 switch (index) {
                 case 0:
                     position.top    = this.orientation == "portrait" ? 0 : 0

@@ -210,20 +210,7 @@ export default defineComponent({
     justify-items: center;
     align-items: center;
     position: relative;
-    &:before {
-        transition:.24 ease opacity;
-        pointer-events: none;
-        position: absolute;
-        content: "";
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        // background-image: url("/images/bg-pattern2.svg");
-        background-repeat: repeat;
-        background-size: 20%;
-        opacity: 0;
-    }
+    
 
     .vpg-svg {
         justify-content: center;
@@ -234,25 +221,25 @@ export default defineComponent({
         height: 100%;
     }
 
-    &.__isActive {
-        .cube-face-selection-container {
-            display: flex;
-        }
+    // &.__isActive {
+    //     .cube-face-selection-container {
+    //         display: flex;
+    //     }
 
-        .cube-faces-dimensions {
-            opacity: 1;
-            pointer-events: visible;
-        }
+    //     .cube-faces-dimensions {
+    //         opacity: 1;
+    //         pointer-events: visible;
+    //     }
         
-        .cube-faces-svg-container {
-            margin: 120px 120px calc(120px - 48px) 120px;
-            height: calc(100% - 120px * 2 - 48px);
-            width: calc(100% - 120px * 2);
-        }
-        &:before {
-            opacity: 0.008;
-        }
-    }
+    //     .cube-faces-svg-container {
+    //         margin: 120px 120px calc(120px - 48px) 120px;
+    //         height: calc(100% - 120px * 2 - 48px);
+    //         width: calc(100% - 120px * 2);
+    //     }
+    //     &:before {
+    //         opacity: 0.008;
+    //     }
+    // }
 }
 
 .cube-faces-svg-wrapper {
