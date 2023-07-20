@@ -71,7 +71,8 @@ export const phygitalFace = defineStore({
         openCube: true,
         seed: null as null | string,
         blockSize: 1, // in cm
-        model3D: new THREE.Object3D()
+        model3D: new THREE.Object3D(),
+        updating: 0,
     }),
     actions: {
         generateSeed() {
@@ -281,6 +282,79 @@ export const phygitalFace = defineStore({
             }
 
             this.surfaces[surfaceSide].update3D++
+        },
+        updateSurface(surface: "top" | "bottom" | "left" | "right" |  "front" | "back", value: number) {
+            let oppositeSurface = ""
+            const side1 = {surface: "", dimension: ""}
+            const side2 = {surface: "", dimension: ""}
+
+            // First define opposite surface
+            if (surface == "top") {
+                oppositeSurface = "bottom"
+            } else if (surface == "bottom") {
+                oppositeSurface = "top"
+            } else if (surface == "left") {
+                oppositeSurface = "right"
+            } else if (surface == "right") {
+                oppositeSurface = "left"
+            } else if (surface == "front") {
+                oppositeSurface = "back"
+            } else if (surface == "back") {
+                oppositeSurface = "front"
+            }
+
+            // Than define side surfaces
+            if (surface == "top" || surface == "bottom") {
+                if (dimension == "height") {
+                    side1.surface   = "left"
+                    side1.dimension = "width"
+                    side2.surface   = "right"
+                    side2.dimension = "width"
+                } else {
+                    side1.surface   = "front"
+                    side1.dimension = "width"
+                    side2.surface   = "back"
+                    side2.dimension = "width"
+                }
+            } else if (surface == "left" || surface == "right") {
+                if (dimension == "height") {
+                    side1.surface   = "front"
+                    side1.dimension = "height"
+                    side2.surface   = "back"
+                    side2.dimension = "height"
+                } else {
+                    side1.surface   = "top"
+                    side1.dimension = "height"
+                    side2.surface   = "bottom"
+                    side2.dimension = "height"
+                }
+            } else if (surface == "front" || surface == "back") {
+                if (dimension == "height") {
+                    side1.surface   = "left"
+                    side1.dimension = "height"
+                    side2.surface   = "right"
+                    side2.dimension = "height"
+                } else {
+                    side1.surface   = "top"
+                    side1.dimension = "width"
+                    side2.surface   = "bottom"
+                    side2.dimension = "width"
+                }
+            } 
+
+            
+            this.phygital.surfaces[surface][dimension] = value
+            this.phygital.surfaces[oppositeSurface][dimension]     = this.phygital.surfaces[surface][dimension]
+            this.phygital.surfaces[side1.surface][side1.dimension] = this.phygital.surfaces[surface][dimension]
+            this.phygital.surfaces[side2.surface][side2.dimension] = this.phygital.surfaces[surface][dimension]
+            
+            clearTimeout(this.updating)
+            
+            this.updating = setTimeout(() => {
+                this.phygital.updateSurfaces()
+                this.phygital.update3DSurface(surface)
+                this.phygital.update3DSurface(oppositeSurface)
+            }, 100)
         },
         downloadSTL(filename: string) { 
             return new Promise((resolve, reject)=> {

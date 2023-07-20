@@ -8,12 +8,21 @@
                 </span>
             </span>
             
-            <icon type="loader" class="seed-button" label="regenerate" @click="regenerateSeed"/>
+            <icon type="loader" class="seed-button" label="regenerate" ref="generateButton" @click="regenerateSeed"/>
         </label>
 
         <div class="download-container" @click="downloadModel">
             <icon class="download-icon" type="save"></icon>
             <label class="download-label">download model</label>
+        </div>
+
+        <div class="sizes-container">
+            <aztech-line />
+            <div class="sizes-container-dimensions">
+                <aztech-input-number v-model="width" disabled label="width" unit="cm" @increase="modifyBlockSize" @decrease="modifyBlockSize"/>
+                <aztech-input-number v-model="height" disabled label="height" unit="cm"  @increase="modifyBlockSize" @decrease="modifyBlockSize"/>
+                <aztech-input-number v-model="depth" disabled label="depth" unit="cm"  @increase="modifyBlockSize" @decrease="modifyBlockSize"/>
+            </div>
         </div>
     </div>
 </template>
@@ -23,13 +32,15 @@
 import { defineComponent } from "vue"
 import icon from "@/components/icon.vue"
 import Phygital from "@/stores/phygital"
+import AztechLine from "@/components/aztech/line-1.vue"
 import AztechUnderline from "@/components/aztech/underline-1.vue"
+import AztechInputNumber from "@/components/aztech/input-number.vue"
 import gsap from "gsap"
 
 export default defineComponent({
     name: "cube-faces",
     components: {
-        icon, AztechUnderline
+        icon, AztechUnderline, AztechLine, AztechInputNumber
     },
     props: {
         character: {
@@ -53,13 +64,47 @@ export default defineComponent({
     computed: {
         line() {
             return this.character.repeat(512)
+        },
+        width() {
+            return this.phygital.surfaces.top.width * this.phygital.blockSize
+        },
+        height() {
+            return this.phygital.surfaces.left.height * this.phygital.blockSize
+        },
+        depth() {
+            return this.phygital.surfaces.top.height * this.phygital.blockSize
         }
     },
     mounted() {
         this.phygital.generateSeed()
         this.seed = this.phygital.seed
+
+        this.mountedAnimations()
+        
     },
     methods: {
+        mountedAnimations() {
+            gsap.set(".aztech-underline-1-slot", {
+                opacity: 0,
+                x: 2
+            })
+
+            setTimeout(() => {
+                gsap.to(this.$el.querySelector(".seed-button g"), {
+                    duration: 1.64,
+                    rotate: 1280,
+                    ease: "elastic.inOut(1, 0.4)",
+                })
+
+                gsap.to(".aztech-underline-1-slot", {
+                    duration: .64,
+                    stagger: .02,
+                    opacity: 1,
+                    x:0,
+                    ease: "power2.out",
+                })
+            })
+        },
         regenerateSeed(event:MouseEvent) {
             const currentTarget = event.currentTarget
 
@@ -74,7 +119,7 @@ export default defineComponent({
             this.regenerating = true
             currentTarget.classList.add("__isGenerating")
             const target = currentTarget.querySelector("g")
-            gsap.set(target, {rotate: 0})
+            
             gsap.to(target, {
                 duration: 1.8,
                 rotate: 540,
@@ -93,6 +138,7 @@ export default defineComponent({
                         onComplete: () => {
                             this.regenerating = false
                             currentTarget.classList.remove("__isGenerating")
+                            gsap.set(target, {rotate: 0})
                         }
                     })
                 }
@@ -100,6 +146,9 @@ export default defineComponent({
         },
         downloadModel() {
             this.phygital.downloadSTL(this.seed)
+        },
+        modifyBlockSize(size: number) {
+            this.phygital.blockSize = size/this.phygital.surfaces.top.width 
         }
     }
 })
@@ -111,7 +160,10 @@ export default defineComponent({
     position: relative;
     display: flex;
     flex-flow: column;
+    padding: 0 8px;
+    justify-content: space-between;
     width: 100%;
+    height: 100%;
     // > * {
     //     pointer-events: none;
     // }
@@ -124,6 +176,7 @@ export default defineComponent({
 
 .seed-container {
     font-size: 24px;
+    margin-top: 12px;
     font-family: $accentFont;
     display: flex;
     gap: 8px;
@@ -208,7 +261,6 @@ export default defineComponent({
     justify-content: start;
     align-items: center;
     font-family: $accentFont;
-    margin-top: 16px;
     
     &:hover {
         cursor: pointer;
@@ -236,6 +288,17 @@ export default defineComponent({
     transition: ease .24s all;
     transform-origin: left center;
     cursor: pointer;
+}
+
+.sizes-container {
+    padding-right: 14px;
+}
+
+.sizes-container-dimensions {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    align-items:flex-end;
 }
 
 </style>

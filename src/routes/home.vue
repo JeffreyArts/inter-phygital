@@ -11,7 +11,7 @@
                 <section ratio="1x1" @click="select('cube-faces')">
                     <main-cube-faces/>
                 </section>
-                <section ratio="2x1">
+                <section ratio="4x1">
                     <cube-config />
                 </section>
                 <section ratio="1x1" @click="select('cube-3d')">
@@ -93,6 +93,10 @@ export default defineComponent ({
         }
         &[ratio="2x1"] {
             aspect-ratio: 2 / 1;
+            width: 100%;
+        }
+        &[ratio="3x1"] {
+            aspect-ratio: 3 / 1;
             width: 100%;
         }
         &[ratio="4x1"] {
