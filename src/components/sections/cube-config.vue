@@ -3,16 +3,7 @@
         <label class="seed-container">
             <span class="seed-value">
                 <span class="seed-label-container">
-                    <strong class="seed-label">
-                        seed
-                    </strong>
-                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 124.8 4.09" style="enable-background:new 0 0 124.8 4.09;" xml:space="preserve">
-                        <polygon points="121.08,4.34 60.7,4.34 56.86,0.5 0,0.5 0,0 57.06,0 60.9,3.84 120.87,3.84 124.42,0.29 124.78,0.64 "/>
-                        <g>
-                            <path d="M33.6,0.25h1.92l-0.01,0.01l1.93,1.91h0.64l0.64,0.64v1.28H36.8l-3.2-3.2V0.25L33.6,0.25z M0,0.25h1.92 L1.91,0.25l1.93,1.91h0.64l0.64,0.64v1.28H3.2L0,0.89V0.25L0,0.25z M4.8,0.25h1.92L6.71,0.25l1.92,1.91h0.64l0.64,0.64v1.28H8 l-3.2-3.2V0.25L4.8,0.25z M9.6,0.25h1.92l-0.01,0.01l1.93,1.91h0.64l0.64,0.64v1.28H12.8l-3.2-3.2V0.25L9.6,0.25z M14.4,0.25h1.92 l-0.01,0.01l1.92,1.91h0.64l0.64,0.64v1.28H17.6l-3.2-3.2V0.25L14.4,0.25z M19.2,0.25h1.92l-0.01,0.01l1.93,1.91h0.64l0.64,0.64 v1.28H22.4l-3.2-3.2V0.25L19.2,0.25z M24,0.25h1.92l-0.01,0.01l1.93,1.91h0.64l0.64,0.64v1.28H27.2L24,0.89V0.25L24,0.25z  M28.8,0.25h1.92l-0.01,0.01l1.93,1.91h0.64l0.64,0.64v1.28H32l-3.2-3.2V0.25L28.8,0.25z M38.4,0.25h1.92l-0.01,0.01l1.93,1.91 h0.64l0.64,0.64v1.28H41.6l-3.2-3.2V0.25L38.4,0.25z M43.2,0.25h1.92l-0.01,0.01l1.93,1.91h0.64l0.64,0.64v1.28H46.4l-3.2-3.2V0.25 L43.2,0.25z M48,0.25h1.92l-0.01,0.01l1.93,1.91h0.64l0.64,0.64v1.28H51.2L48,0.89V0.25L48,0.25z M52.8,0.25h1.92l-0.01,0.01 l1.93,1.91h0.64l0.64,0.64v1.28H56l-3.2-3.2V0.25L52.8,0.25z"/>
-                            <polygon points="124.8,0.25 122.88,0.25 122.88,2.17 124.8,2.17 124.8,0.25 	"/>
-                        </g>
-                    </svg>
+                    <AztechUnderline label="seed" :slots="8" />
                 </span>
                 {{ seed }}
             </span>
@@ -30,12 +21,13 @@
 import { defineComponent } from "vue"
 import icon from "@/components/icon.vue"
 import Phygital from "@/stores/phygital"
+import AztechUnderline from "@/components/aztech/underline-1.vue"
 import gsap from "gsap"
 
 export default defineComponent({
     name: "cube-faces",
     components: {
-        icon
+        icon, AztechUnderline
     },
     props: {
         character: {
@@ -134,9 +126,9 @@ export default defineComponent({
 
 .seed-label-container {
     position: absolute;
-    bottom: 0;
+    bottom: -8px;
     right: 0;
-    left: 16px;
+    left: 0;
     font-size: 14px;
     font-family: Fixedsys;
     font-weight: normal;
