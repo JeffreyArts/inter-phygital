@@ -9,7 +9,7 @@ export const dashboard = defineStore({
         elements: [] as HTMLElement[],
         container: null as null | HTMLElement,
         orientation: "portrait" as "portrait" | "landscape",
-        layoutType: "A",
+        activeComponent: "cube-3d" as "cube-3d" | "cube-faces",
         inTransition: false,
         activeIndex: 0 as null | number,
         activeElement: null as null | HTMLElement,
@@ -46,15 +46,9 @@ export const dashboard = defineStore({
                 
             
             if (this.elements.length == 2) {
-                this.update2ElementsDashboard(this.layoutType)
+                this.update2ElementsDashboard()
             }
 
-            if (this.elements.length == 3) {
-                this.update3ElementsDashboard(this.layoutType)
-            }
-            if (this.elements.length == 4) {
-                this.update4ElementsDashboard(this.layoutType)
-            }
         },
         focusElement(event: MouseEvent) {
             if (this.inTransition) {
@@ -83,7 +77,7 @@ export const dashboard = defineStore({
             
             this.updatePositions()
         },
-        update2ElementsDashboard(layoutType = "A" as string) {
+        update2ElementsDashboard() {
 
             if (!this.container)  {
                 console.warn("No dashboard container set, can't update positions")
@@ -146,442 +140,442 @@ export const dashboard = defineStore({
             })
             this.animatePositions(positions)
         },
-        update3ElementsDashboard(layoutType = "A" as string) {
+        // update3ElementsDashboard(layoutType = "A" as string) {
           
-            const positions = _.map(this.elements, (el, index) => {
+        //     const positions = _.map(this.elements, (el, index) => {
 
-                const position = {
-                    width:  0,
-                    height: 0,
-                    left:   0,
-                    top:    0,
-                    unit: "%",
-                    element: el,
-                } as DashboardPosition
+        //         const position = {
+        //             width:  0,
+        //             height: 0,
+        //             left:   0,
+        //             top:    0,
+        //             unit: "%",
+        //             element: el,
+        //         } as DashboardPosition
 
-                if (layoutType == "A") {
-                    switch (index) {
-                    case 0:
-                        position.top    = this.orientation == "portrait" ? 0 : 0
-                        position.left   = this.orientation == "portrait" ? 0 : 0
-                        position.width  = this.orientation == "portrait" ? 100 : 50
-                        position.height = this.orientation == "portrait" ? 50 : 100
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? 100 : 80
-                            position.height = this.orientation == "portrait" ? 80 : 100
-                        } else if(this.activeIndex == 1) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? 100 : 20
-                            position.height = this.orientation == "portrait" ? 10 : 50
-                        } else if(this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? 0 : 50
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? 50 : 20
-                            position.height = this.orientation == "portrait" ? 20 : 50
-                        }
-                        break
-                    case 1:
-                        position.left   = this.orientation == "portrait" ? 0 : 50
-                        position.top    = this.orientation == "portrait" ? 50 : 0
-                        position.width  = this.orientation == "portrait" ? 100 : 50
-                        position.height = this.orientation == "portrait" ? 50 : 50
+        //         if (layoutType == "A") {
+        //             switch (index) {
+        //             case 0:
+        //                 position.top    = this.orientation == "portrait" ? 0 : 0
+        //                 position.left   = this.orientation == "portrait" ? 0 : 0
+        //                 position.width  = this.orientation == "portrait" ? 100 : 50
+        //                 position.height = this.orientation == "portrait" ? 50 : 100
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? 100 : 80
+        //                     position.height = this.orientation == "portrait" ? 80 : 100
+        //                 } else if(this.activeIndex == 1) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? 100 : 20
+        //                     position.height = this.orientation == "portrait" ? 10 : 50
+        //                 } else if(this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 50
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? 50 : 20
+        //                     position.height = this.orientation == "portrait" ? 20 : 50
+        //                 }
+        //                 break
+        //             case 1:
+        //                 position.left   = this.orientation == "portrait" ? 0 : 50
+        //                 position.top    = this.orientation == "portrait" ? 50 : 0
+        //                 position.width  = this.orientation == "portrait" ? 100 : 50
+        //                 position.height = this.orientation == "portrait" ? 50 : 50
 
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? 80 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 80
-                            position.width  = this.orientation == "portrait" ? 50 : 20
-                            position.height = this.orientation == "portrait" ? 50 : 50
-                        } else if(this.activeIndex == 1) {
-                            position.top    = this.orientation == "portrait" ? 10 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 20
-                            position.width  = this.orientation == "portrait" ? 100 : 80
-                            position.height = this.orientation == "portrait" ? 80 : 100
-                        } else if(this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 50 : 0
-                            position.width  = this.orientation == "portrait" ? 50 : 20
-                            position.height = this.orientation == "portrait" ? 20 : 50
-                        }
-                        break
-                    case 2:
-                        position.top    = this.orientation == "portrait" ? 50 : 50
-                        position.left   = this.orientation == "portrait" ? 50 : 50
-                        position.width  = this.orientation == "portrait" ? 100 : 50
-                        position.height = this.orientation == "portrait" ? 50 : 50
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 80
+        //                     position.width  = this.orientation == "portrait" ? 50 : 20
+        //                     position.height = this.orientation == "portrait" ? 50 : 50
+        //                 } else if(this.activeIndex == 1) {
+        //                     position.top    = this.orientation == "portrait" ? 10 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 20
+        //                     position.width  = this.orientation == "portrait" ? 100 : 80
+        //                     position.height = this.orientation == "portrait" ? 80 : 100
+        //                 } else if(this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 50 : 0
+        //                     position.width  = this.orientation == "portrait" ? 50 : 20
+        //                     position.height = this.orientation == "portrait" ? 20 : 50
+        //                 }
+        //                 break
+        //             case 2:
+        //                 position.top    = this.orientation == "portrait" ? 50 : 50
+        //                 position.left   = this.orientation == "portrait" ? 50 : 50
+        //                 position.width  = this.orientation == "portrait" ? 100 : 50
+        //                 position.height = this.orientation == "portrait" ? 50 : 50
 
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? 80 : 50
-                            position.left   = this.orientation == "portrait" ? 50 : 80
-                            position.width  = this.orientation == "portrait" ? 100 : 20
-                            position.height = this.orientation == "portrait" ? 80 : 50
-                        } else if(this.activeIndex == 1) {
-                            position.top    = this.orientation == "portrait" ? 90 : 50
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? 100 : 20
-                            position.height = this.orientation == "portrait" ? 10 : 50
-                        }  else if(this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? 20 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 20
-                            position.width  = this.orientation == "portrait" ? 100 : 80
-                            position.height = this.orientation == "portrait" ? 80 : 100
-                        } 
-                        break
-                    }
-                }
-
-
-
-                if (layoutType == "B") {
-                    const size = 100/3
-                    switch (index) {
-                    case 0:
-                        position.top    = this.orientation == "portrait" ? 0 : 0
-                        position.left   = this.orientation == "portrait" ? 0 : 0
-                        position.width  = this.orientation == "portrait" ? 100 : size
-                        position.height = this.orientation == "portrait" ? size : 100
-
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? 100 : size*2.4
-                            position.height = this.orientation == "portrait" ? 80 : 100
-                        } else if (this.activeIndex == 1) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? 100 : size*0.3
-                            position.height = this.orientation == "portrait" ? size*0.3 : 100
-                        } else if (this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? 100 : size*0.3
-                            position.height = this.orientation == "portrait" ? size*0.3 : 100
-                        }
-                        break
-                    case 1:
-                        position.top    = this.orientation == "portrait" ? size : 0
-                        position.left   = this.orientation == "portrait" ? 0 : size
-                        position.width  = this.orientation == "portrait" ? 100 : size
-                        position.height = this.orientation == "portrait" ? size : 100
-
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? 80 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : size*2.4
-                            position.width  = this.orientation == "portrait" ? 100 : size*0.3
-                            position.height = this.orientation == "portrait" ? 10 : 100
-                        } else if (this.activeIndex == 1) {
-                            position.top    = this.orientation == "portrait" ? size*0.3 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : size*0.3
-                            position.width  = this.orientation == "portrait" ? 100 : size*2.4
-                            position.height = this.orientation == "portrait" ? size*2.4 : 100
-                        } else if (this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? size*0.3 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : size*0.3
-                            position.width  = this.orientation == "portrait" ? 100 : size*0.3
-                            position.height = this.orientation == "portrait" ? size*0.3 : 100
-                        }
-                        break
-                    case 2:
-                        position.top    = this.orientation == "portrait" ? size*2 : 0
-                        position.left   = this.orientation == "portrait" ? 0 : size*2
-                        position.width  = this.orientation == "portrait" ? 100 : size
-                        position.height = this.orientation == "portrait" ? size : 100
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : 50
+        //                     position.left   = this.orientation == "portrait" ? 50 : 80
+        //                     position.width  = this.orientation == "portrait" ? 100 : 20
+        //                     position.height = this.orientation == "portrait" ? 80 : 50
+        //                 } else if(this.activeIndex == 1) {
+        //                     position.top    = this.orientation == "portrait" ? 90 : 50
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? 100 : 20
+        //                     position.height = this.orientation == "portrait" ? 10 : 50
+        //                 }  else if(this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? 20 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 20
+        //                     position.width  = this.orientation == "portrait" ? 100 : 80
+        //                     position.height = this.orientation == "portrait" ? 80 : 100
+        //                 } 
+        //                 break
+        //             }
+        //         }
 
 
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? 90 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : size*2.7
-                            position.width  = this.orientation == "portrait" ? 100 : size*0.3
-                            position.height = this.orientation == "portrait" ? 10 : 100
-                        } else if (this.activeIndex == 1) {
-                            position.top    = this.orientation == "portrait" ? size*2.7 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : size*2.7
-                            position.width  = this.orientation == "portrait" ? 100 : size*0.3
-                            position.height = this.orientation == "portrait" ? size*0.3 : 100
-                        } else if (this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? size*0.6 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : size*0.6
-                            position.width  = this.orientation == "portrait" ? 100 : size*2.4
-                            position.height = this.orientation == "portrait" ? size*2.4 : 100
-                        }
-                        break
-                    }
-                }
+
+        //         if (layoutType == "B") {
+        //             const size = 100/3
+        //             switch (index) {
+        //             case 0:
+        //                 position.top    = this.orientation == "portrait" ? 0 : 0
+        //                 position.left   = this.orientation == "portrait" ? 0 : 0
+        //                 position.width  = this.orientation == "portrait" ? 100 : size
+        //                 position.height = this.orientation == "portrait" ? size : 100
+
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? 100 : size*2.4
+        //                     position.height = this.orientation == "portrait" ? 80 : 100
+        //                 } else if (this.activeIndex == 1) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? 100 : size*0.3
+        //                     position.height = this.orientation == "portrait" ? size*0.3 : 100
+        //                 } else if (this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? 100 : size*0.3
+        //                     position.height = this.orientation == "portrait" ? size*0.3 : 100
+        //                 }
+        //                 break
+        //             case 1:
+        //                 position.top    = this.orientation == "portrait" ? size : 0
+        //                 position.left   = this.orientation == "portrait" ? 0 : size
+        //                 position.width  = this.orientation == "portrait" ? 100 : size
+        //                 position.height = this.orientation == "portrait" ? size : 100
+
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : size*2.4
+        //                     position.width  = this.orientation == "portrait" ? 100 : size*0.3
+        //                     position.height = this.orientation == "portrait" ? 10 : 100
+        //                 } else if (this.activeIndex == 1) {
+        //                     position.top    = this.orientation == "portrait" ? size*0.3 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : size*0.3
+        //                     position.width  = this.orientation == "portrait" ? 100 : size*2.4
+        //                     position.height = this.orientation == "portrait" ? size*2.4 : 100
+        //                 } else if (this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? size*0.3 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : size*0.3
+        //                     position.width  = this.orientation == "portrait" ? 100 : size*0.3
+        //                     position.height = this.orientation == "portrait" ? size*0.3 : 100
+        //                 }
+        //                 break
+        //             case 2:
+        //                 position.top    = this.orientation == "portrait" ? size*2 : 0
+        //                 position.left   = this.orientation == "portrait" ? 0 : size*2
+        //                 position.width  = this.orientation == "portrait" ? 100 : size
+        //                 position.height = this.orientation == "portrait" ? size : 100
+
+
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? 90 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : size*2.7
+        //                     position.width  = this.orientation == "portrait" ? 100 : size*0.3
+        //                     position.height = this.orientation == "portrait" ? 10 : 100
+        //                 } else if (this.activeIndex == 1) {
+        //                     position.top    = this.orientation == "portrait" ? size*2.7 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : size*2.7
+        //                     position.width  = this.orientation == "portrait" ? 100 : size*0.3
+        //                     position.height = this.orientation == "portrait" ? size*0.3 : 100
+        //                 } else if (this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? size*0.6 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : size*0.6
+        //                     position.width  = this.orientation == "portrait" ? 100 : size*2.4
+        //                     position.height = this.orientation == "portrait" ? size*2.4 : 100
+        //                 }
+        //                 break
+        //             }
+        //         }
 
                 
-                return position
-            })
-            this.animatePositions(positions)
-        },
-        update4ElementsDashboard(layoutType = "A" as string) {
+        //         return position
+        //     })
+        //     this.animatePositions(positions)
+        // },
+        // update4ElementsDashboard(layoutType = "A" as string) {
 
-            if (!this.container)  {
-                console.warn("No dashboard container set, can't update positions")
-                return
-            }
+        //     if (!this.container)  {
+        //         console.warn("No dashboard container set, can't update positions")
+        //         return
+        //     }
 
-            const width = this.container.clientWidth
-            const height = this.container.clientHeight
+        //     const width = this.container.clientWidth
+        //     const height = this.container.clientHeight
 
-            const positions = _.map(this.elements, (el, index) => {
+        //     const positions = _.map(this.elements, (el, index) => {
 
-                const size =  this.orientation == "portrait" ? width/3 : height/3
-                const position = {
-                    width:  0,
-                    height: 0,
-                    left:   0,
-                    top:    0,
-                    unit: "px",
-                    element: el,
-                } as DashboardPosition
+        //         const size =  this.orientation == "portrait" ? width/3 : height/3
+        //         const position = {
+        //             width:  0,
+        //             height: 0,
+        //             left:   0,
+        //             top:    0,
+        //             unit: "px",
+        //             element: el,
+        //         } as DashboardPosition
                 
-                if (layoutType == "A") { 
-                    switch (index) {
-                    case 0:
-                        position.top    = this.orientation == "portrait" ? 0 : 0
-                        position.left   = this.orientation == "portrait" ? 0 : 0
-                        position.width  = this.orientation == "portrait" ? width/2 : width/2
-                        position.height = this.orientation == "portrait" ? height/2 : height/2
+        //         if (layoutType == "A") { 
+        //             switch (index) {
+        //             case 0:
+        //                 position.top    = this.orientation == "portrait" ? 0 : 0
+        //                 position.left   = this.orientation == "portrait" ? 0 : 0
+        //                 position.width  = this.orientation == "portrait" ? width/2 : width/2
+        //                 position.height = this.orientation == "portrait" ? height/2 : height/2
 
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? width : width - size
-                            position.height = this.orientation == "portrait" ? height - size : height
-                        } else if (this.activeIndex == 1 ) {
-                            position.top    = this.orientation == "portrait" ? height - size : 0
-                            position.left   = this.orientation == "portrait" ? 0 : width - size
-                            position.width  = this.orientation == "portrait" ? size : size
-                            position.height = this.orientation == "portrait" ? size : size
-                        } else if (this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? height - size : 0
-                            position.left   = this.orientation == "portrait" ? 0 : width - size
-                            position.width  = this.orientation == "portrait" ? size : size
-                            position.height = this.orientation == "portrait" ? size : size
-                        } else if (this.activeIndex == 3) {
-                            position.top    = this.orientation == "portrait" ? height - size : 0
-                            position.left   = this.orientation == "portrait" ? 0 : width - size
-                            position.width  = this.orientation == "portrait" ? size : size
-                            position.height = this.orientation == "portrait" ? size : size
-                        } 
-                        break
-                    case 1:
-                        position.top    = this.orientation == "portrait" ? 0 : 0
-                        position.left   = this.orientation == "portrait" ? width/2 : width/2
-                        position.width  = this.orientation == "portrait" ? width/2 : width/2
-                        position.height = this.orientation == "portrait" ? height/2 : height/2
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? width : width - size
+        //                     position.height = this.orientation == "portrait" ? height - size : height
+        //                 } else if (this.activeIndex == 1 ) {
+        //                     position.top    = this.orientation == "portrait" ? height - size : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : width - size
+        //                     position.width  = this.orientation == "portrait" ? size : size
+        //                     position.height = this.orientation == "portrait" ? size : size
+        //                 } else if (this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? height - size : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : width - size
+        //                     position.width  = this.orientation == "portrait" ? size : size
+        //                     position.height = this.orientation == "portrait" ? size : size
+        //                 } else if (this.activeIndex == 3) {
+        //                     position.top    = this.orientation == "portrait" ? height - size : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : width - size
+        //                     position.width  = this.orientation == "portrait" ? size : size
+        //                     position.height = this.orientation == "portrait" ? size : size
+        //                 } 
+        //                 break
+        //             case 1:
+        //                 position.top    = this.orientation == "portrait" ? 0 : 0
+        //                 position.left   = this.orientation == "portrait" ? width/2 : width/2
+        //                 position.width  = this.orientation == "portrait" ? width/2 : width/2
+        //                 position.height = this.orientation == "portrait" ? height/2 : height/2
 
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? height - size : 0
-                            position.left   = this.orientation == "portrait" ? 0 : width - size
-                            position.width  = this.orientation == "portrait" ? size : size
-                            position.height = this.orientation == "portrait" ? size : size
-                        } else if (this.activeIndex == 1) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? width : width - size
-                            position.height = this.orientation == "portrait" ? height - size : height
-                        } else if (this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? height - size : size
-                            position.left   = this.orientation == "portrait" ? size : width - size
-                            position.width  = this.orientation == "portrait" ? size : size
-                            position.height = this.orientation == "portrait" ? size : size
-                        } else if (this.activeIndex == 3) {
-                            position.top    = this.orientation == "portrait" ? height - size : size
-                            position.left   = this.orientation == "portrait" ? size : width - size
-                            position.width  = this.orientation == "portrait" ? size : size
-                            position.height = this.orientation == "portrait" ? size : size
-                        } 
-                        break
-                    case 2:
-                        position.top    = this.orientation == "portrait" ? height/2 : height/2
-                        position.left   = this.orientation == "portrait" ? 0 : 0
-                        position.width  = this.orientation == "portrait" ? width/2 : width/2
-                        position.height = this.orientation == "portrait" ? height/2 : height/2
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? height - size : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : width - size
+        //                     position.width  = this.orientation == "portrait" ? size : size
+        //                     position.height = this.orientation == "portrait" ? size : size
+        //                 } else if (this.activeIndex == 1) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? width : width - size
+        //                     position.height = this.orientation == "portrait" ? height - size : height
+        //                 } else if (this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? height - size : size
+        //                     position.left   = this.orientation == "portrait" ? size : width - size
+        //                     position.width  = this.orientation == "portrait" ? size : size
+        //                     position.height = this.orientation == "portrait" ? size : size
+        //                 } else if (this.activeIndex == 3) {
+        //                     position.top    = this.orientation == "portrait" ? height - size : size
+        //                     position.left   = this.orientation == "portrait" ? size : width - size
+        //                     position.width  = this.orientation == "portrait" ? size : size
+        //                     position.height = this.orientation == "portrait" ? size : size
+        //                 } 
+        //                 break
+        //             case 2:
+        //                 position.top    = this.orientation == "portrait" ? height/2 : height/2
+        //                 position.left   = this.orientation == "portrait" ? 0 : 0
+        //                 position.width  = this.orientation == "portrait" ? width/2 : width/2
+        //                 position.height = this.orientation == "portrait" ? height/2 : height/2
 
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? height - size : size
-                            position.left   = this.orientation == "portrait" ? size : width - size
-                            position.width  = this.orientation == "portrait" ? size : size
-                            position.height = this.orientation == "portrait" ? size : size
-                        } else if (this.activeIndex == 1) {
-                            position.top    = this.orientation == "portrait" ? height - size : size
-                            position.left   = this.orientation == "portrait" ? size : width - size
-                            position.width  = this.orientation == "portrait" ? size : size
-                            position.height = this.orientation == "portrait" ? size : size
-                        } else if (this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? width : width - size
-                            position.height = this.orientation == "portrait" ? height - size : height
-                        } else if (this.activeIndex == 3) {
-                            position.top    = this.orientation == "portrait" ? height - size : size*2
-                            position.left   = this.orientation == "portrait" ? size*2 : width - size
-                            position.width  = this.orientation == "portrait" ? size : size
-                            position.height = this.orientation == "portrait" ? size : size
-                        } 
-                        break
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? height - size : size
+        //                     position.left   = this.orientation == "portrait" ? size : width - size
+        //                     position.width  = this.orientation == "portrait" ? size : size
+        //                     position.height = this.orientation == "portrait" ? size : size
+        //                 } else if (this.activeIndex == 1) {
+        //                     position.top    = this.orientation == "portrait" ? height - size : size
+        //                     position.left   = this.orientation == "portrait" ? size : width - size
+        //                     position.width  = this.orientation == "portrait" ? size : size
+        //                     position.height = this.orientation == "portrait" ? size : size
+        //                 } else if (this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? width : width - size
+        //                     position.height = this.orientation == "portrait" ? height - size : height
+        //                 } else if (this.activeIndex == 3) {
+        //                     position.top    = this.orientation == "portrait" ? height - size : size*2
+        //                     position.left   = this.orientation == "portrait" ? size*2 : width - size
+        //                     position.width  = this.orientation == "portrait" ? size : size
+        //                     position.height = this.orientation == "portrait" ? size : size
+        //                 } 
+        //                 break
                         
-                    case 3:
-                        position.top    = this.orientation == "portrait" ? height/2  : height/2 
-                        position.left   = this.orientation == "portrait" ? width/2 : width/2
-                        position.width  = this.orientation == "portrait" ? width/2 : width/2
-                        position.height = this.orientation == "portrait" ? height/2 : height/2
+        //             case 3:
+        //                 position.top    = this.orientation == "portrait" ? height/2  : height/2 
+        //                 position.left   = this.orientation == "portrait" ? width/2 : width/2
+        //                 position.width  = this.orientation == "portrait" ? width/2 : width/2
+        //                 position.height = this.orientation == "portrait" ? height/2 : height/2
 
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? height - size : size*2
-                            position.left   = this.orientation == "portrait" ? size*2 : width - size
-                            position.width  = this.orientation == "portrait" ? size : size
-                            position.height = this.orientation == "portrait" ? size : size
-                        } else if (this.activeIndex == 1) {
-                            position.top    = this.orientation == "portrait" ? height - size : size*2
-                            position.left   = this.orientation == "portrait" ? size*2 : width - size
-                            position.width  = this.orientation == "portrait" ? size : size
-                            position.height = this.orientation == "portrait" ? size : size
-                        } else if (this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? height - size : size*2
-                            position.left   = this.orientation == "portrait" ? size*2 : width - size
-                            position.width  = this.orientation == "portrait" ? size : size
-                            position.height = this.orientation == "portrait" ? size : size
-                        }  else if (this.activeIndex == 3) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? width : width - size
-                            position.height = this.orientation == "portrait" ? height - size : height
-                        } 
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? height - size : size*2
+        //                     position.left   = this.orientation == "portrait" ? size*2 : width - size
+        //                     position.width  = this.orientation == "portrait" ? size : size
+        //                     position.height = this.orientation == "portrait" ? size : size
+        //                 } else if (this.activeIndex == 1) {
+        //                     position.top    = this.orientation == "portrait" ? height - size : size*2
+        //                     position.left   = this.orientation == "portrait" ? size*2 : width - size
+        //                     position.width  = this.orientation == "portrait" ? size : size
+        //                     position.height = this.orientation == "portrait" ? size : size
+        //                 } else if (this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? height - size : size*2
+        //                     position.left   = this.orientation == "portrait" ? size*2 : width - size
+        //                     position.width  = this.orientation == "portrait" ? size : size
+        //                     position.height = this.orientation == "portrait" ? size : size
+        //                 }  else if (this.activeIndex == 3) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? width : width - size
+        //                     position.height = this.orientation == "portrait" ? height - size : height
+        //                 } 
 
-                        break
-                    }
-                }
+        //                 break
+        //             }
+        //         }
 
 
-                if (layoutType == "B") { 
-                    const size = 100/3
-                    switch (index) {
-                    case 0:
-                        position.top    = this.orientation == "portrait" ? 0 : 0
-                        position.left   = this.orientation == "portrait" ? 0 : 0
-                        position.width  = this.orientation == "portrait" ? 100 : 60
-                        position.height = this.orientation == "portrait" ? 60 : 100
+        //         if (layoutType == "B") { 
+        //             const size = 100/3
+        //             switch (index) {
+        //             case 0:
+        //                 position.top    = this.orientation == "portrait" ? 0 : 0
+        //                 position.left   = this.orientation == "portrait" ? 0 : 0
+        //                 position.width  = this.orientation == "portrait" ? 100 : 60
+        //                 position.height = this.orientation == "portrait" ? 60 : 100
 
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? 100 : 80
-                            position.height = this.orientation == "portrait" ? 80 : 100
-                        } else if (this.activeIndex == 1 ) {
-                            position.top    = this.orientation == "portrait" ? 80 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 60
-                            position.width  = this.orientation == "portrait" ? size : 40
-                            position.height = this.orientation == "portrait" ? 20 : size
-                        } else if (this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? 80 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 60
-                            position.width  = this.orientation == "portrait" ? size : 40
-                            position.height = this.orientation == "portrait" ? 20 : size
-                        } else if (this.activeIndex == 3) {
-                            position.top    = this.orientation == "portrait" ? 80 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 60
-                            position.width  = this.orientation == "portrait" ? size : 40
-                            position.height = this.orientation == "portrait" ? 20 : size
-                        } 
-                        break
-                    case 1:
-                        position.top    = this.orientation == "portrait" ? 60 : 0
-                        position.left   = this.orientation == "portrait" ? 0 : 60
-                        position.width  = this.orientation == "portrait" ? size : 40
-                        position.height = this.orientation == "portrait" ? 40 : size
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? 100 : 80
+        //                     position.height = this.orientation == "portrait" ? 80 : 100
+        //                 } else if (this.activeIndex == 1 ) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 60
+        //                     position.width  = this.orientation == "portrait" ? size : 40
+        //                     position.height = this.orientation == "portrait" ? 20 : size
+        //                 } else if (this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 60
+        //                     position.width  = this.orientation == "portrait" ? size : 40
+        //                     position.height = this.orientation == "portrait" ? 20 : size
+        //                 } else if (this.activeIndex == 3) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 60
+        //                     position.width  = this.orientation == "portrait" ? size : 40
+        //                     position.height = this.orientation == "portrait" ? 20 : size
+        //                 } 
+        //                 break
+        //             case 1:
+        //                 position.top    = this.orientation == "portrait" ? 60 : 0
+        //                 position.left   = this.orientation == "portrait" ? 0 : 60
+        //                 position.width  = this.orientation == "portrait" ? size : 40
+        //                 position.height = this.orientation == "portrait" ? 40 : size
 
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? 80 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 60
-                            position.width  = this.orientation == "portrait" ? size : 40
-                            position.height = this.orientation == "portrait" ? 20 : size
-                        } else if (this.activeIndex == 1) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? 100 : 60
-                            position.height = this.orientation == "portrait" ? 80 : 100
-                        } else if (this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? 80 : size
-                            position.left   = this.orientation == "portrait" ? size : 60
-                            position.width  = this.orientation == "portrait" ? size : 40
-                            position.height = this.orientation == "portrait" ? 20 : size
-                        } else if (this.activeIndex == 3) {
-                            position.top    = this.orientation == "portrait" ? 80 : size
-                            position.left   = this.orientation == "portrait" ? size : 60
-                            position.width  = this.orientation == "portrait" ? size : 40
-                            position.height = this.orientation == "portrait" ? 20 : size
-                        } 
-                        break
-                    case 2:
-                        position.top    = this.orientation == "portrait" ? 60 : size
-                        position.left   = this.orientation == "portrait" ? size : 60
-                        position.width  = this.orientation == "portrait" ? size : 40
-                        position.height = this.orientation == "portrait" ? 40 : size
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 60
+        //                     position.width  = this.orientation == "portrait" ? size : 40
+        //                     position.height = this.orientation == "portrait" ? 20 : size
+        //                 } else if (this.activeIndex == 1) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? 100 : 60
+        //                     position.height = this.orientation == "portrait" ? 80 : 100
+        //                 } else if (this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : size
+        //                     position.left   = this.orientation == "portrait" ? size : 60
+        //                     position.width  = this.orientation == "portrait" ? size : 40
+        //                     position.height = this.orientation == "portrait" ? 20 : size
+        //                 } else if (this.activeIndex == 3) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : size
+        //                     position.left   = this.orientation == "portrait" ? size : 60
+        //                     position.width  = this.orientation == "portrait" ? size : 40
+        //                     position.height = this.orientation == "portrait" ? 20 : size
+        //                 } 
+        //                 break
+        //             case 2:
+        //                 position.top    = this.orientation == "portrait" ? 60 : size
+        //                 position.left   = this.orientation == "portrait" ? size : 60
+        //                 position.width  = this.orientation == "portrait" ? size : 40
+        //                 position.height = this.orientation == "portrait" ? 40 : size
 
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? 80 : size
-                            position.left   = this.orientation == "portrait" ? size : 60
-                            position.width  = this.orientation == "portrait" ? size : 40
-                            position.height = this.orientation == "portrait" ? 20 : size
-                        } else if (this.activeIndex == 1) {
-                            position.top    = this.orientation == "portrait" ? 80 : size
-                            position.left   = this.orientation == "portrait" ? size : 60
-                            position.width  = this.orientation == "portrait" ? size : 40
-                            position.height = this.orientation == "portrait" ? 20 : size
-                        } else if (this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? 100 : 60
-                            position.height = this.orientation == "portrait" ? 80 : 100
-                        } else if (this.activeIndex == 3) {
-                            position.top    = this.orientation == "portrait" ? 80 : size*2
-                            position.left   = this.orientation == "portrait" ? size*2 : 60
-                            position.width  = this.orientation == "portrait" ? size : 40
-                            position.height = this.orientation == "portrait" ? 20 : size
-                        } 
-                        break
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : size
+        //                     position.left   = this.orientation == "portrait" ? size : 60
+        //                     position.width  = this.orientation == "portrait" ? size : 40
+        //                     position.height = this.orientation == "portrait" ? 20 : size
+        //                 } else if (this.activeIndex == 1) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : size
+        //                     position.left   = this.orientation == "portrait" ? size : 60
+        //                     position.width  = this.orientation == "portrait" ? size : 40
+        //                     position.height = this.orientation == "portrait" ? 20 : size
+        //                 } else if (this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? 100 : 60
+        //                     position.height = this.orientation == "portrait" ? 80 : 100
+        //                 } else if (this.activeIndex == 3) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : size*2
+        //                     position.left   = this.orientation == "portrait" ? size*2 : 60
+        //                     position.width  = this.orientation == "portrait" ? size : 40
+        //                     position.height = this.orientation == "portrait" ? 20 : size
+        //                 } 
+        //                 break
                         
-                    case 3:
-                        position.top    = this.orientation == "portrait" ? 60 : size*2
-                        position.left   = this.orientation == "portrait" ? size*2 : 60
-                        position.width  = this.orientation == "portrait" ? size : 40
-                        position.height = this.orientation == "portrait" ? 40 : size
+        //             case 3:
+        //                 position.top    = this.orientation == "portrait" ? 60 : size*2
+        //                 position.left   = this.orientation == "portrait" ? size*2 : 60
+        //                 position.width  = this.orientation == "portrait" ? size : 40
+        //                 position.height = this.orientation == "portrait" ? 40 : size
 
-                        if (this.activeIndex == 0) {
-                            position.top    = this.orientation == "portrait" ? 80 : size*2
-                            position.left   = this.orientation == "portrait" ? size*2 : 60
-                            position.width  = this.orientation == "portrait" ? size : 40
-                            position.height = this.orientation == "portrait" ? 20 : size
-                        } else if (this.activeIndex == 1) {
-                            position.top    = this.orientation == "portrait" ? 80 : size*2
-                            position.left   = this.orientation == "portrait" ? size*2 : 60
-                            position.width  = this.orientation == "portrait" ? size : 40
-                            position.height = this.orientation == "portrait" ? 20 : size
-                        } else if (this.activeIndex == 2) {
-                            position.top    = this.orientation == "portrait" ? 80 : size*2
-                            position.left   = this.orientation == "portrait" ? size*2 : 60
-                            position.width  = this.orientation == "portrait" ? size : 40
-                            position.height = this.orientation == "portrait" ? 20 : size
-                        }  else if (this.activeIndex == 3) {
-                            position.top    = this.orientation == "portrait" ? 0 : 0
-                            position.left   = this.orientation == "portrait" ? 0 : 0
-                            position.width  = this.orientation == "portrait" ? 100 : 60
-                            position.height = this.orientation == "portrait" ? 80 : 100
-                        } 
+        //                 if (this.activeIndex == 0) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : size*2
+        //                     position.left   = this.orientation == "portrait" ? size*2 : 60
+        //                     position.width  = this.orientation == "portrait" ? size : 40
+        //                     position.height = this.orientation == "portrait" ? 20 : size
+        //                 } else if (this.activeIndex == 1) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : size*2
+        //                     position.left   = this.orientation == "portrait" ? size*2 : 60
+        //                     position.width  = this.orientation == "portrait" ? size : 40
+        //                     position.height = this.orientation == "portrait" ? 20 : size
+        //                 } else if (this.activeIndex == 2) {
+        //                     position.top    = this.orientation == "portrait" ? 80 : size*2
+        //                     position.left   = this.orientation == "portrait" ? size*2 : 60
+        //                     position.width  = this.orientation == "portrait" ? size : 40
+        //                     position.height = this.orientation == "portrait" ? 20 : size
+        //                 }  else if (this.activeIndex == 3) {
+        //                     position.top    = this.orientation == "portrait" ? 0 : 0
+        //                     position.left   = this.orientation == "portrait" ? 0 : 0
+        //                     position.width  = this.orientation == "portrait" ? 100 : 60
+        //                     position.height = this.orientation == "portrait" ? 80 : 100
+        //                 } 
 
-                        break
-                    }
-                }
-                return position
-            })
+        //                 break
+        //             }
+        //         }
+        //         return position
+        //     })
             
-            this.animatePositions(positions)
+        //     this.animatePositions(positions)
 
-        },
+        // },
         clearSelection() {
             this.activeIndex = null
             this.activeElement = null

@@ -97,9 +97,10 @@ export default defineComponent({
                 })
 
                 gsap.to(".aztech-underline-1-slot", {
-                    duration: .64,
+                    duration: .8,
                     stagger: .02,
                     opacity: 1,
+                    delay: .32,
                     x:0,
                     ease: "power2.out",
                 })

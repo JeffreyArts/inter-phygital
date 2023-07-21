@@ -3,22 +3,23 @@
         <dashboard>
             <main class="main __isActive">
                 <section class="main-section">
-                    <cube3d v-if="activeComponent === 'cube-3d'"/>
-                    <main-cube-faces v-if="activeComponent === 'cube-faces'"/>
+                    <section-cube3d v-if="dashboard.activeComponent === 'cube-3d'"/>
+                    <main-cube-faces v-if="dashboard.activeComponent === 'cube-faces'"/>
                 </section>
             </main>
             <aside class="sidebar">
-                <section ratio="1x1" @click="select('cube-faces')">
+                <!-- <section ratio="1x1" @click="select('cube-faces')">
                     <main-cube-faces/>
+                </section> -->
+                <section ratio="2x1">
+                    <section-surfaces/>
                 </section>
                 <section ratio="4x1">
-                    <cube-config />
+                    <section-cube-config />
                 </section>
                 <section ratio="1x1" @click="select('cube-3d')">
-                    <cube3d  />
+                    <section-cube3d  />
                 </section>
-                <!-- <section></section>
-                <cube-config class="section" disabled/> -->
             </aside>
       </dashboard>
     </div>
@@ -29,14 +30,15 @@
 import {defineComponent} from "vue"
 import DashboardStore from "@/stores/dashboard"
 import MainCubeFaces from "@/components/sections/main-cube-faces.vue"
-import CubeConfig from "@/components/sections/cube-config.vue"
-import Cube3d from "@/components/sections/cube-3d.vue"
+import sectionCubeConfig from "@/components/sections/cube-config.vue"
+import sectionCube3d from "@/components/sections/cube-3d.vue"
+import sectionSurfaces from "@/components/sections/surfaces-grid.vue"
 import Dashboard from "@/components/dashboard.vue"
 import _ from "lodash"
 
 export default defineComponent ({ 
     name: "homePage",
-    components: {Dashboard, MainCubeFaces, CubeConfig,Cube3d},
+    components: {Dashboard, MainCubeFaces, sectionCubeConfig,sectionCube3d,sectionSurfaces},
     props: [],
     setup() {
         const dashboard = DashboardStore()
@@ -46,13 +48,11 @@ export default defineComponent ({
     },
     data() {
         return {
-            confirmMessage: "",
-            activeComponent: "cube-3d" as "cube-3d" | "cube-faces",
         }
     },
     methods: {
         select(section: "cube-3d" | "cube-faces") {
-            this.activeComponent = section
+            this.dashboard.activeComponent = section
         },
     },
 })
@@ -80,7 +80,8 @@ export default defineComponent ({
     height: 100%;
     position: relative;
   }
-  section,
+  .sidebar > section,
+  .main > section,
   .section {
         display: flex;
         justify-content: center;

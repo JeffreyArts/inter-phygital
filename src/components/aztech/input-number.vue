@@ -49,7 +49,6 @@ export default defineComponent({
     },
     computed: {
         isDisabled() {
-            console.log(this.disabled)
             return this.disabled
         },
         value() {

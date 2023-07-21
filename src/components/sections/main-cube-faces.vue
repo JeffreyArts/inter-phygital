@@ -93,8 +93,10 @@ export default defineComponent({
         },
         
     },
-    mounted() {
-        
+    watch: {
+        "phygital.selectedSurface"() {
+            this.selectedSurface = this.phygital.selectedSurface
+        }
     },
     methods: {
         updateDimension(event: MouseEvent, dimension: string, operator: string) {

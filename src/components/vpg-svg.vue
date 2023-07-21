@@ -3,7 +3,7 @@ use the .vpg-svg-content for styling the content inside the box. Best way is to 
  -->
 
 <template>
-    <figure class="vpg-svg" ref="vpgSVG"></figure>
+    <figure class="vpg-svg" ref="vpgSVG" />
 </template>
 
 
@@ -81,11 +81,13 @@ export default defineComponent({
 @import "./../assets/scss/variables.scss";
 .vpg-svg {
     margin: 0;
-
+    display: block;
+    
     svg {
         width: 100%;
         max-width: 100%;
         max-height: 100%;
+        display: block;
         
         polyline {
             stroke: #333;
