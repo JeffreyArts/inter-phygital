@@ -4,7 +4,7 @@
             <span class="seed-value">
                 {{ seed }}
                 <span class="seed-label-container">
-                    <AztechUnderline label="seed" :slots="8" />
+                    <AztechUnderline label="seed" :slots="slots" />
                 </span>
             </span>
             
@@ -58,7 +58,8 @@ export default defineComponent({
     data: () => {
         return {
             regenerating: false,
-            seed: "a-61892379"
+            seed: "a-61892379",
+            slots: 8
         }
     },
     computed: {
@@ -121,6 +122,13 @@ export default defineComponent({
             currentTarget.classList.add("__isGenerating")
             const target = currentTarget.querySelector("g")
             
+            const slotsAnimation = gsap.fromTo(this, {
+                slots: 8,
+            },{
+                duration: 6.4,
+                ease: "power2.out",
+                slots: 16,
+            })
             gsap.to(target, {
                 duration: 1.8,
                 rotate: 540,
@@ -137,6 +145,13 @@ export default defineComponent({
                         rotate: 720,
                         ease: "elastic.out(1, .4)",
                         onComplete: () => {
+                            // kill slots animation
+                            slotsAnimation.kill()
+
+                            gsap.to(this, {
+                                slots: 8,
+                                duration: .8,
+                            })
                             this.regenerating = false
                             currentTarget.classList.remove("__isGenerating")
                             gsap.set(target, {rotate: 0})
@@ -257,7 +272,7 @@ export default defineComponent({
     width: 100%;
     display: flex;
     flex-flow: row;
-    gap: 12px;
+    gap: 8px;
     font-size: 14px;
     justify-content: start;
     align-items: center;
@@ -265,9 +280,9 @@ export default defineComponent({
     
     &:hover {
         cursor: pointer;
-        .icon-bg {
-            fill: #fff;
-            stroke: #fff;
+        
+        .icon-save-arrow {
+            animation: hoverSaveIcon .4s ease infinite alternate;
         }
         .download-label {
             translate: 0 0;
@@ -280,7 +295,7 @@ export default defineComponent({
     }
 
 
-    .icon-bg {
+    .icon-save-arrow {
         transition: ease .24s all;
     }
 }
@@ -300,6 +315,16 @@ export default defineComponent({
     flex-flow: row;
     justify-content: space-between;
     align-items:flex-end;
+}
+
+// animation
+@keyframes hoverSaveIcon {
+    0% {
+        translate: 0 -1px;
+    }
+    100% {
+        translate: 0 1px;
+    }
 }
 
 </style>

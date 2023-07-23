@@ -14,7 +14,7 @@
                 <section ratio="2x1">
                     <section-surfaces/>
                 </section>
-                <section ratio="4x1">
+                <section ratio="2x1">
                     <section-cube-config />
                 </section>
                 <section ratio="1x1" @click="select('cube-3d')">
