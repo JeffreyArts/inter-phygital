@@ -283,9 +283,9 @@ export default defineComponent({
 
 .cube-faces-svg-container {
     position: relative;
-    margin: 32px;
-    height: calc(100% - 64px);
-    width: calc(100% - 64px);
+    margin: 0;
+    height: calc(100% - 0px);
+    width: calc(100% - 0px);
 }
 
 .cube-faces-dimensions {

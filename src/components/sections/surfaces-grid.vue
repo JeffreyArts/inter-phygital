@@ -130,7 +130,7 @@ export default defineComponent({
     text-align: center;
 }
 .cube-surfaces-container {
-    padding: 0 16px;
+    padding: 0 8px;
     width: 100%;
 }
 .cube-surfaces-footer {
