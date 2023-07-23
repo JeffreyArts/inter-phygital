@@ -21,7 +21,7 @@
                     <section-cube3d  />
                 </section>
             </aside>
-      </dashboard>
+        </dashboard>
     </div>
 </template>
 
@@ -62,27 +62,30 @@ export default defineComponent ({
 @import "@/assets/scss/variables.scss";
 
 .home {
-  min-height:100%;
-  min-width: 100%;
+    min-height:100%;
+    min-width: 100%;
+    
+    .dashboard {
+        margin: 32px;
+        height: calc(100vh - 64px);
+        width: calc(100vw - 64px);
+        overflow: hidden;
+    }
+    .layout-modifiers {
+        position: absolute;
+        left: 50%;
+        bottom: 32px;
+        transform: translateX(-50%);
+    }
 
-  .dashboard {
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-  }
-  .layout-modifiers {
-      position: absolute;
-      left: 50%;
-      bottom: 32px;
-      transform: translateX(-50%);
-  }
-  .main-section {
-    height: 100%;
-    position: relative;
-  }
-  .sidebar > section,
-  .main > section,
-  .section {
+    .main-section {
+        height: 100%;
+        position: relative;
+    }
+    
+    .sidebar > section,
+    .main > section,
+    .section {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -124,7 +127,7 @@ export default defineComponent ({
         // &:nth-child(2) { background-color: #ddd; opacity: 0.8;}
         // &:nth-child(3) { background-color: #ccc; opacity: .8; }
         // &:nth-child(4) { background-color: #bbb; opacity: .8;}
-  }
+    }
 }
 
 .sidebar {
