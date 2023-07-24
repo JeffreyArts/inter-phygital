@@ -1,0 +1,94 @@
+<template>
+    <div class="aztech-label">
+        <svg class="aztech-label-svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" :viewBox="`0 0 ${widthStartSection + width + widthEndSection} 16`" xml:space="preserve">
+            <polygon points="7.5,16 7.5,16 0,8.62 0,8.62 0,7.38 7.5,0 "/>
+            <rect :x="widthStartSection" y="0" :width="width" height="16"/>
+            <polygon :style="`translate: ${width}px 0`" points="7.5,0 15,7.38 15,7.38 15,8.62 7.5,16 "/>
+        </svg>
+        <span class="aztech-label-content-spacer" ref="content">
+            <slot />
+        </span>
+        <span class="aztech-label-content">
+            <slot />
+        </span>
+    </div>
+</template>
+
+
+<script lang="ts">
+import { defineComponent } from "vue"
+
+
+export default defineComponent({
+    name: "aztech-label",
+    data: () => {
+        return {
+            widthStartSection: 7.5,
+            widthEndSection: 7.5,
+            width: 0
+        }
+    },
+    computed: {
+        // width() {
+        //     const contentElement = this.$refs.content as HTMLElement
+        //     if (!contentElement) return 0
+        //     console.log(this.widthStartSection + this.widthEndSection + contentElement.clientWidth)
+        //     return this.widthStartSection + this.widthEndSection + contentElement.clientWidth
+        // }
+    },
+    mounted() {
+        this.updateLabel()
+        window.addEventListener("resize", this.updateLabel)    
+    },
+    unmounted() {
+        window.removeEventListener("resize", this.updateLabel)
+    },
+    methods: {
+        updateLabel() {
+            const contentElement = this.$refs.content as HTMLElement
+            if (!contentElement) return null
+            console.log(this.widthStartSection + this.widthEndSection + contentElement.clientWidth)
+            this.width = contentElement.clientWidth
+        },
+    }
+})
+</script>
+
+<style lang="scss" scoped>
+@import "@/assets/scss/variables.scss";
+
+.aztech-label-content {
+    display: inline-block;
+    position: relative;
+    z-index: 1;
+    position: absolute;
+    text-align: center;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    line-height: 16px;
+    translate: 0 -1px;
+    font-size: inherit;
+}
+
+.aztech-label {
+    display: inline-block;
+    position: relative;
+    height: 16px;
+    font-size: 14px;
+    color: #fff;
+}
+.aztech-label-content-spacer {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    font-size: inherit;
+    padding: 0 4px;
+}
+
+.aztech-label-svg {
+    fill: $black;
+    height: 16px;
+}
+</style>

@@ -1,9 +1,11 @@
 <template>
     <div class="cube-faces-container" ref="container">
-        
-        <div class="cube-faces-svg-container">
-            <div class="cube-faces-svg-wrapper">
+        <aztech-label class="cube-faces-title">
+            {{ selectedSurface }}
+        </aztech-label>
 
+        <AztechGridCell class="cube-faces-svg-container">
+            <div class="cube-faces-svg-wrapper">
                 <div class="cube-faces-dimensions __isWidth">
                     <span 
                         class="cube-faces-dimensions-button"
@@ -36,7 +38,7 @@
                 </div>
                 <vpg-svg :vpg-pattern="phygital.surfaces[selectedSurface]" v-if="phygital.surfaces[selectedSurface]"/>
             </div>
-        </div>
+        </AztechGridCell>
 
         <div class="cube-face-selection-container">
             <select v-model="selectedSurface" class="cube-faces-selectbox">
@@ -50,6 +52,8 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import Phygital from "@/stores/phygital"
+import AztechGridCell from "@/components/aztech/grid-cell.vue"
+import AztechLabel from "@/components/aztech/label.vue"
 import vpgSvg from "@/components/vpg-svg.vue"
 import Icon from "@/components/icon.vue"
 import gsap from "gsap"
@@ -58,7 +62,7 @@ import gsap from "gsap"
 export default defineComponent({
     name: "cube-faces",
     components: {
-        vpgSvg, Icon
+        vpgSvg, Icon, AztechGridCell, AztechLabel
     },
     props: {
         character: {
@@ -96,7 +100,13 @@ export default defineComponent({
     watch: {
         "phygital.selectedSurface"() {
             this.selectedSurface = this.phygital.selectedSurface
+            setTimeout(() => {
+                window.dispatchEvent(new Event("resize"))
+            })
         }
+    },
+    mounted() {
+        this.selectedSurface = this.phygital.selectedSurface
     },
     methods: {
         updateDimension(event: MouseEvent, dimension: string, operator: string) {
@@ -206,12 +216,16 @@ export default defineComponent({
 @import "./../../assets/scss/variables.scss";
 .cube-faces-container {
     display: flex;
-    flex-flow: column;
     width: 100%;
     height: 100%;
-    justify-items: center;
+    flex-flow: column;
+    justify-content: center;
     align-items: center;
     position: relative;
+    gap: 16px;
+    .aztech-grid-cell-corner {
+        scale: 1.32;
+    }
     
 
     .vpg-svg {
@@ -244,14 +258,32 @@ export default defineComponent({
     // }
 }
 
+.cube-faces-title {
+    &.aztech-label {
+        height: 24px;
+        font-size: 16px;
+    }
+
+    .aztech-label-content {
+        line-height: 24px;
+    }
+    .aztech-label-svg {
+        height: 24px;
+        rect {
+            stroke: $black;
+            stroke-width: 0.25px;
+        }
+    }
+}
+
 .cube-faces-svg-wrapper {
     position: absolute;
     max-width: 100%;
     max-height: 100%;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
+    left: 16px;
+    right: 16px;
+    top: 16px;
+    bottom: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -284,8 +316,11 @@ export default defineComponent({
 .cube-faces-svg-container {
     position: relative;
     margin: 0;
-    height: calc(100% - 0px);
-    width: calc(100% - 0px);
+    width: 100%;
+    height: 100%;
+    max-width: 320px;
+    max-height: 320px;
+    background-color: #fff;
 }
 
 .cube-faces-dimensions {

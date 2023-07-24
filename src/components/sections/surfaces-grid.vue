@@ -2,28 +2,28 @@
     <div class="cube-surfaces-container" ref="container">
         <header class="cube-surfaces-header">
             <span class="cube-surfaces-cell">
-                <span class="cube-surfaces-label" :class="[
+                <aztech-label class="cube-surfaces-label" :class="[
                     (phygital.selectedSurface == 'top') && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == 'top' ? '__isHover': ''
                     ]">
                     top
-                </span>
+                </aztech-label>
             </span>
             <span class="cube-surfaces-cell">
-                <span class="cube-surfaces-label" :class="[
+                <aztech-label class="cube-surfaces-label" :class="[
                     (phygital.selectedSurface == 'front') && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == 'front' ? '__isHover': ''
                     ]">
                     front
-                </span>
+                </aztech-label>
             </span>
             <span class="cube-surfaces-cell">
-                <span class="cube-surfaces-label" :class="[
+                <aztech-label class="cube-surfaces-label" :class="[
                     (phygital.selectedSurface == 'left') && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == 'left' ? '__isHover': ''
                     ]">
                     left
-                </span>
+                </aztech-label>
             </span>
         </header>
         <section class="cube-surfaces-grid">
@@ -43,28 +43,28 @@
         </section>
         <footer class="cube-surfaces-footer">
             <span class="cube-surfaces-cell">
-                <span class="cube-surfaces-label" :class="[
+                <aztech-label class="cube-surfaces-label" :class="[
                     (phygital.selectedSurface == 'bottom') && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == 'bottom' ? '__isHover': ''
                     ]">
                     bottom
-                </span>
+                </aztech-label>
             </span>
             <span class="cube-surfaces-cell">
-                <span class="cube-surfaces-label" :class="[
+                <aztech-label class="cube-surfaces-label" :class="[
                     (phygital.selectedSurface == 'back') && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == 'back' ? '__isHover': ''
                     ]">
                     back
-                </span>
+                </aztech-label>
             </span>
             <span class="cube-surfaces-cell">
-                <span class="cube-surfaces-label" :class="[
+                <aztech-label class="cube-surfaces-label" :class="[
                     (phygital.selectedSurface == 'right') && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == 'right' ? '__isHover': ''
                     ]">
                     right
-                </span>
+                </aztech-label>
             </span>
         </footer>
     </div>
@@ -77,13 +77,14 @@ import { defineComponent } from "vue"
 import Phygital from "@/stores/phygital"
 import Dashboard from "@/stores/dashboard"
 import AztechGridCell from "@/components/aztech/grid-cell.vue"
+import AztechLabel from "@/components/aztech/label.vue"
 import VpgSvg from "@/components/vpg-svg.vue"
 import gsap from "gsap"
 
 export default defineComponent({
     name: "pgygital-surfaces-grid",
     components: {
-        AztechGridCell, VpgSvg
+        AztechGridCell, VpgSvg, AztechLabel
     },
     setup() {
         const phygital = Phygital()
@@ -165,66 +166,23 @@ export default defineComponent({
     }
 }
 .cube-surfaces-label {
-    display: inline-block;
-    position: relative;
-    height: 18px;
-    line-height: 17px;
-    font-weight: normal;
-    font-size:14px;
-    padding-left: 4px;
-    padding-right: 4px;
-    transition: .24s linear;
-    color: #333;
+    &.aztech-label {
+        color: $black;
+        transition: .24s linear;
+        .aztech-label-svg {
+            transition: .24s linear;
+            fill: transparent;
+        }
+    }
 
-    // &.__isHover {
-    //     background-color: #ddd;
-    //     &:after {
-    //         opacity: 1;
-    //         border-left-color: #ddd;
-    //     }
-    //    
-    //     &:before {
-    //         opacity: 1;
-    //         border-right-color: #dedede;
-    //     }
-    // }
 
     &.__isSelected {
-        color: #fff;
-        background-color: #333;
-        &:after,
-        &:before {
-            opacity: 1;
+        &.aztech-label {
+            color: #fff;
+            .aztech-label-svg {
+                fill: $black;
+            }
         }
-        &:after {
-            opacity: 1;
-            border-left-color: #333;
-        }
-        
-        &:before {
-            opacity: 1;
-            border-right-color: #333;
-        }
-    }
-
-    &:after,
-    &:before {
-        content: "";
-        position: absolute;
-        top: 0;
-        width: 0;
-        height: 0;
-        border: 9px solid transparent;
-        opacity: 0;
-        transition: .24s linear;
-    }
-
-    &:after {
-        right: -18px;
-    }
-
-    &:before {
-        left: -18px;
     }
 }
 </style>
