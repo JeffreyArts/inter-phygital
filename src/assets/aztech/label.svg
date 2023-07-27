@@ -5,7 +5,8 @@
 <style type="text/css">
 	.st0{fill-rule:evenodd;clip-rule:evenodd;fill:#010101;}
 </style>
-<polygon class="st0" points="7.5,16 7.5,16 0,8.62 0,8.62 0,7.38 7.5,0 "/>
-<polygon class="st0" points="7.5,0 15,7.38 15,7.38 15,8.62 7.5,16 "/>
-<rect x="7.5" y="0" class="st0" width="0" height="16"/>
+<path class="st0" d="M7.5,16"/>
+<path class="st0" d="M10,16"/>
+<path class="st0" d="M10,0"/>
+<polygon class="st0" points="7.5,16 7.5,16 0,8.62 0,8.62 0,7.38 7.5,0 7.5,0 15,7.38 15,7.38 15,8.62 7.5,16 "/>
 </svg>

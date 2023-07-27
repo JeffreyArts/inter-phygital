@@ -90,7 +90,7 @@ export default defineComponent({
         display: block;
         
         polyline {
-            stroke: #333;
+            stroke: $black;
             stroke-width: .5;
             stroke-type: solid;
             stroke-linecap: square;

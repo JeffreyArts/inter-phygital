@@ -293,7 +293,7 @@ export default defineComponent({
     position: absolute;
     top: 0;
     right: 0;
-    background-color: #222;
+    background-color: $black;
     color: #eee;
     padding: 0;
     font-family: $defaultFont;

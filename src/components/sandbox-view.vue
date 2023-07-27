@@ -114,11 +114,11 @@ export default {
 </script>
 
 <style lang="scss" >
-
+@import "@/assets/scss/variables.scss";
 .sandbox-view {
     width: 100%;
     height: 100%;
-    color: #333;
+    color: $black;
     font-size: 8px;
     display: flex;
     align-items: center;

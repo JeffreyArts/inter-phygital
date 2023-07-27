@@ -123,10 +123,6 @@ export default defineComponent ({
             aspect-ratio: 1/ 2;
             width: 50%;
         }
-        // &:nth-child(1) { background-color: #eee; }
-        // &:nth-child(2) { background-color: #ddd; opacity: 0.8;}
-        // &:nth-child(3) { background-color: #ccc; opacity: .8; }
-        // &:nth-child(4) { background-color: #bbb; opacity: .8;}
     }
 }
 

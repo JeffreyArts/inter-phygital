@@ -231,7 +231,7 @@ export default defineComponent({
 
 .seed-button {
     // display: inline-block;
-    height: 40px;
+    height: 52px;
     translate: 8px 0px;
     cursor: pointer;
 

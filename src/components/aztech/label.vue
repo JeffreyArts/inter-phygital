@@ -1,9 +1,15 @@
 <template>
     <div class="aztech-label">
         <svg class="aztech-label-svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" :viewBox="`0 0 ${widthStartSection + width + widthEndSection} 16`" xml:space="preserve">
-            <polygon points="7.5,16 7.5,16 0,8.62 0,8.62 0,7.38 7.5,0 "/>
-            <rect :x="widthStartSection" y="0" :width="width" height="16"/>
-            <polygon :style="`translate: ${width}px 0`" points="7.5,0 15,7.38 15,7.38 15,8.62 7.5,16 "/>
+            <polygon :points="`
+                   ${widthStartSection},16
+                    0,8.62
+                    0,7.38
+                    ${widthStartSection},0
+                    ${widthStartSection + width},0
+                    ${widthStartSection + width + widthEndSection},7.38
+                    ${widthStartSection + width + widthEndSection},8.62
+                    ${widthStartSection + width },16 `"/>
         </svg>
         <span class="aztech-label-content-spacer" ref="content">
             <slot />
@@ -47,7 +53,6 @@ export default defineComponent({
         updateLabel() {
             const contentElement = this.$refs.content as HTMLElement
             if (!contentElement) return null
-            console.log(this.widthStartSection + this.widthEndSection + contentElement.clientWidth)
             this.width = contentElement.clientWidth
         },
     }

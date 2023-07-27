@@ -56,35 +56,6 @@ export default defineComponent({
             this.hasTop    = !!(topElement    && this.isGridCell(topElement))
             this.hasBottom = !!(bottomElement && this.isGridCell(bottomElement))
 
-            // // Check top left corner
-            // if (hasLeft && !hasTop) {
-            //     corners[0] = "┬"
-            // } else if (hasLeft && hasTop) {
-            //     corners[0] = "┼"
-            // }
-
-            // // Check top right corner
-            // if (hasRight && !hasTop) {
-            //     corners[1] = "┬"
-            // } else if (hasRight && hasTop) {
-            //     corners[1] = "┼"
-            // }
-
-            // // Check bottom right corner
-            // if (hasRight && !hasBottom) {
-            //     corners[2] = "┴"
-            // } else if (hasRight && hasBottom) {
-            //     corners[2] = "┼"
-            // }
-
-            // // Check bottom left corner
-            // if (hasLeft && !hasBottom) {
-            //     corners[3] = "┴"
-            // } else if (hasLeft && hasBottom) {
-            //     corners[3] = "┼"
-            // }
-
-            // this.corners = corners
             return corners
         },
         isGridCell(el: Element | undefined) {
@@ -113,7 +84,7 @@ export default defineComponent({
     align-items: center;
     aspect-ratio: 1 / 1;
     position: relative;
-    border: 1px solid #777;
+    border: 1px solid $dark-grey;
     &.__hasLeft {
         border-left: none;
     }
@@ -144,7 +115,7 @@ export default defineComponent({
         left: -8.5px;
     }
     polygon {
-        fill: #454545;
+        fill: $dark-grey;
     }
 }
 </style>

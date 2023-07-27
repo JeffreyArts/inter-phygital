@@ -73,12 +73,12 @@
     &.ghost {
         border: 1px solid currentColor;
         background-color: transparent;
-        color: $grey;
+        color: $dark-grey;
     }
     
     &:hover {
-        background-color: $grey;
-        border-color: $grey;
+        background-color: $dark-grey2;
+        border-color: $dark-grey2;
         color: $white;
         
         &.ghost {
