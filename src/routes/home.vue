@@ -20,6 +20,9 @@
                 <section ratio="1x1" @click="select('cube-3d')">
                     <section-cube3d  />
                 </section>
+                <section ratio="2x2" v-if="dashboard.activeComponent === 'cube-faces'">
+                    <section-view-edit-button />
+                </section>
             </aside>
         </dashboard>
     </div>
@@ -33,12 +36,13 @@ import MainCubeFaces from "@/components/sections/main-cube-faces.vue"
 import sectionCubeConfig from "@/components/sections/cube-config.vue"
 import sectionCube3d from "@/components/sections/cube-3d.vue"
 import sectionSurfaces from "@/components/sections/surfaces-grid.vue"
+import sectionViewEditButton from "@/components/sections/view-edit-button.vue"
 import Dashboard from "@/components/dashboard.vue"
 import _ from "lodash"
 
 export default defineComponent ({ 
     name: "homePage",
-    components: {Dashboard, MainCubeFaces, sectionCubeConfig,sectionCube3d,sectionSurfaces},
+    components: {Dashboard, MainCubeFaces, sectionCubeConfig, sectionCube3d, sectionSurfaces, sectionViewEditButton},
     props: [],
     setup() {
         const dashboard = DashboardStore()
@@ -128,6 +132,8 @@ export default defineComponent ({
 
 .sidebar {
     display: flex;
-    flex-flow: row wrap
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
 }
 </style>

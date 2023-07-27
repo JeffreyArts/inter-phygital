@@ -14,6 +14,7 @@ export const dashboard = defineStore({
         activeIndex: 0 as null | number,
         activeElement: null as null | HTMLElement,
         animationDuration: .8,
+        cellSize:128,
         animationEasing: "elastic.out(1.1, 0.9)",
     }),
     actions: {
@@ -38,6 +39,12 @@ export const dashboard = defineStore({
             if (this.elements.length <= 1) {
                 return
             } 
+
+            if (this.orientation == "portrait") {
+                this.cellSize = this.container.clientWidth/6
+            } else if (this.orientation == "landscape") {
+                this.cellSize = this.container.clientHeight/6
+            }
             
             // _.forEach(this.elements, (element, index) => {
             //     element.removeEventListener("click",this.focusElement)
@@ -89,7 +96,7 @@ export const dashboard = defineStore({
 
             const positions = _.map(this.elements, (el, index) => {
 
-                const size = 140*2
+                const size = this.cellSize * 2
                 const position = {
                     width:  0,
                     height: 0,

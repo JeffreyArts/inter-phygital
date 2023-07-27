@@ -15,7 +15,7 @@
     "dayjs": "^1.11.7",
     "events": "^3.3.0",
     "file-saver": "^2.0.5",
-    "gsap": "^3.11.5",
+    "gsap": "file:gsap-bonus.tgz",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "normalize.css": "^8.0.1",

@@ -165,7 +165,7 @@ export default defineComponent({
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 8px;
+    // padding: 8px;
     height: 100%;
     > * {
         pointer-events: none;
