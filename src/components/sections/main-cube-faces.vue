@@ -44,9 +44,9 @@ export default defineComponent({
     watch: {
         "phygital.selectedSurface"() {
             this.selectedSurface = this.phygital.selectedSurface
-            setTimeout(() => {
-                window.dispatchEvent(new Event("resize"))
-            })
+            // setTimeout(() => {
+            //     window.dispatchEvent(new Event("resize"))
+            // })
         }
     },
     mounted() {
