@@ -103,13 +103,14 @@ export default defineComponent({
             }
         },
         "vpgPattern.polylines": {
-            handler() {
+            handler(v,v2) {
                 const el = this.$el
                 if (!el) return
-                console.log(objectHash(this.surfacePolylines) === objectHash(this.vpgPattern.polylines))
+
                 const surfacePolylines = _.cloneDeep(this.vpgPattern.polylines)
-                if (objectHash(this.surfacePolylines) === objectHash(this.vpgPattern.polylines)) {
+                if (this.newLine.length == 1) {
                     const newLine = this.surfacePolylines[this.surfacePolylines.length-1]
+                    this.newLine.length = 0
                     const coordinates = _.map(newLine, cord => {
                         return `${(this.offset.x + cord.x) * this.cellSize + this.cellSize/2},${(this.offset.y + cord.y) * this.cellSize + this.cellSize/2}`
                     }).join(" ")
@@ -122,7 +123,7 @@ export default defineComponent({
                     })
                     polyline.addTo(this.svg, 0)
                     return
-                }
+                } 
 
                 this.surfacePolylines = surfacePolylines                
                 const promise1 = this.removeGridPoints(true)
@@ -569,10 +570,10 @@ export default defineComponent({
                 width = this.vpgPattern.width
             } else if (this.phygital.selectedSurface == "front") {
                 height = this.vpgPattern.height
-                width = this.vpgPattern.depth
+                width = this.vpgPattern.width
             } else if (this.phygital.selectedSurface == "back") {
                 height = this.vpgPattern.height
-                width = this.vpgPattern.depth
+                width = this.vpgPattern.width
             }
 
 
@@ -621,37 +622,51 @@ export default defineComponent({
             const targetPoint = this.$el.querySelector(`.grid-point[dataX="${endPosition.x}"][dataY="${endPosition.y}"]`) as HTMLElement
 
             
-            // if (!targetPoint.classList.contains("__isOption")) {
+            
             // Cancel new-line animation
             gsap.to(".new-line", {
                 opacity: 0,
                 duration: .8,
                 ease: "power4.out",
                 onComplete: () => {
-                    this.newLine.length = 0
                     this.$el.querySelector(".new-line").remove()
-                    this.removeNewLine = false
                     this.$el.querySelectorAll(".__isOption").forEach((el) => {
                         el.classList.remove("__isOption")
                     })
+                    
+                    // Update related variables
+                    this.newLine.length = 0
+                    this.removeNewLine = false
                 }
             })
 
+            // Add new-line
             if (targetPoint.classList.contains("__isOption")) {
                 const newLine = [
                     {x: this.newLine[0].x - this.offset.x, y: this.newLine[0].y- this.offset.y},
                     {x: endPosition.x - this.offset.x, y: endPosition.y- this.offset.y}
                 ]
-                this.surfacePolylines.push(_.clone(newLine))
-                this.$emit("update:vpgPattern", _.clone(newLine))
+                this.surfacePolylines.push(_.cloneDeep(newLine))
+                this.$emit("update:vpgPattern", _.cloneDeep(newLine))
+
+                const otherTargetPoint = this.$el.querySelector(`.grid-point[dataX="${this.newLine[0].x}"][dataY="${this.newLine[0].y}"]`) as HTMLElement
+                if (!targetPoint.classList.contains("__isActive")) {
+                    targetPoint.classList.add("__isActive")
+                } 
+                if (!otherTargetPoint.classList.contains("__isActive")) {
+                    otherTargetPoint.classList.add("__isActive")
+                } 
+
+                // Update related variables
+                this.removeNewLine = false
             }
-            // }
+
             this.$el.querySelectorAll(".__isOption").forEach((el) => {
                 el.classList.remove("__isOption")
             })
+
             
-            // this.newLine.length = 0
-            // this.removeNewLine = false
+            
 
 
         }

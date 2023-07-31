@@ -62,6 +62,8 @@ export default defineComponent({
             if (!surface) {
                 return
             }
+            surface.mirrorX = 0
+            surface.mirrorY = 0
             surface.polylines.push(_.clone(newLine))
             this.phygital.update3DSurface(this.selectedSurface)
             this.phygital.seed = "custom"
