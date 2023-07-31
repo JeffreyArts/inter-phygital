@@ -153,16 +153,12 @@ export default defineComponent({
             }
         },
         wink(){
-            console.log("Wink")
             if (!this.editMode) {
                 const tl = gsap.timeline()
                 tl.to("#hand", {morphSVG: "#eye-closed", duration: 0.3})
                     .to("#hand", {morphSVG: "#eye-open", duration: 0.3, delay:.16})
             }
         },
-        // animateDeco() {
-
-        // },
         animateText(el1:HTMLElement, el2:HTMLElement) {
             // Animate text
             gsap.set(el1, {opacity: 0, x: -16})
