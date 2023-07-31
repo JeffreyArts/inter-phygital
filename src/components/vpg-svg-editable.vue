@@ -435,6 +435,14 @@ export default defineComponent({
             gridPoint.add(r4)
             gridPoint.add(r5)
 
+            if ((x - this.offset.x >= 0) &&
+                (x - this.offset.x < this.vpgPattern.width) &&
+                (y - this.offset.y >= 0) &&
+                (y - this.offset.y < this.vpgPattern.height)
+            ) {
+                gridPoint.addClass("__hasHover")
+            }
+            
 
             gsap.set(gridPoint, {opacity: 0})
 
@@ -720,9 +728,15 @@ export default defineComponent({
     }
     
     .grid-point {
-        cursor: pointer;
         z-index: 1;
-        &:hover {
+        &.__hasHover {
+            cursor: pointer;
+            .inner-ring {
+                opacity: 1;
+            }
+        }
+        &.__hasHover:hover {
+            
             .line-vertical,
             .line-horizontal {
                 scale: 1;
@@ -758,7 +772,7 @@ export default defineComponent({
                     stroke-width: 2px;
                 }
             }
-            &:hover {
+            &.__hasHover:hover {
                 .outer-ring {
                     opacity: 1;
                 }
@@ -793,6 +807,7 @@ export default defineComponent({
         stroke-dasharray: 3.2 1.6;
         fill: transparent;
         transition: .32s all ease;
+        opacity: 0;
     }
 
     .line-vertical,
