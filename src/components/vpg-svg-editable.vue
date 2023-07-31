@@ -729,7 +729,9 @@ export default defineComponent({
     
     .grid-point {
         z-index: 1;
+        pointer-events: none;
         &.__hasHover {
+            pointer-events: all;
             cursor: pointer;
             .inner-ring {
                 opacity: 1;
