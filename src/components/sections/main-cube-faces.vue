@@ -12,6 +12,7 @@ import AztechGridCell from "@/components/aztech/grid-cell.vue"
 import AztechLabel from "@/components/aztech/label.vue"
 import vpgSvgEditable from "@/components/vpg-svg-editable.vue"
 import Icon from "@/components/icon.vue"
+import _ from "lodash"
 import gsap from "gsap"
 
 
@@ -54,7 +55,6 @@ export default defineComponent({
     },
     methods: {
         updateVpgPattern(newLine:Array<{x: number, y: number}>) {
-            console.log("newLine", newLine)
             let surface = null
             if (this.phygital.surfaces) {
                 surface = this.phygital.surfaces[this.selectedSurface]
@@ -62,7 +62,7 @@ export default defineComponent({
             if (!surface) {
                 return
             }
-            surface.polylines.push(newLine)
+            surface.polylines.push(_.clone(newLine))
             this.phygital.update3DSurface(this.selectedSurface)
             this.phygital.seed = "custom"
         }

@@ -27,6 +27,8 @@ use the .vpg-svg-content for styling the content inside the box. Best way is to 
 import { defineComponent } from "vue"
 import { SVG } from "@svgdotjs/svg.js"
 import gsap from "gsap"
+import objectHash from "object-hash"
+
 import DrawSVGPlugin from "gsap/DrawSVGPlugin"
 import Phygital from "@/stores/phygital"
 import _ from "lodash"
@@ -57,6 +59,7 @@ export default defineComponent({
             removeNewLine: false,
             offset: {x:1, y:1} as {x:number, y:number},
             grid: [] as Array<Array<number>>,
+            surfacePolylines: [] as Array<Array<{x:number, y:number}>>,
             newLine: [] as Array<{x:number, y:number}>
         }
     },
@@ -103,7 +106,25 @@ export default defineComponent({
             handler() {
                 const el = this.$el
                 if (!el) return
-                
+                console.log(objectHash(this.surfacePolylines) === objectHash(this.vpgPattern.polylines))
+                const surfacePolylines = _.cloneDeep(this.vpgPattern.polylines)
+                if (objectHash(this.surfacePolylines) === objectHash(this.vpgPattern.polylines)) {
+                    const newLine = this.surfacePolylines[this.surfacePolylines.length-1]
+                    const coordinates = _.map(newLine, cord => {
+                        return `${(this.offset.x + cord.x) * this.cellSize + this.cellSize/2},${(this.offset.y + cord.y) * this.cellSize + this.cellSize/2}`
+                    }).join(" ")
+                    const polyline = this.svg.polyline(coordinates).attr({
+                        class: "vpg-line",
+                        style: `stroke-width: 30px;
+                        stroke-linecap: round;
+                        opacity: 1;
+                        stroke: #1c1c1e;`
+                    })
+                    polyline.addTo(this.svg, 0)
+                    return
+                }
+
+                this.surfacePolylines = surfacePolylines                
                 const promise1 = this.removeGridPoints(true)
                 const promise2 = this.removeSurface(true)
                 Promise.all([promise1, promise2]).then(() => {
@@ -119,6 +140,7 @@ export default defineComponent({
     },
     mounted() {
         gsap.registerPlugin(DrawSVGPlugin)
+        this.surfacePolylines = _.cloneDeep(this.vpgPattern.polylines)
         this.initialiseSVG()
         window.addEventListener("resize", this.updateSVG)
     },
@@ -129,7 +151,6 @@ export default defineComponent({
     methods: {
         defineGrid() {  
             this.orientation = this.$el.clientWidth > this.$el.clientHeight ? "landscape" : "portrait"
-
             this.offset = {x:1, y:1}
             this.verticalLines = this.vpgPattern.height + 2
             this.cellSize = this.$el.clientHeight/this.verticalLines
@@ -163,7 +184,7 @@ export default defineComponent({
                 for (let x = 0; x < this.horizontalLines; x++) {
                     
                     
-                    const found = _.find(this.vpgPattern.polylines, p => {
+                    const found = _.find(this.surfacePolylines, p => {
                         return _.find(p, (cord, pIndex) => {
                             if (cord.x == x - this.offset.x && cord.y == y - this.offset.y) {
                                 return true
@@ -198,7 +219,7 @@ export default defineComponent({
                 style.strokeLinecap = "round"
             }
 
-            _.each(this.vpgPattern.polylines, p => {
+            _.each(this.surfacePolylines, p => {
                 const coordinates = _.map(p, cord => {
                     // This, plus enlarging viewbox prevents lines to be cut off from edges
                     return `${(this.offset.x + cord.x) * this.cellSize + this.cellSize/2},${(this.offset.y + cord.y) * this.cellSize + this.cellSize/2}`
@@ -256,7 +277,7 @@ export default defineComponent({
                         tl.to(line, {
                             drawSVG: "0.01%",
                             ease: "power2.out",
-                            duration: .64,
+                            duration: .48,
                             delay: index * .08,
                         }).to(line, {
                             opacity: 0,
@@ -265,7 +286,7 @@ export default defineComponent({
                             onComplete: () => {
                                 setTimeout(() => {
                                     resolve2(true)
-                                }, 320)
+                                }, 240)
                             }
                         })
                     }))
@@ -521,6 +542,11 @@ export default defineComponent({
             }
         },
         startNewLine(x: number, y: number) {
+            const xClean = x - this.offset.x
+            const yClean = y - this.offset.y
+            let height = 0
+            let width = 0
+
             if (!x || !y) return
             const gridPoint = this.$el.querySelector(`.grid-point[dataX="${x}"][dataY="${y}"]`) as HTMLElement
             const topPoint = this.$el.querySelector(`.grid-point[dataX="${x}"][dataY="${parseInt(y) - 1}"]`) as HTMLElement
@@ -528,16 +554,38 @@ export default defineComponent({
             const leftPoint = this.$el.querySelector(`.grid-point[dataX="${parseInt(x) - 1}"][dataY="${y}"]`) as HTMLElement
             const rightPoint = this.$el.querySelector(`.grid-point[dataX="${parseInt(x) + 1}"][dataY="${y}"]`) as HTMLElement
             
-            if (topPoint) {
+
+            if (this.phygital.selectedSurface == "bottom") {
+                height = this.vpgPattern.height
+                width = this.vpgPattern.width
+            } else if (this.phygital.selectedSurface == "top") {
+                height = this.vpgPattern.height
+                width = this.vpgPattern.width
+            } else if (this.phygital.selectedSurface == "left") {
+                height = this.vpgPattern.height
+                width = this.vpgPattern.width
+            } else if (this.phygital.selectedSurface == "right") {
+                height = this.vpgPattern.height
+                width = this.vpgPattern.width
+            } else if (this.phygital.selectedSurface == "front") {
+                height = this.vpgPattern.height
+                width = this.vpgPattern.depth
+            } else if (this.phygital.selectedSurface == "back") {
+                height = this.vpgPattern.height
+                width = this.vpgPattern.depth
+            }
+
+
+            if (topPoint && yClean > 0) {
                 topPoint.classList.add("__isOption")
             }
-            if (bottomPoint) {
+            if (bottomPoint && yClean < height-1) {
                 bottomPoint.classList.add("__isOption")
             }
-            if (leftPoint) {
+            if (leftPoint && xClean > 0) {
                 leftPoint.classList.add("__isOption")
             }
-            if (rightPoint) {
+            if (rightPoint && xClean < width-1) {
                 rightPoint.classList.add("__isOption")
             }
             
@@ -590,11 +638,12 @@ export default defineComponent({
             })
 
             if (targetPoint.classList.contains("__isOption")) {
-
-                this.$emit("update:vpgPattern", [
+                const newLine = [
                     {x: this.newLine[0].x - this.offset.x, y: this.newLine[0].y- this.offset.y},
                     {x: endPosition.x - this.offset.x, y: endPosition.y- this.offset.y}
-                ])
+                ]
+                this.surfacePolylines.push(_.clone(newLine))
+                this.$emit("update:vpgPattern", _.clone(newLine))
             }
             // }
             this.$el.querySelectorAll(".__isOption").forEach((el) => {
@@ -603,7 +652,6 @@ export default defineComponent({
             
             // this.newLine.length = 0
             // this.removeNewLine = false
-            // this.vpgPattern.polylines.push(this.newLine)
 
 
         }

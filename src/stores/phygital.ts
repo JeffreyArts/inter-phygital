@@ -359,18 +359,18 @@ export const phygitalFace = defineStore({
         },
         downloadSTL(filename: string) { 
             return new Promise((resolve, reject)=> {
+                console.log(this.model3D.children.length)
                 
                 let mergedObject = this.model3D.children[0]
                 if (!mergedObject) {
                     console.error("No object available")
                     return new Error("noObjectAvailable")
                 }
-            
-                for (let i = 0; i < this.model3D.children.length; i++) {
-            
+                this.model3D.children.forEach((child, i) => {
+                    
                     mergedObject.updateMatrix()
-                    mergedObject = CSG.toMesh(CSG.fromMesh(mergedObject).union(CSG.fromMesh(this.model3D.children[i])), mergedObject.matrix)
-                }
+                    mergedObject = CSG.toMesh(CSG.fromMesh(mergedObject).union(CSG.fromMesh(child)), mergedObject.matrix)
+                })
             
                 const buffer = exportSTL.fromMesh(mergedObject)
                 const blob = new Blob([buffer], { type: exportSTL.mimeType })
