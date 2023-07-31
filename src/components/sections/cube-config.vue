@@ -76,6 +76,13 @@ export default defineComponent({
             return this.phygital.surfaces.top.height * this.phygital.blockSize
         }
     },
+    watch: {
+        "phygital.seed"(value) {
+            if (value == "custom" && this.seed != "custom") {
+                this.seed = "custom"
+            }
+        }
+    },
     mounted() {
         this.phygital.generateSeed()
         this.seed = this.phygital.seed

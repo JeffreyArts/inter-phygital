@@ -1,6 +1,6 @@
 <template>
     <div class="cube-faces-container" ref="container">
-        <vpg-svg-editable class="svg-container" :vpg-pattern="phygital.surfaces[selectedSurface]" v-if="phygital.surfaces[selectedSurface]"/>
+        <vpg-svg-editable class="svg-container" :vpg-pattern="phygital.surfaces[selectedSurface]" v-if="phygital.surfaces[selectedSurface]" @update:vpgPattern="updateVpgPattern"/>
     </div>
 </template>
 
@@ -53,6 +53,19 @@ export default defineComponent({
         this.selectedSurface = this.phygital.selectedSurface
     },
     methods: {
+        updateVpgPattern(newLine:Array<{x: number, y: number}>) {
+            console.log("newLine", newLine)
+            let surface = null
+            if (this.phygital.surfaces) {
+                surface = this.phygital.surfaces[this.selectedSurface]
+            }
+            if (!surface) {
+                return
+            }
+            surface.polylines.push(newLine)
+            this.phygital.update3DSurface(this.selectedSurface)
+            this.phygital.seed = "custom"
+        }
         // updateDimension(event: MouseEvent, dimension: string, operator: string) {
         //     let oppositeSurface = ""
         //     let side1 = {surface: "", dimension: ""}
