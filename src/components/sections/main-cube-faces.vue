@@ -37,7 +37,7 @@ export default defineComponent({
     },
     data: () => {
         return {
-            selectedSurface: "top",
+            selectedSurface: "top" as "top" | "bottom" | "left" | "right" | "front" | "back",
             surfaces: ["top", "bottom", "left", "right", "front", "back"],
             clickTimeout: 0
         }
@@ -54,8 +54,13 @@ export default defineComponent({
         this.selectedSurface = this.phygital.selectedSurface
     },
     methods: {
-        updateVpgPattern(newLine:Array<{x: number, y: number}>) {
+        updateVpgPattern(line:Array<{x: number, y: number}>, action: "add" | "remove" ) {
+            if (!this.selectedSurface) {
+                return
+            }
+
             let surface = null
+            
             if (this.phygital.surfaces) {
                 surface = this.phygital.surfaces[this.selectedSurface]
             }
@@ -64,9 +69,16 @@ export default defineComponent({
             }
             surface.mirrorX = 0
             surface.mirrorY = 0
-            surface.polylines.push(_.clone(newLine))
-            this.phygital.update3DSurface(this.selectedSurface)
             this.phygital.seed = "custom"
+            
+            if (action == "add") {
+                surface.polylines.push(_.clone(line))
+            } else {
+                _.remove(surface.polylines, (polyline) => {
+                    return _.isEqual(polyline, line) || _.isEqual(polyline, line.reverse())
+                })
+            }
+            this.phygital.update3DSurface(this.selectedSurface)
         }
         // updateDimension(event: MouseEvent, dimension: string, operator: string) {
         //     let oppositeSurface = ""

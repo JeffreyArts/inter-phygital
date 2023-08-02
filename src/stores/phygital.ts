@@ -67,7 +67,7 @@ export const phygitalFace = defineStore({
                 model3D: null as null | THREE.Mesh
             }
         },
-        selectedSurface: "top",
+        selectedSurface: "top" as "top" | "bottom" | "left" | "right" | "front" | "back",
         openCube: true,
         seed: null as null | string,
         blockSize: 1, // in cm
