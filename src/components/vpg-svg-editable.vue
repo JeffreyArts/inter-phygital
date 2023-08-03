@@ -536,6 +536,16 @@ export default defineComponent({
 
                 if (target.classList.contains("vpg-line")) {
                     if (!target.classList.contains("__isRemovable")) {
+                        const oldLines = this.$el.querySelectorAll(".__isRemovable")
+                        for (let i = 0; i < oldLines.length; i++) {
+                            gsap.to(oldLines[i], {
+                                duration: 3,
+                                stroke: "#1c1c1e", 
+                                opacity: 1, 
+                            })
+                            oldLines[i].classList.remove("__isRemovable")
+                        }
+
                         target.classList.add("__isRemovable")
                         // const hasPoints = target.getAttribute("points")
                         // if (hasPoints) {
@@ -552,32 +562,36 @@ export default defineComponent({
 
                     
                     this.removableLine = target
-                    
-                    const vpgLines = this.$el.querySelectorAll(".vpg-line")
-                    // remove this.removableLine from the list and add it to the end
+                    // Add this.removableLine to the end of the list
                     this.removableLine.parentElement?.appendChild(this.removableLine)
+                    
+                    // const vpgLines = this.$el.querySelectorAll(".vpg-line")
                     
                     
                     // Get all the other lines and animate them to their default state
-                    const otherLines = []
-                    for (let i = 0; i < vpgLines.length; i++) {
-                        if (vpgLines[i].getAttribute("points") !== target.getAttribute("points")) {
-                            otherLines.push(vpgLines[i])
-                        }
-                    }
-
-                    gsap.to(otherLines, {
-                        duration: .16,
-                        opacity:1,
-                        stroke: "#1c1c1e",
-                        strokeWidth: 30
-                    })
+                    // const otherLines = []
+                    // for (let i = 0; i < vpgLines.length; i++) {
+                    //     if (
+                    //         (objectHash(this.pointsToCoord(vpgLines[i].getAttribute("points"))) !== objectHash(this.pointsToCoord(target.getAttribute("points"))) ) 
+                    //     ) {
+                    //         otherLines.push(vpgLines[i])
+                    //     }
+                    // }
+                    // _.each(otherLines, (line) => {
+                    //     console.log("otherLines", line, line.getAttribute("points"), this.pointsToCoord(line.getAttribute("points")))
+                    // })
+                    // console.log("otherLines", otherLines)
+                    // gsap.to(otherLines, {
+                    //     duration: .16,
+                    //     opacity:1,
+                    //     stroke: "#1c1c1e",
+                    //     strokeWidth: 30
+                    // })
 
                     
-
+                    gsap.killTweensOf(target)
                     gsap.to(target, {
                         duration: .64, 
-                        cursor: "delete",
                         stroke: "#545760",
                         opacity: .72,
                     })
@@ -585,19 +599,12 @@ export default defineComponent({
                     
                 } else {
                     if (this.removableLine) {
-                        this.removableLine.classList.remove("__isRemovable")
-
-                        gsap.set(this.$el.querySelectorAll(".grid-point"), {
-                            opacity:1, 
-                            pointerEvents: "all"
-                        })
-                        
-                        const lines = this.$el.querySelectorAll(".vpg-line")
-                        gsap.to(lines, {
-                            duration: 1,
+                        gsap.to(this.removableLine, {
+                            duration: 3,
                             stroke: "#1c1c1e", 
                             opacity: 1, 
                         })
+                        this.removableLine = null
                     }
                 }
             }
