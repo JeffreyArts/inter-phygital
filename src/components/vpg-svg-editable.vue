@@ -124,11 +124,25 @@ export default defineComponent({
                     
                     if (this.newLine.length == 1) {
                         const newLine = this.surfacePolylines[this.surfacePolylines.length-1]
+                        const cords = [] as Array<{x:number, y:number}>
                         const coordinates = _.map(newLine, cord => {
+                            cords.push({
+                                x: this.offset.x + cord.x,
+                                y: this.offset.y + cord.y
+                            })
                             return `${(this.offset.x + cord.x) * this.cellSize + this.cellSize/2},${(this.offset.y + cord.y) * this.cellSize + this.cellSize/2}`
                         }).join(" ")
+
+                        if (cords.length < 2) {
+                            return
+                        }
+
                         const polyline = this.svg.polyline(coordinates).attr({
                             class: "vpg-line",
+                            dataX1: cords[0].x,
+                            dataY1: cords[0].y,
+                            dataX2: cords[1].x,
+                            dataY2: cords[1].y,
                             style: `stroke-width: 30px;
                             stroke-linecap: round;
                             opacity: 1;
@@ -238,14 +252,27 @@ export default defineComponent({
                 }
                 const polylines = this.svg.group().addClass("vpg-pattern")
                 _.each(this.surfacePolylines, p => {
+                    const cords = [] as Array<{x:number, y:number}>
                     const coordinates = _.map(p, cord => {
-                        // This, plus enlarging viewbox prevents lines to be cut off from edges
+                        cords.push({
+                            x: this.offset.x + cord.x,
+                            y: this.offset.y + cord.y
+                        })
                         return `${(this.offset.x + cord.x) * this.cellSize + this.cellSize/2},${(this.offset.y + cord.y) * this.cellSize + this.cellSize/2}`
                     }).join(" ")
 
+
+                    if (cords.length <2) {
+                        return
+                    }
+
                     polylines.add(this.svg.polyline(coordinates).attr({
-                        fill:"none",
                         class: "vpg-line",
+                        dataX1: cords[0].x,
+                        dataY1: cords[0].y,
+                        dataX2: cords[1].x,
+                        dataY2: cords[1].y,
+                        fill:"none",
                     }))
                 })
                 
@@ -283,6 +310,7 @@ export default defineComponent({
                         }
                     }
                 }
+                
                 this.svg.add(gridPoints)
                 
                 if (this.phygital.editMode)  {
@@ -386,6 +414,57 @@ export default defineComponent({
                     }
                 })
             })
+        },
+        removeLine(target: HTMLElement) {
+            const x1 = target.getAttribute("dataX1")
+            const x2 = target.getAttribute("dataX2")
+            const y1 = target.getAttribute("dataY1")
+            const y2 = target.getAttribute("dataY2")
+            const gridPoints = this.$el.querySelectorAll(`
+                .grid-point[dataX="${x1}"][dataY="${y1}"],
+                .grid-point[dataX="${x1}"][dataY="${y2}"],
+                .grid-point[dataX="${x2}"][dataY="${y2}"],
+                .grid-point[dataX="${x2}"][dataY="${y1}"]
+            `)
+            const filteredGridPoints = _.compact(_.filter(gridPoints, (gridPoint) => {
+                const x = gridPoint.getAttribute("dataX")
+                const y = gridPoint.getAttribute("dataY")
+                const matches = _.filter(this.$el.querySelector(`
+                .vpg-line[dataX1="${x}"][dataY1="${y}"],
+                .vpg-line[dataX2="${x}"][dataY2="${y}"],
+                .vpg-line[dataX2="${x}"][dataY1="${y}"],
+                .vpg-line[dataX1="${x}"][dataY2="${y}"]
+                `), (match) => {
+                    if (match.target?.classList.contains("__isRemovable") ||
+                        match.node?.classList.contains("__isRemovable")
+                    ) {
+                        return true
+                    }
+                    return false
+                })
+                if (matches.length > 0) {
+                    return gridPoint
+                } 
+                return null
+            }))
+            
+            target.classList.add("__isRemovable")
+            _.forEach(filteredGridPoints, (gridPoint) => {
+                gridPoint.classList.remove("__isActive")
+            })
+            gsap.to(target, {
+                opacity: 0,
+                duration: .24,
+                onComplete: () => {
+                    target.remove()
+                }
+            })
+
+            this.removingLine = true
+            setTimeout(() => {
+                this.removingLine = false
+            }, 500)
+
         },
         initialiseSVG() {
             this.svg = SVG()
@@ -514,7 +593,6 @@ export default defineComponent({
             this.svg.viewbox(0,0, this.cellSize * this.horizontalLines,  this.cellSize * this.verticalLines)
         },
         hasClicked(event: MouseEvent) {
-            console.log("hasClicked")
             const target = event.target as HTMLElement
             const parentNode = target.parentNode as HTMLElement
             
@@ -531,34 +609,17 @@ export default defineComponent({
                 // Remove a line
                 if (target.classList.contains("__isRemovable")) {
                     const coord = this.pointsToCoord(target.getAttribute("points") as string)
-                    this.removingLine = true
+                    this.removeLine(target)
                     this.$emit("update:vpgPattern", _.map(coord, (point) => {
                         return {
                             x: point.x - this.offset.x,
                             y: point.y - this.offset.y
                         }
                     }), "remove")
-                    setTimeout(() => {
-                        this.removingLine = false
-                    }, 500)
                 }
                     
             } else if (this.newLine.length == 1) {
                 this.completeNewLine()
-                if (parentNode.classList.contains("grid-point")) {
-                    // const gridPoint = parentNode as HTMLElement
-                    // const x = gridPoint.getAttribute("dataX")
-                    // const y = gridPoint.getAttribute("dataY")
-                    // this.newLine.push({x: parseInt(x as string), y: parseInt(y as string)})
-                    // gridPoint.classList.add("__isActive")
-
-                    // const newLine = this.newLine.map((coord) => {
-                    //     return {x: coord.x - this.offset.x, y: coord.y - this.offset.y}
-                    // })
-                    // this.vpgPattern.polylines.push(newLine)
-                    // this.newLine.length = 0
-                    // this.$emit("update:vpgPattern", this.vpgPattern)
-                }
             }
         },
         mouseMove(event: MouseEvent) {
@@ -583,15 +644,6 @@ export default defineComponent({
                         }
 
                         target.classList.add("__isRemovable")
-                        // const hasPoints = target.getAttribute("points")
-                        // if (hasPoints) {
-                        //     const points = hasPoints.split(" ") as string[]
-                        //     const x1 =  Math.round((points[0].split(",")[0] - this.cellSize / 2) / this.cellSize)
-                        //     const y1 =  Math.round((points[0].split(",")[1] - this.cellSize / 2) / this.cellSize)
-                        //     const x2 =  Math.round((points[1].split(",")[0] - this.cellSize / 2) / this.cellSize)
-                        //     const y2 =  Math.round((points[1].split(",")[1] - this.cellSize / 2) / this.cellSize)
-                        //     const gridPoints = this.$el.querySelectorAll(".grid-point")
-                        // }
                     }
 
 
@@ -600,30 +652,6 @@ export default defineComponent({
                     this.removableLine = target
                     // Add this.removableLine to the end of the list
                     this.removableLine.parentElement?.appendChild(this.removableLine)
-                    
-                    // const vpgLines = this.$el.querySelectorAll(".vpg-line")
-                    
-                    
-                    // Get all the other lines and animate them to their default state
-                    // const otherLines = []
-                    // for (let i = 0; i < vpgLines.length; i++) {
-                    //     if (
-                    //         (objectHash(this.pointsToCoord(vpgLines[i].getAttribute("points"))) !== objectHash(this.pointsToCoord(target.getAttribute("points"))) ) 
-                    //     ) {
-                    //         otherLines.push(vpgLines[i])
-                    //     }
-                    // }
-                    // _.each(otherLines, (line) => {
-                    //     console.log("otherLines", line, line.getAttribute("points"), this.pointsToCoord(line.getAttribute("points")))
-                    // })
-                    // console.log("otherLines", otherLines)
-                    // gsap.to(otherLines, {
-                    //     duration: .16,
-                    //     opacity:1,
-                    //     stroke: "#1c1c1e",
-                    //     strokeWidth: 30
-                    // })
-
                     
                     gsap.killTweensOf(target)
                     gsap.to(target, {
