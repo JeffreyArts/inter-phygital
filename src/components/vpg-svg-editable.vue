@@ -833,10 +833,20 @@ export default defineComponent({
 
             // Add new-line
             if (targetPoint.classList.contains("__isOption")) {
+                
                 const newLine = [
                     {x: this.newLine[0].x - this.offset.x, y: this.newLine[0].y- this.offset.y},
                     {x: endPosition.x - this.offset.x, y: endPosition.y- this.offset.y}
                 ]
+
+                const duplicate = this.$el.querySelector(`
+                .vpg-line[dataX1="${newLine[0].x + this.offset.x}"][dataY1="${newLine[0].y + this.offset.y}"][dataX2="${newLine[1].x + this.offset.x}"][dataY2="${newLine[1].y + this.offset.y}"],
+                .vpg-line[dataX1="${newLine[1].x + this.offset.x}"][dataY1="${newLine[1].y + this.offset.y}"][dataX2="${newLine[0].x + this.offset.x}"][dataY2="${newLine[0].y + this.offset.y}"]
+                `)
+                if (duplicate) {
+                    return
+                }
+
                 this.surfacePolylines.push(_.cloneDeep(newLine))
                 this.$emit("update:vpgPattern", _.cloneDeep(newLine), "add")
 
@@ -881,19 +891,15 @@ export default defineComponent({
             //     stroke-linecap: round;
             // }
         }
+
+        .grid-point {
+            &.__hasHover {
+                pointer-events: all;
+                cursor: pointer;
+            }
+        }
     }
     
-    &.__isBlock {
-        // .vpg-line {
-        //     stroke-linecap: square;
-        //     @media (orientation: landscape) {
-        //         stroke-width: 3vw;
-        //     }
-        //     @media (orientation: portrait) {
-        //         stroke-width: 3vh;
-        //     }
-        // }
-    }
     figure {
         margin: 0;
         display: flex;
@@ -916,8 +922,6 @@ export default defineComponent({
         z-index: 1;
         pointer-events: none;
         &.__hasHover {
-            pointer-events: all;
-            cursor: pointer;
             .inner-ring {
                 opacity: 1;
             }
