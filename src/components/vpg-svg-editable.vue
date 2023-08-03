@@ -167,7 +167,11 @@ export default defineComponent({
                     this.defineGrid()
                     const p1 = this.defineSurface()
                     const p2 = this.defineGridPoints()
-                    this.svg.viewbox(0,0, this.cellSize * this.horizontalLines,  this.cellSize * this.verticalLines)   
+                    this.svg.viewbox(0,0, Math.round(this.cellSize * this.horizontalLines),  Math.round(this.cellSize * this.verticalLines))   
+                    this.svg.attr({
+                        width: Math.round(this.cellSize * this.horizontalLines),
+                        height: Math.round(this.cellSize * this.verticalLines)
+                    })
 
                     Promise.all([p1, p2]).then(() => {
                         this.surfaceInTransition = false
@@ -475,6 +479,10 @@ export default defineComponent({
             this.defineSurface()
             this.defineGridPoints()
             this.svg.viewbox(0,0, this.cellSize * this.horizontalLines,  this.cellSize * this.verticalLines)
+            this.svg.attr({
+                width: Math.round(this.cellSize * this.horizontalLines),
+                height: Math.round(this.cellSize * this.verticalLines)
+            })
         },
         isBetweenCoordinates(coord: {x:number, y:number}, p1: {x:number, y:number}, p2: {x:number, y:number}) {
             return (
@@ -591,6 +599,10 @@ export default defineComponent({
             this.defineSurface()
             this.defineGridPoints()
             this.svg.viewbox(0,0, this.cellSize * this.horizontalLines,  this.cellSize * this.verticalLines)
+            this.svg.attr({
+                width: Math.round(this.cellSize * this.horizontalLines),
+                height: Math.round(this.cellSize * this.verticalLines)
+            })
         },
         hasClicked(event: MouseEvent) {
             const target = event.target as HTMLElement
@@ -678,9 +690,10 @@ export default defineComponent({
                 // sanitize mouse position to match svg element x &  y
                 const currentTarget = event.currentTarget as HTMLElement
                 if (!currentTarget) return
-                const rect = currentTarget.getBoundingClientRect()
-                const mouseX = event.clientX - rect.left
-                const mouseY = event.clientY - rect.top
+                const rect = this.svg.node.getBoundingClientRect()
+                let mouseX = event.clientX - rect.left
+                let mouseY = event.clientY - rect.top
+                
                 if (!mouseX || !mouseY) return
 
 
@@ -691,8 +704,6 @@ export default defineComponent({
                     const x = gridPoint.getAttribute("dataX")
                     const y = gridPoint.getAttribute("dataY")
                     if (x && y) {
-                        // newLine.setAttribute("x2", `${parseInt(x) * this.cellSize + this.cellSize/2}`)
-                        // newLine.setAttribute("y2", `${parseInt(y) * this.cellSize + this.cellSize/2}`)
                         if (newLine.attributes["x2"].value != `${parseInt(x) * this.cellSize + this.cellSize/2}` &&
                             newLine.attributes["y2"].value != `${parseInt(y) * this.cellSize + this.cellSize/2}`) {
                             gsap.to(newLine, {
@@ -716,10 +727,8 @@ export default defineComponent({
                         ease: "power4.out",
                     })
 
-
-                    
                     newLine.setAttribute("x2", `${mouseX}`)
-                    newLine.setAttribute("y2", `${mouseY - 15}`)
+                    newLine.setAttribute("y2", `${mouseY}`)
                 }
                 
             }
@@ -890,6 +899,8 @@ export default defineComponent({
         display: flex;
         width: 100%;
         height: 100%;
+        justify-content: center;
+        align-items: center;
     }
     
     svg {
