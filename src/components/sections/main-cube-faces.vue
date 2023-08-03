@@ -58,12 +58,14 @@ export default defineComponent({
             if (!this.selectedSurface) {
                 return
             }
-
-            let surface = null
             
-            if (this.phygital.surfaces) {
-                surface = this.phygital.surfaces[this.selectedSurface]
+            if (line.length < 2) {
+                console.error("Line must have at least 2 coordinates")
+                return
             }
+
+            let surface = this.phygital.surfaces[this.selectedSurface]
+            
             if (!surface) {
                 return
             }
@@ -74,8 +76,23 @@ export default defineComponent({
             if (action == "add") {
                 surface.polylines.push(_.clone(line))
             } else {
+
+                // // console.log("remove line",line,[line[1], line[0]])
+                // _.each(surface.polylines, p => {
+                //     console.log(JSON.stringify(p))
+                // })
                 _.remove(surface.polylines, (polyline) => {
-                    return _.isEqual(polyline, line) || _.isEqual(polyline, line.reverse())
+                    if (_.isEqual(polyline, line) || _.isEqual(polyline, [line[1], line[0]])) {
+                        const removableLine = document.querySelector(".__isRemovable")
+                        if (removableLine) {
+                            gsap.killTweensOf(removableLine)
+                            gsap.to(removableLine, {opacity: 0, duration: 0.5, onComplete: () => {
+                                removableLine.remove()
+                            }})
+                        }
+                        return true
+                    }
+                    return false
                 })
             }
             this.phygital.update3DSurface(this.selectedSurface)

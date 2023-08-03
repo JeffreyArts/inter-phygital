@@ -17,7 +17,7 @@ export const phygitalFace = defineStore({
                 mirrorY: 0,
                 width: 3,
                 height: 3,
-                polylines: [],
+                polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
                 model3D: null as null | THREE.Mesh
             },
@@ -26,7 +26,7 @@ export const phygitalFace = defineStore({
                 mirrorY: 0,
                 width: 3,
                 height: 3,
-                polylines: [],
+                polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
                 model3D: null as null | THREE.Mesh
             },
@@ -35,7 +35,7 @@ export const phygitalFace = defineStore({
                 mirrorY: 0,
                 width: 3,
                 height: 7,
-                polylines: [],
+                polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
                 model3D: null as null | THREE.Mesh
             },
@@ -44,7 +44,7 @@ export const phygitalFace = defineStore({
                 mirrorY: 0,
                 width: 3,
                 height: 7,
-                polylines: [],
+                polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
                 model3D: null as null | THREE.Mesh
             },
@@ -53,7 +53,7 @@ export const phygitalFace = defineStore({
                 mirrorY: 0,
                 width: 3,
                 height: 7,
-                polylines: [],
+                polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
                 model3D: null as null | THREE.Mesh
             },
@@ -62,7 +62,7 @@ export const phygitalFace = defineStore({
                 mirrorY: 0,
                 width: 3,
                 height: 7,
-                polylines: [],
+                polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
                 model3D: null as null | THREE.Mesh
             }

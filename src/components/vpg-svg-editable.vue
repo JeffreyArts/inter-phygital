@@ -7,7 +7,7 @@ use the .vpg-svg-content for styling the content inside the box. Best way is to 
          phygital.editMode ? '__isEditMode' : '',
          '__isBlock'
         ]">
-        <figure ref="vpgSVG" @click="hasClicked" @mousemove="mouseMove"/>
+        <figure ref="vpgSVG" @mousedown="hasClicked" @mousemove="mouseMove"/>
         <svg style="display:none;" id="grid-point-container" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 24 24" xml:space="preserve">
             <g class="grid-point" id="grid-point">
                 <circle  class="center_ring"  cx="12.5" cy="12.5" r="4"/>
@@ -62,6 +62,7 @@ export default defineComponent({
             surfacePolylines: [] as Array<Array<{x:number, y:number}>>,
             newLine: [] as Array<{x:number, y:number}>,
             removableLine: null as null | HTMLElement,
+            removingLine: false,
             surfaceInTransition: false
         }
     },
@@ -133,7 +134,12 @@ export default defineComponent({
                             opacity: 1;
                             stroke: #1c1c1e;`
                         })
-                        polyline.addTo(this.svg, 0)
+                        const group = this.svg.findOne(".vpg-pattern")
+                        if (!group) {
+                            console.error("Missing .vpg-pattern group")
+                            return
+                        }
+                        polyline.addTo(group, 0)
                         this.newLine.length = 0
                     }
                     return
@@ -508,27 +514,33 @@ export default defineComponent({
             this.svg.viewbox(0,0, this.cellSize * this.horizontalLines,  this.cellSize * this.verticalLines)
         },
         hasClicked(event: MouseEvent) {
+            console.log("hasClicked")
             const target = event.target as HTMLElement
             const parentNode = target.parentNode as HTMLElement
+            
             if (!this.phygital.editMode) return
 
             if (this.newLine.length == 0) {
+                // Add start of new line
                 if (parentNode?.classList.contains("grid-point")) {
                     const x = parentNode.getAttribute("dataX") as string
                     const y = parentNode.getAttribute("dataY") as string
                     this.startNewLine(parseInt(x, 10),parseInt(y, 10))
                 }
-
+                
+                // Remove a line
                 if (target.classList.contains("__isRemovable")) {
                     const coord = this.pointsToCoord(target.getAttribute("points") as string)
-                    target.remove()
+                    this.removingLine = true
                     this.$emit("update:vpgPattern", _.map(coord, (point) => {
                         return {
                             x: point.x - this.offset.x,
                             y: point.y - this.offset.y
                         }
                     }), "remove")
-                    
+                    setTimeout(() => {
+                        this.removingLine = false
+                    }, 500)
                 }
                     
             } else if (this.newLine.length == 1) {
@@ -551,6 +563,8 @@ export default defineComponent({
         },
         mouseMove(event: MouseEvent) {
             if (this.surfaceInTransition) return
+            if (this.removingLine) return
+            
             if (this.newLine.length == 0 && this.phygital.editMode) {
                 
                 const target = event.target as HTMLElement
