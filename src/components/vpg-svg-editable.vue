@@ -3,9 +3,9 @@ use the .vpg-svg-content for styling the content inside the box. Best way is to 
  -->
 
  <template>
-    <div class="vpg-svg-editable" :class="[
-            phygital.editMode ? '__isEditMode' : '',
-            '__isBlock'
+     <div class="vpg-svg-editable" :class="[
+         phygital.editMode ? '__isEditMode' : '',
+         '__isBlock'
         ]">
         <figure ref="vpgSVG" @click="hasClicked" @mousemove="mouseMove"/>
         <svg style="display:none;" id="grid-point-container" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 24 24" xml:space="preserve">
@@ -62,16 +62,18 @@ export default defineComponent({
             surfacePolylines: [] as Array<Array<{x:number, y:number}>>,
             newLine: [] as Array<{x:number, y:number}>,
             removableLine: null as null | HTMLElement,
+            surfaceInTransition: false
         }
     },
     watch: {
         "phygital.editMode": {
             handler(editMode) {
+                this.surfaceInTransition = true
                 if (editMode) {
                     gsap.to(".grid-point", {
                         opacity: 1,
-                        ease: "back.out(1.7)",
-                        duration: 1,
+                        ease: "back.out(3.2)",
+                        duration: 0.8,
                         stagger: {
                             grid: [this.horizontalLines, this.verticalLines],
                             each: 24/Math.max(this.horizontalLines, this.verticalLines)/32,
@@ -81,8 +83,11 @@ export default defineComponent({
                     gsap.to(".vpg-line", {
                         strokeWidth: 30,
                         strokeLinecap: "round",
-                        duration: 1.44,
-                        ease: "back.out(1.7)",
+                        duration: 0.8,
+                        ease: "back.out(3.2)",
+                        onComplete: () => {
+                            this.surfaceInTransition = false
+                        }
                     })
                 } else {
                     gsap.to(".grid-point", {
@@ -104,7 +109,7 @@ export default defineComponent({
             }
         },
         "vpgPattern.polylines": {
-            handler(v,v2) {
+            handler() {
                 const el = this.$el
                 if (!el) return
 
@@ -134,14 +139,19 @@ export default defineComponent({
                     return
                 } 
 
+                this.surfaceInTransition = true
                 this.surfacePolylines = surfacePolylines                
                 const promise1 = this.removeGridPoints(true)
                 const promise2 = this.removeSurface(true)
                 Promise.all([promise1, promise2]).then(() => {
                     this.defineGrid()
-                    this.defineSurface()
-                    this.defineGridPoints()
-                    this.svg.viewbox(0,0, this.cellSize * this.horizontalLines,  this.cellSize * this.verticalLines)                    
+                    const p1 = this.defineSurface()
+                    const p2 = this.defineGridPoints()
+                    this.svg.viewbox(0,0, this.cellSize * this.horizontalLines,  this.cellSize * this.verticalLines)   
+
+                    Promise.all([p1, p2]).then(() => {
+                        this.surfaceInTransition = false
+                    })
                 })
             },
             deep: true
@@ -205,72 +215,83 @@ export default defineComponent({
             }
         },
         defineSurface() {
-            const style = {
-                strokeWidth: Math.round(this.cellSize / 2),
-                strokeLinecap: "square",
-            }
-            if (this.phygital.editMode) {
-                style.strokeWidth = 30
-                style.strokeLinecap = "round"
-            }
-            // remove old vpg-pattern group when available
-            if (this.$el.querySelector(".vpg-pattern")) {
-                this.$el.querySelector(".vpg-pattern").remove()
-            }
-            const polylines = this.svg.group().addClass("vpg-pattern")
-            _.each(this.surfacePolylines, p => {
-                const coordinates = _.map(p, cord => {
-                    // This, plus enlarging viewbox prevents lines to be cut off from edges
-                    return `${(this.offset.x + cord.x) * this.cellSize + this.cellSize/2},${(this.offset.y + cord.y) * this.cellSize + this.cellSize/2}`
-                    // return `${cord.x+1},${cord.y+1}`
-                }).join(" ")
+            return new Promise(resolve => {
+                const style = {
+                    strokeWidth: Math.round(this.cellSize / 2),
+                    strokeLinecap: "square",
+                }
 
+                if (this.phygital.editMode) {
+                    style.strokeWidth = 30
+                    style.strokeLinecap = "round"
+                }
 
+                // remove old vpg-pattern group when available
+                if (this.$el.querySelector(".vpg-pattern")) {
+                    this.$el.querySelector(".vpg-pattern").remove()
+                }
+                const polylines = this.svg.group().addClass("vpg-pattern")
+                _.each(this.surfacePolylines, p => {
+                    const coordinates = _.map(p, cord => {
+                        // This, plus enlarging viewbox prevents lines to be cut off from edges
+                        return `${(this.offset.x + cord.x) * this.cellSize + this.cellSize/2},${(this.offset.y + cord.y) * this.cellSize + this.cellSize/2}`
+                    }).join(" ")
 
-                polylines.add(this.svg.polyline(coordinates).attr({
-                    fill:"none",
-                    class: "vpg-line",
-                }))
-            })
-            
+                    polylines.add(this.svg.polyline(coordinates).attr({
+                        fill:"none",
+                        class: "vpg-line",
+                    }))
+                })
+                
 
-            gsap.set(".vpg-line", {
-                strokeWidth: 0,
-                strokeLinecap: style.strokeLinecap,
-            })
-            gsap.to(".vpg-line", {
-                strokeWidth: style.strokeWidth,
-                duration: 1.44,
-                ease: "power4.out",
+                gsap.set(".vpg-line", {
+                    strokeWidth: 0,
+                    strokeLinecap: style.strokeLinecap,
+                })
+                gsap.to(".vpg-line", {
+                    strokeWidth: style.strokeWidth,
+                    duration: 1.44,
+                    ease: "power4.out",
+                    onComplete() {
+                        resolve(true)
+                    }
+                })
             })
                 
         },
         defineGridPoints() {
-            const gridPointContainer = this.$el.querySelector("#grid-point-container") as SVGElement
-            
-            // remove old grid-points group when available
-            if (this.$el.querySelector(".grid-points")) {
-                this.$el.querySelector(".grid-points").remove()
-            }
-            const gridPoints = this.svg.group().addClass("grid-points")
+            return new Promise(resolve => {
+                const gridPointContainer = this.$el.querySelector("#grid-point-container") as SVGElement
+                
+                // remove old grid-points group when available
+                if (this.$el.querySelector(".grid-points")) {
+                    this.$el.querySelector(".grid-points").remove()
+                }
+                const gridPoints = this.svg.group().addClass("grid-points")
 
-            for (let y = 0; y < this.verticalLines; y++) {
-                for (let x = 0; x < this.horizontalLines; x++) {
-                    const gridPoint = this.drawGridPoint(gridPointContainer, x, y)
-                    if (gridPoint) {
-                        gridPoints.add(gridPoint)
+                for (let y = 0; y < this.verticalLines; y++) {
+                    for (let x = 0; x < this.horizontalLines; x++) {
+                        const gridPoint = this.drawGridPoint(gridPointContainer, x, y)
+                        if (gridPoint) {
+                            gridPoints.add(gridPoint)
+                        }
                     }
                 }
-            }
-            this.svg.add(gridPoints)
-            
-            if (this.phygital.editMode)  {
-                gsap.to(".grid-point", {
-                    opacity: 1,
-                    duration: .8,
-                    ease: "power4.out",
-                })
-            }
+                this.svg.add(gridPoints)
+                
+                if (this.phygital.editMode)  {
+                    gsap.to(".grid-point", {
+                        opacity: 1,
+                        duration: .8,
+                        ease: "power4.out",
+                        onComplete: () => {
+                            resolve(true)
+                        }
+                    })
+                } else {
+                    resolve(true)
+                }
+            })
         },
         removeSurface(hard = true as boolean) {
             // If hard is true, remove the domElements from the svg, otherwise only hide them
@@ -529,6 +550,7 @@ export default defineComponent({
             }
         },
         mouseMove(event: MouseEvent) {
+            if (this.surfaceInTransition) return
             if (this.newLine.length == 0 && this.phygital.editMode) {
                 
                 const target = event.target as HTMLElement
