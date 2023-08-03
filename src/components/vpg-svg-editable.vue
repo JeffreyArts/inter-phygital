@@ -166,28 +166,13 @@ export default defineComponent({
             this.cellSize = this.$el.clientHeight/this.verticalLines
             this.horizontalLines = Math.ceil(this.$el.clientWidth  / this.cellSize)
             if ((this.vpgPattern.width % 2 != 0 && this.horizontalLines % 2 == 0) ||
-            (this.vpgPattern.width % 2 == 0 && this.horizontalLines % 2 != 0)) {
+                (this.vpgPattern.width % 2 == 0 && this.horizontalLines % 2 != 0))
+            {
                 this.horizontalLines += 1
             }
             this.cellSize = this.$el.clientWidth/this.horizontalLines
-            if (this.orientation == "landscape") {
-                
-                this.offset.x = Math.floor(this.horizontalLines / 2) - 1
-            } else { 
-                this.horizontalLines = this.vpgPattern.width + 2
-                this.cellSize = this.$el.clientWidth/this.horizontalLines
-                this.verticalLines = Math.ceil(this.$el.clientHeight  / this.cellSize)
-                if ((this.vpgPattern.height % 2 != 0 && this.verticalLines % 2 == 0) ||
-                    (this.vpgPattern.height % 2 == 0 && this.verticalLines % 2 != 0)) {
-                    this.verticalLines += 1
-                }
-                this.cellSize = this.$el.clientHeight/this.verticalLines
-
-                this.offset.y = 1
-                // this.offset.y = Math.floor(this.verticalLines / 2) - 1
-            }
+            this.offset.x = Math.floor(this.horizontalLines / 2) - 1
             
-
             this.grid = []
             for (let y = 0; y < this.verticalLines; y++) {
                 this.grid[y] = []
