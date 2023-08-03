@@ -153,9 +153,6 @@ export default defineComponent({
 .main {
     .cube-3d-container {
         padding: 0;
-        > * {
-            pointer-events: visible;
-        }
     }
 }
 
@@ -165,19 +162,8 @@ export default defineComponent({
     display: flex;
     justify-content: center;
     align-items: center;
-    // padding: 8px;
     height: 100%;
-    > * {
-        pointer-events: none;
-    }
-    
-        
 
-    .sandbox-view canvas {
-        // position: absolute;
-        // max-width: calc(100% - 32px);
-        // max-height: calc(100% - 32px);
-    }
 
 }
 </style>

@@ -666,7 +666,6 @@ export default defineComponent({
                         }
                     }
                 } else {
-                    
                     // Not the most efficent method to do this, but it works
                     gsap.killTweensOf(".new-line")
                     gsap.to(".new-line", {
