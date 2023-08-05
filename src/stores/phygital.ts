@@ -17,7 +17,7 @@ export const phygitalFace = defineStore({
                 mirrorY: 0,
                 width: 3,
                 height: 3,
-                polylines: [],
+                polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
                 model3D: null as null | THREE.Mesh
             },
@@ -26,7 +26,7 @@ export const phygitalFace = defineStore({
                 mirrorY: 0,
                 width: 3,
                 height: 3,
-                polylines: [],
+                polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
                 model3D: null as null | THREE.Mesh
             },
@@ -35,7 +35,7 @@ export const phygitalFace = defineStore({
                 mirrorY: 0,
                 width: 3,
                 height: 7,
-                polylines: [],
+                polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
                 model3D: null as null | THREE.Mesh
             },
@@ -44,7 +44,7 @@ export const phygitalFace = defineStore({
                 mirrorY: 0,
                 width: 3,
                 height: 7,
-                polylines: [],
+                polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
                 model3D: null as null | THREE.Mesh
             },
@@ -53,7 +53,7 @@ export const phygitalFace = defineStore({
                 mirrorY: 0,
                 width: 3,
                 height: 7,
-                polylines: [],
+                polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
                 model3D: null as null | THREE.Mesh
             },
@@ -62,12 +62,12 @@ export const phygitalFace = defineStore({
                 mirrorY: 0,
                 width: 3,
                 height: 7,
-                polylines: [],
+                polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
                 model3D: null as null | THREE.Mesh
             }
         },
-        selectedSurface: "top",
+        selectedSurface: "top" as "top" | "bottom" | "left" | "right" | "front" | "back",
         openCube: true,
         seed: null as null | string,
         blockSize: 1, // in cm
@@ -359,18 +359,18 @@ export const phygitalFace = defineStore({
         },
         downloadSTL(filename: string) { 
             return new Promise((resolve, reject)=> {
+                console.log(this.model3D.children.length)
                 
                 let mergedObject = this.model3D.children[0]
                 if (!mergedObject) {
                     console.error("No object available")
                     return new Error("noObjectAvailable")
                 }
-            
-                for (let i = 0; i < this.model3D.children.length; i++) {
-            
+                this.model3D.children.forEach((child, i) => {
+                    
                     mergedObject.updateMatrix()
-                    mergedObject = CSG.toMesh(CSG.fromMesh(mergedObject).union(CSG.fromMesh(this.model3D.children[i])), mergedObject.matrix)
-                }
+                    mergedObject = CSG.toMesh(CSG.fromMesh(mergedObject).union(CSG.fromMesh(child)), mergedObject.matrix)
+                })
             
                 const buffer = exportSTL.fromMesh(mergedObject)
                 const blob = new Blob([buffer], { type: exportSTL.mimeType })

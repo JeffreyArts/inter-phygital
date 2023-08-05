@@ -345,7 +345,7 @@ const patternToThreejsService = (pattern, options = {
     //     console.log(JSON.stringify(_.map(row, o =>{return o.char})));
     // })
 
-    mergePattern(pattern, map)
+    // mergePattern(pattern, map)
     pattern.forEach((polyline, polylineIndex) => {
         polyline.forEach((cord, ii) => {
             if (ii == 0) {

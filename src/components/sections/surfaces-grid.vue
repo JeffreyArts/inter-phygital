@@ -144,16 +144,30 @@ export default defineComponent({
 .cube-surfaces-grid {
     .cube-surfaces-cell {
         padding: 8px;
-        opacity: 0.9;
+
         transition: .24s ease all;
         &.__isSelected {
             background-color: #fff;
             opacity:1;
+            .vpg-svg {
+                opacity:1;
+                polyline {
+                    stroke: $dark-grey;
+                }
+            }
         }
         &.__isHover {
             cursor: pointer;
-            opacity:1;
-            background-color: #fff;
+            background-color: #f6f6f6;
+            .vpg-svg {
+                opacity:1;
+                polyline {
+                    stroke: $dark-grey2;
+                }
+            }
+        }
+        .vpg-svg {
+            opacity: 0.72;
         }
     }
 
@@ -163,6 +177,10 @@ export default defineComponent({
         display: flex;
         justify-content: center;
         align-items: center;
+        polyline {
+            stroke: $grey;
+            transition: .24s ease all;
+        }
     }
 }
 .cube-surfaces-label {
@@ -174,8 +192,16 @@ export default defineComponent({
             fill: transparent;
         }
     }
-
-
+    
+    &.__isHover {
+        &.aztech-label {
+            color: #fff;
+            fill: $dark-grey2;
+            .aztech-label-svg {
+                fill: $dark-grey;
+            }
+        }
+    }
     &.__isSelected {
         &.aztech-label {
             color: #fff;

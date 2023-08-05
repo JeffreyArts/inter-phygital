@@ -17,7 +17,7 @@
                 <section ratio="2x1">
                     <section-cube-config />
                 </section>
-                <section ratio="1x1" @click="select('cube-3d')">
+                <section ratio="1x1" @click="select('cube-3d')" @mousedown="setSelection" @mousemove="cancelSelection">
                     <section-cube3d  />
                 </section>
                 <section ratio="2x2" v-if="dashboard.activeComponent === 'cube-faces'">
@@ -52,12 +52,25 @@ export default defineComponent ({
     },
     data() {
         return {
+            selection: {x: 0, y:0}
         }
     },
     methods: {
-        select(section: "cube-3d" | "cube-faces") {
-            this.dashboard.activeComponent = section
+        setSelection(event:MouseEvent) {
+            this.selection.x = event.clientX
+            this.selection.y = event.clientY
         },
+        select(section: "cube-3d" | "cube-faces") {
+            if (this.selection.x !== 0 && this.selection.y !== 0) {
+                this.dashboard.activeComponent = section
+            }
+        },
+        cancelSelection(event:MouseEvent) {
+            if (Math.abs(this.selection.x - event.clientX) > 4 || Math.abs(this.selection.y - event.clientY) > 4) {
+                this.selection.x = 0
+                this.selection.y = 0
+            }
+        }
     },
 })
 </script>
