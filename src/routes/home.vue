@@ -154,9 +154,10 @@ export default defineComponent ({
 }
 
 .sidebar {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: flex-start;
-    align-items: flex-start;
+    display: grid;
+    &.__2Columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
 }
 </style>

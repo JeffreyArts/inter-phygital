@@ -110,37 +110,33 @@ export const dashboard = defineStore({
                 case 0:
                     position.top    = this.orientation == "portrait" ? 0 : 0
                     position.left   = this.orientation == "portrait" ? 0 : 0
-                    position.width  = this.orientation == "portrait" ? width : width/2
-                    position.height = this.orientation == "portrait" ? height/2: height
-                    if (this.activeIndex == 0) {
-                        position.top    = this.orientation == "portrait" ? 0 : 0
-                        position.left   = this.orientation == "portrait" ? 0 : 0
-                        position.width  = this.orientation == "portrait" ? width : width-size
-                        position.height = this.orientation == "portrait" ? height-size : height
-                    } else if(this.activeIndex == 1) {
-                        position.top    = this.orientation == "portrait" ? 0 : 0
-                        position.left   = this.orientation == "portrait" ? 0 : 0
-                        position.width  = this.orientation == "portrait" ? width : size
-                        position.height = this.orientation == "portrait" ? size : height
-                    } 
+                    position.width  = this.orientation == "portrait" ? width : width-size
+                    position.height = this.orientation == "portrait" ? height-size : height
+                    // if (this.activeIndex == 0) {
+                    // } else if(this.activeIndex == 1) {
+                    //     position.top    = this.orientation == "portrait" ? 0 : 0
+                    //     position.left   = this.orientation == "portrait" ? 0 : 0
+                    //     position.width  = this.orientation == "portrait" ? width : size
+                    //     position.height = this.orientation == "portrait" ? size : height
+                    // } 
                     break
                 case 1:
-                    position.left   = this.orientation == "portrait" ? 0 : width/2
-                    position.top    = this.orientation == "portrait" ? height/2 : 0
-                    position.width  = this.orientation == "portrait" ? width : width/2
-                    position.height = this.orientation == "portrait" ? height/2 : height
+                    position.top    = this.orientation == "portrait" ? height-size : 0
+                    position.left   = this.orientation == "portrait" ? 0 : width-size
+                    position.width  = this.orientation == "portrait" ? width : size
+                    position.height = this.orientation == "portrait" ? size : height
 
-                    if (this.activeIndex == 0) {
-                        position.top    = this.orientation == "portrait" ? height-size : 0
-                        position.left   = this.orientation == "portrait" ? 0 : width-size
-                        position.width  = this.orientation == "portrait" ? width : size
-                        position.height = this.orientation == "portrait" ? size : height
-                    } else if(this.activeIndex == 1) {
-                        position.top    = this.orientation == "portrait" ? size : 0
-                        position.left   = this.orientation == "portrait" ? 0 : size
-                        position.width  = this.orientation == "portrait" ? width : width-size
-                        position.height = this.orientation == "portrait" ? height-size : height
-                    }
+                    // if (this.activeIndex == 0) {
+                    //     position.top    = this.orientation == "portrait" ? height-size : 0
+                    //     position.left   = this.orientation == "portrait" ? 0 : width-size
+                    //     position.width  = this.orientation == "portrait" ? width : size
+                    //     position.height = this.orientation == "portrait" ? size : height
+                    // } else if(this.activeIndex == 1) {
+                    //     position.top    = this.orientation == "portrait" ? size : 0
+                    //     position.left   = this.orientation == "portrait" ? 0 : size
+                    //     position.width  = this.orientation == "portrait" ? width : width-size
+                    //     position.height = this.orientation == "portrait" ? height-size : height
+                    // }
                     break
                 }
                 return position
