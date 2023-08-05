@@ -1,5 +1,5 @@
 <template>
-    <div class="cube-config-container" ref="container">
+    <div class="seed-section-container" ref="container">
         <label class="seed-container">
             <span class="seed-value">
                 {{ seed }}
@@ -10,20 +10,6 @@
             
             <icon type="loader" class="seed-button" label="regenerate" ref="generateButton" @click="regenerateSeed"/>
         </label>
-
-        <div class="download-container" @click="downloadModel">
-            <icon class="download-icon" type="save"></icon>
-            <label class="download-label">download model</label>
-        </div>
-
-        <div class="sizes-container">
-            <aztech-line />
-            <div class="sizes-container-dimensions">
-                <aztech-input-number v-model="width" disabled label="width" unit="cm" @increase="modifyBlockSize" @decrease="modifyBlockSize"/>
-                <aztech-input-number v-model="height" disabled label="height" unit="cm"  @increase="modifyBlockSize" @decrease="modifyBlockSize"/>
-                <aztech-input-number v-model="depth" disabled label="depth" unit="cm"  @increase="modifyBlockSize" @decrease="modifyBlockSize"/>
-            </div>
-        </div>
     </div>
 </template>
 
@@ -32,15 +18,13 @@
 import { defineComponent } from "vue"
 import icon from "@/components/icon.vue"
 import Phygital from "@/stores/phygital"
-import AztechLine from "@/components/aztech/line-1.vue"
 import AztechUnderline from "@/components/aztech/underline-1.vue"
-import AztechInputNumber from "@/components/aztech/input-number.vue"
 import gsap from "gsap"
 
 export default defineComponent({
-    name: "cube-faces",
+    name: "cube-config",
     components: {
-        icon, AztechUnderline, AztechLine, AztechInputNumber
+        icon, AztechUnderline
     },
     props: {
         character: {
@@ -85,7 +69,7 @@ export default defineComponent({
     },
     mounted() {
         this.phygital.generateSeed()
-        this.seed = this.phygital.seed
+        this.seed = this.phygital.seed + ""
 
         this.mountedAnimations()
         
@@ -115,7 +99,7 @@ export default defineComponent({
             })
         },
         regenerateSeed(event:MouseEvent) {
-            const currentTarget = event.currentTarget
+            const currentTarget = event.currentTarget as HTMLElement
 
             if (this.regenerating) { 
                 return
@@ -134,7 +118,7 @@ export default defineComponent({
             },{
                 duration: 6.4,
                 ease: "power2.out",
-                slots: 16,
+                slots: 14,
             })
             gsap.to(target, {
                 duration: 1.8,
@@ -145,7 +129,7 @@ export default defineComponent({
                 onComplete: () => {
                     this.phygital.generateSeed()
                     setTimeout(() => {
-                        this.seed = this.phygital.seed
+                        this.seed = this.phygital.seed + ""
                     }, 128)
                     gsap.to(target, {
                         duration: .64,
@@ -167,9 +151,6 @@ export default defineComponent({
                 }
             })
         },
-        downloadModel() {
-            this.phygital.downloadSTL(this.seed)
-        },
         modifyBlockSize(size: number) {
             this.phygital.blockSize = size/this.phygital.surfaces.top.width 
         }
@@ -179,7 +160,7 @@ export default defineComponent({
 
 <style lang="scss">
 @import "@/assets/scss/variables.scss";
-.cube-config-container {
+.seed-section-container {
     position: relative;
     display: flex;
     flex-flow: column;
@@ -187,30 +168,25 @@ export default defineComponent({
     justify-content: space-between;
     width: 100%;
     height: 100%;
-    // > * {
-    //     pointer-events: none;
-    // }
-    &.__isActive {
-        > * {
-            pointer-events: all;
-        }
-    }
+    container-type: size;
+    container-name: seed-section-container;
 }
 
 .seed-container {
-    font-size: 24px;
-    margin-top: 12px;
+    // margin-top: 12px;
+    height: 100%;
     font-family: $accentFont;
     display: flex;
     gap: 8px;
     color: $black;
     position: relative;
     justify-content: space-between;
+    align-items: center;
 }
 
 .seed-label-container {
-    margin-top: 8px;
-    display: block;
+    // margin-top: 8px;
+    display: none;
     
     svg {
         width: 100%;
@@ -230,21 +206,28 @@ export default defineComponent({
 .seed-name {
     font-weight: normal;
 }
+
 .seed-value {
-    width: 100%;
-    text-align: right;
+    width: calc(100% - 48px); 
+    font-size: 14px;
+    text-align: left;
     position: relative;
 }
 
 .seed-button {
-    // display: inline-block;
-    height: 52px;
+    // height: 100%;
+    // height: 52px;
+    // width: 88px;
+    width: 48px;
     translate: 8px 0px;
     cursor: pointer;
-
+    .icon-svg {
+        height: 32px;
+    }
     svg {
         display: inline-block;
         transition: .4s all ease;
+        width: 100%;
         g {
             transform-origin: center center;
         }
@@ -270,68 +253,56 @@ export default defineComponent({
 
     .icon-label {
         opacity: 0;
+        display: none;
         font-size: 10px;
         transition: .24s opacity ease;
     }
 }
 
-.download-container {
-    width: 100%;
-    display: flex;
-    flex-flow: row;
-    gap: 8px;
-    font-size: 14px;
-    justify-content: start;
-    align-items: center;
-    font-family: $accentFont;
-    
-    &:hover {
-        cursor: pointer;
-        
-        .icon-save-arrow {
-            animation: hoverSaveIcon .4s ease infinite alternate;
+@container seed-section-container (min-height: 44px) {
+    .seed-value {
+        font-size: 16px;
+    }
+}
+@container seed-section-container (min-height: 52px) {
+    .seed-value {
+        font-size: 18px;
+    }
+}
+
+@container seed-section-container (min-height: 56px) {
+    .seed-value {
+        text-align: right;
+    }
+    .seed-label-container {
+        display: block;
+    }
+}
+
+@container seed-section-container (min-height: 60px) {
+    .seed-label-container {
+        margin: 4px;
+    }
+}
+
+@container seed-section-container (min-height: 64px) {
+    .seed-label-container {
+        margin: 8px;
+    }
+    .seed-value {
+        margin-top: 12px;
+        width: calc(100% - 88px); 
+    }
+    .seed-button {
+        height: 48px;
+        width: 88px; 
+        .icon-svg {
+            height: 48px;
         }
-        .download-label {
-            translate: 0 0;
-            scale: 1.1;
+        .icon-label {
+            display: block;
+            // font-family: $defaultFont;
         }
     }
-    
-    .icon {
-        height: 32px;
-    }
-
-
-    .icon-save-arrow {
-        transition: ease .24s all;
-    }
 }
-
-.download-label {
-    transition: ease .24s all;
-    transform-origin: left center;
-    cursor: pointer;
-}
-
-.sizes-container {
-    padding-right: 14px;
-}
-
-.sizes-container-dimensions {
-    display: flex;
-    flex-flow: row;
-    justify-content: space-between;
-    align-items:flex-end;
-}
-
-// animation
-@keyframes hoverSaveIcon {
-    0% {
-        translate: 0 -1px;
-    }
-    100% {
-        translate: 0 1px;
-    }
-}
-
 </style>

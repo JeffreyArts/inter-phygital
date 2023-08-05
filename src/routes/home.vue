@@ -14,16 +14,24 @@
                 <section ratio="2x1">
                     <section-surfaces/>
                 </section>
-                <section ratio="2x1">
-                    <section-cube-config />
-                </section>
                 <section ratio="1x1" @click="select('cube-3d')" @mousedown="setSelection" @mousemove="cancelSelection">
                     <section-cube3d  />
                 </section>
+                <section ratio="4x1">
+                    <section-seed/>
+                </section>
+                <section ratio="4x1">
+                    <section-download/>
+                </section>
+                <section ratio="4x1">
+                    <section-meta-dimensions />
+                </section>
+            </aside>
+            <!-- <aside class="sidebar">
                 <section ratio="2x2" v-if="dashboard.activeComponent === 'cube-faces'">
                     <section-view-edit-button />
                 </section>
-            </aside>
+            </aside> -->
         </dashboard>
     </div>
 </template>
@@ -33,16 +41,18 @@
 import {defineComponent} from "vue"
 import DashboardStore from "@/stores/dashboard"
 import MainCubeFaces from "@/components/sections/main-cube-faces.vue"
-import sectionCubeConfig from "@/components/sections/cube-config.vue"
+import sectionMetaDimensions from "@/components/sections/meta-dimensions.vue"
 import sectionCube3d from "@/components/sections/cube-3d.vue"
 import sectionSurfaces from "@/components/sections/surfaces-grid.vue"
 import sectionViewEditButton from "@/components/sections/view-edit-button.vue"
+import sectionDownload from "@/components/sections/download-model.vue"
+import sectionSeed from "@/components/sections/cube-seed.vue"
 import Dashboard from "@/components/dashboard.vue"
 import _ from "lodash"
 
 export default defineComponent ({ 
     name: "homePage",
-    components: {Dashboard, MainCubeFaces, sectionCubeConfig, sectionCube3d, sectionSurfaces, sectionViewEditButton},
+    components: {Dashboard, MainCubeFaces, sectionMetaDimensions, sectionCube3d, sectionSurfaces, sectionViewEditButton, sectionDownload, sectionSeed},
     props: [],
     setup() {
         const dashboard = DashboardStore()
