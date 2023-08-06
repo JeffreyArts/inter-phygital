@@ -1,6 +1,6 @@
 <template>
-    <div class="cube-3d-container" ref="container">
-        <sandbox-view v-bind:datamodel="pattern3D" v-bind:camera-focal-length="128" :model-changed="pattern3D.update"></sandbox-view>
+    <div class="cube-3d-container" :class="[mouseDown ? '__mouseDown' : '']" ref="container">
+        <sandbox-view :name="name" v-bind:datamodel="pattern3D" :model-changed="pattern3D.update" @active:camera="cameraUpdate" @mousedown="mouseDown = true" @mouseup="mouseDown = false"></sandbox-view>
     </div>
 </template>
 
@@ -41,6 +41,10 @@ export default defineComponent({
             required: false,
             default: "-"
         },
+        name: {
+            type: String,
+            required: false
+        }
     },
     setup() {
         const phygital = Phygital()
@@ -52,6 +56,7 @@ export default defineComponent({
     data: () => {
         return {
             pattern3D: new THREE.Object3D(),
+            mouseDown: false,
             cube: {
                 top: new THREE.Object3D(),
                 bottom: new THREE.Object3D(),
@@ -60,6 +65,8 @@ export default defineComponent({
                 front: new THREE.Object3D(),
                 back: new THREE.Object3D(),
             },
+            // name: "",
+            camera: null as THREE.PerspectiveCamera | null,
         }
     },
     computed: {
@@ -84,29 +91,42 @@ export default defineComponent({
             this.update3DModel("front")
             this.update3DModel("back")
         })
+        // if (this.$el.parentElement) {
+        //     if (this.$el.parentElement.classList.contains( "main-section")) {
+        //         this.name = "main"
+        //     } else {
+        //         this.name = "sidebar"
+        //     }
+        // }
     },
     methods: {
-        // regenerateSeed() {
-        //     this.phygital.generateSeed()
-        // },
+        cameraUpdate(camera : THREE.PerspectiveCamera) {
+            this.camera = camera
+            this.camera.position.set(20, 8, -2)
+            this.camera.zoom = 1.5
+            this.camera.updateProjectionMatrix()
+        },
         update3DModel(side: "top" | "bottom" | "left" | "right" | "front" | "back"){
             _.remove(this.pattern3D.children, childObject => {
                 if (childObject.name == "innerCube") {
                     removeObject(childObject)
                     return true
                 }
-                if (childObject.name == `face-${side}`) {
+                if (childObject.name.startsWith(`face-${side}`)) {
                     removeObject(this.cube[side])
                     removeObject(childObject)
                     return true
                 }
             })
 
+            if (!this.phygital.surfaces[side].model3D) {
+                return
+            }
+
             this.pattern3D.name = Math.floor(Math.random()*1000)
             this.pattern3D.width = this.phygital.surfaces.top.width
             this.pattern3D.depth = this.phygital.surfaces.top.height
             this.pattern3D.height = this.phygital.surfaces.left.height
-
             if (!this.phygital.openCube) {
                 const box = new THREE.BoxGeometry(this.pattern3D.width-1.5, this.pattern3D.height-1.5, this.pattern3D.depth-1.5)
                 const mesh = new THREE.Mesh(box, this.phygital.surfaces.top.model3D.material)
@@ -163,7 +183,14 @@ export default defineComponent({
     justify-content: center;
     align-items: center;
     height: 100%;
-
+    .sandbox-view {
+        cursor: grab;
+    }
+    &.__mouseDown {
+        .sandbox-view {
+            cursor: grabbing;
+        }
+    }
 
 }
 </style>

@@ -78,7 +78,7 @@ export default defineComponent({
 }
 
 .aztech-label {
-    display: inline-block;
+    display: block;
     position: relative;
     height: 16px;
     font-size: 14px;

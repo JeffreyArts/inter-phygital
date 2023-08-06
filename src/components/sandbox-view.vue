@@ -1,15 +1,24 @@
 <template>
-    <div class="sandbox-view"></div>
+    <div class="sandbox-view" @mousedown="cancelAnimations"></div>
 </template>
 
 <script>
 import _ from "lodash"
 import * as THREE from "three"
+import gsap from "gsap" 
+import Phygital from "@/stores/phygital"
 import threeDView from "@/services/3d-view.js"
 
 
 export default {
-    props: ["cameraFocalLength", "datamodel", "modelChanged"],
+    props: ["datamodel", "modelChanged", "name"],
+    setup() {
+        const phygital = Phygital()
+        
+        return {
+            phygital
+        }
+    },
     data() {
         return {
             scene: false,
@@ -17,6 +26,7 @@ export default {
                 width: 256,
                 height: 256,
             },
+            scale: 6,
             renderer: null,
             camera: null,
             orbitControls: null,
@@ -27,12 +37,7 @@ export default {
             handler(val, oldVal) {
                 this.updateModel()
             },
-        }
-        // cameraFocalLength: {
-        //     handler(val) {
-        //         this.camera.setFocalLength(val)
-        //     }
-        // }
+        },
     },
 
     mounted() {
@@ -45,9 +50,14 @@ export default {
         this.renderer   = o.renderer
         this.camera     = o.camera
         this.orbitControls = o.orbitControls
+        this.$emit("active:camera", this.camera)
 
-        this.$emit("camera", this.camera)
-
+        
+        setTimeout(() => {
+            if (this.name) {
+                this.phygital.sandbox[this.name] = o
+            }
+        })
         this.$el.append( this.renderer.domElement )
         window.addEventListener("resize", this.updateCanvasSize)
         setTimeout(() => {
@@ -81,32 +91,59 @@ export default {
             this.container.height = size
 
             this.renderer.setSize( this.container.width, this.container.height)
-            this.camera.bottom = -this.container.height/this.scale
-            this.camera.top = this.container.height/this.scale
-            this.camera.left = -this.container.width/this.scale
-            this.camera.right = this.container.width/this.scale
-
-            this.camera.updateProjectionMatrix()
         },
         updateModel() {
+            if (this.datamodel.children.length <= 0){
+                return // Can not update model if there is no model
+            }
+
+
             _.each(this.scene.children, childObject => {
-                if (childObject.datamodel == true) {
+                if (childObject.name == "datamodel") {
                     this.removeObject(childObject)
                 }
             })
 
             if (this.datamodel && this.datamodel.uuid) {
-                var internalDatamodel = this.datamodel.clone()
-                internalDatamodel.datamodel = true
+                const internalDatamodel = this.datamodel.clone()
+                internalDatamodel.name = "datamodel"
                 this.scene.add(internalDatamodel)
             }
+
+            // Calculate the target position
+            const target = new THREE.Vector3(this.datamodel.width / 2 - 0.75, this.datamodel.height / 2 + 0.5, this.datamodel.depth / 2 - 0.75)
+
+            // Animate camera position and lookAt using GSAP
+            gsap.to(this.camera.position, {
+                duration: 1.28, // Duration in seconds
+                x: this.datamodel.width * 4,
+                y: this.datamodel.height * 1.8,
+                z: this.datamodel.depth * 4,
+                // ease: "power1.in"
+                ease: "elastic.out(1, 0.3)"
+            })
+
+            gsap.to(this.camera.lookAt, {
+                duration: 1.28,
+                x: target.x,
+                y: target.y,
+                z: target.z,
+                onUpdate: () => {
+                    this.camera.lookAt(target)
+                    if (this.orbitControls) {
+                        this.orbitControls.target = target
+                    }
+                },
+                ease: "power1.inOut",
+            })
             
-            this.camera.position.set( this.datamodel.width*4, this.datamodel.height*1.72, this.datamodel.depth*4)
-            const target = new THREE.Vector3(this.datamodel.width/2-.75, this.datamodel.height/2 + .5, this.datamodel.depth/2-.75)
-            this.camera.lookAt( target)
             if (this.orbitControls) {
                 this.orbitControls.target =  target
             }
+        },
+        cancelAnimations() {
+            gsap.killTweensOf(this.camera.position)
+            gsap.killTweensOf(this.camera.lookAt)
         }
     }
 

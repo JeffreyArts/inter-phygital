@@ -56,6 +56,9 @@ export default defineComponent({
     methods: {
         mountedAnimations() {
             //
+        },
+        modifyBlockSize() {
+            //
         }
     }
 })
@@ -67,7 +70,7 @@ export default defineComponent({
     position: relative;
     display: flex;
     flex-flow: column;
-    padding: 0 8px;
+    padding: 0;
     justify-content: space-between;
     width: 100%;
     height: 100%;

@@ -20,6 +20,7 @@ import icon from "@/components/icon.vue"
 import Phygital from "@/stores/phygital"
 import AztechUnderline from "@/components/aztech/underline-1.vue"
 import gsap from "gsap"
+import _ from "lodash"
 
 export default defineComponent({
     name: "cube-config",
@@ -69,6 +70,9 @@ export default defineComponent({
     },
     mounted() {
         this.phygital.generateSeed()
+        
+        this.updateSurfaces()
+
         this.seed = this.phygital.seed + ""
 
         this.mountedAnimations()
@@ -120,36 +124,144 @@ export default defineComponent({
                 ease: "power2.out",
                 slots: 14,
             })
-            gsap.to(target, {
-                duration: 1.8,
-                rotate: 540,
-                onUpdate: () => {
-                    this.seed = "a-" + Math.floor(Math.random() * 100000000)
-                },
-                onComplete: () => {
-                    this.phygital.generateSeed()
-                    setTimeout(() => {
-                        this.seed = this.phygital.seed + ""
-                    }, 128)
-                    gsap.to(target, {
-                        duration: .64,
-                        rotate: 720,
-                        ease: "elastic.out(1, .4)",
-                        onComplete: () => {
-                            // kill slots animation
-                            slotsAnimation.kill()
 
-                            gsap.to(this, {
-                                slots: 8,
-                                duration: .8,
-                            })
-                            this.regenerating = false
-                            currentTarget.classList.remove("__isGenerating")
-                            gsap.set(target, {rotate: 0})
-                        }
-                    })
-                }
+
+
+            const randomSeedInterval = setInterval(() => {
+                this.seed = "a-" +_.random(0, 100000000).toString()
+            }, 64)
+
+            gsap.to(target, {
+                duration: 1.28,
+                rotate: 360,
+                repeat: -1,
+                ease: "none",
             })
+            this.animateDisapearingMainSandbox().then(() => {
+                clearInterval(randomSeedInterval)
+                this.seed =  this.phygital.seed + ""
+                // kill slots animation
+                gsap.killTweensOf(target)
+                gsap.to(target, {
+                    duration: .64,
+                    rotate: 560,
+                    ease: "elastic.out(1, .4)",
+                })
+                setTimeout(() => {
+
+                    slotsAnimation.kill()
+
+                    gsap.to(this, {
+                        slots: 8,
+                        duration: .8,
+                    })
+                    this.regenerating = false
+                    currentTarget.classList.remove("__isGenerating")
+                    gsap.set(target, {rotate: 0})
+                }, 0)
+                    
+            })
+            
+            
+        },
+        animateDisapearingMainSandbox() {
+            return new Promise ((resolve, reject) => {
+
+                
+                if (!this.phygital.sandbox.main) {
+                    console.warn("No main sandbox found")
+                    return reject(false)
+                }
+
+                // Create array with all the parts
+                let surfaceObjects = []
+                const model3D = _.find(this.phygital.sandbox.main.scene.children, child => {
+                    return child.name == "datamodel"
+                })
+                if (model3D && model3D.children.length > 0) {
+                    _.each(model3D.children, surface => {
+                        _.each(surface.children, (child, i) => {
+                            child.material.transparent = true
+                                
+                            const material = child.material.clone()
+                            child.material = material
+                            surfaceObjects.push (child)
+                        })
+                    })                
+                }
+                surfaceObjects = _.shuffle(surfaceObjects).sort((a,b) => {
+                    return a.position.z - b.position.z
+                })
+
+                const timeline = gsap.timeline({
+                    onComplete: () => {
+                        this.phygital.sandbox.main.camera.position.set(20, 8, -2)
+                        this.phygital.sandbox.main.camera.zoom = 1.5
+                        this.phygital.sandbox.main.camera.updateProjectionMatrix()
+                        this.updateSurfaces()
+                        
+                        // this.phygital.update3DSurface(surface)
+                        // this.phygital.update3DSurface(oppositeSurface)
+                        return resolve(true)
+                    }
+                })
+                // Animate parts    
+                _.each(surfaceObjects, (object, i) => {
+                    let newPos = (object.name.startsWith("top") || object.name.startsWith("front")) ? object.position.y + 1 : object.position.y - 1
+                    const positionAnimation = gsap.to(object.position, {
+                        duration: 0.8,
+                        y: newPos,
+                        ease: "power4.out",
+                        delay: i * .008
+                    })
+                    
+                    
+                    const opacityAnimation = gsap.to(object.material, {
+                        duration: 0.4,
+                        delay: i*.008,
+                        opacity: 0,
+                        onUpdate: () => {
+                            object.material.needsUpdate = true
+                        },
+                        onComplete: () => {
+                            object.material.opacity = 0 // Ensure opacity is set to 0 when animation completes
+                            object.material.needsUpdate = true
+                        },
+                        ease: "none",
+                    })
+
+                    timeline.add(positionAnimation, i * 0.01)
+                    timeline.add(opacityAnimation, i * 0.02)
+                })
+                timeline.play()
+
+                // aAfter all parts are animated, remove them from the scene
+                this.phygital.generateSeed()
+                
+                    
+                // Animate camera
+                gsap.to(this.phygital.sandbox.main.camera, {
+                    duration: 1.8,
+                    zoom: 1,
+                    onUpdate: () => {
+                        this.phygital.sandbox.main.camera.updateProjectionMatrix()
+                    },
+                
+                    ease: "power2.out",
+                })
+            })
+        },
+        updateSurfaces() {
+            this.phygital.updateSurfaces().then(() => {
+                this.phygital.update3DSurface("top")
+                this.phygital.update3DSurface("bottom")
+
+                this.phygital.update3DSurface("left")
+                this.phygital.update3DSurface("right")
+
+                this.phygital.update3DSurface("front")
+                this.phygital.update3DSurface("back")
+            }) 
         },
         modifyBlockSize(size: number) {
             this.phygital.blockSize = size/this.phygital.surfaces.top.width 
@@ -164,7 +276,7 @@ export default defineComponent({
     position: relative;
     display: flex;
     flex-flow: column;
-    padding: 0 8px;
+    padding: 0;
     justify-content: space-between;
     width: 100%;
     height: 100%;

@@ -17,17 +17,18 @@ export const dashboard = defineStore({
         cellSize:128,
         animationEasing: "elastic.out(1.1, 0.9)",
     }),
-    actions: {
+    actions: { 
         setContainer(container: HTMLElement) {
             if (!!(this.container instanceof HTMLElement)) {
                 return
             }
             
+            window.removeEventListener("resize", this.updatePositions)
             window.addEventListener("resize", this.updatePositions)
             this.container = container
             container.clientHeight > container.clientWidth ? this.orientation = "portrait" : this.orientation = "landscape"
 
-        },
+        }, 
         updatePositions() {
             if (!this.container) {
                 return
@@ -40,12 +41,6 @@ export const dashboard = defineStore({
                 return
             } 
 
-            if (this.orientation == "portrait") {
-                this.cellSize = this.container.clientWidth/6
-            } else if (this.orientation == "landscape") {
-                this.cellSize = this.container.clientHeight/6
-            }
-            
             // _.forEach(this.elements, (element, index) => {
             //     element.removeEventListener("click",this.focusElement)
             //     element.addEventListener("click", this.focusElement)
@@ -85,18 +80,35 @@ export const dashboard = defineStore({
             this.updatePositions()
         },
         update2ElementsDashboard() {
-
+            
             if (!this.container)  {
                 console.warn("No dashboard container set, can't update positions")
                 return
             }
+            const style = window.getComputedStyle(this.container)
+            const width = this.container.clientWidth // - parseInt(style["padding-left"].replace("px", ""), 10) - parseInt(style["padding-right"].replace("px", ""), 10)- parseInt(style["margin-left"].replace("px", ""), 10) - parseInt(style["margin-right"].replace("px", ""), 10)
+            const height = this.container.clientHeight //- parseInt(style["padding-top"].replace("px", ""), 10) - parseInt(style["padding-bottom"].replace("px", ""), 10)- parseInt(style["margin-top"].replace("px", ""), 10) - parseInt(style["margin-bottom"].replace("px", ""), 10)
+            
 
-            const width = this.container.clientWidth
-            const height = this.container.clientHeight
+            if (_.isNaN(width) || _.isNaN(height)) {
+
+                return
+            }
+
+            let grid = "3x6"
+            if (this.orientation == "portrait") {
+                grid = "6x4"
+                this.cellSize = Math.floor(width/parseInt(grid.split("x")[0], 10))
+            } else if (this.orientation == "landscape") {
+                this.cellSize = Math.floor(height/parseInt(grid.split("x")[1], 10))
+            }
+
+            this.container.setAttribute("data-grid", grid)
+            
 
             const positions = _.map(this.elements, (el, index) => {
 
-                const size = this.cellSize * 2
+                
                 const position = {
                     width:  0,
                     height: 0,
@@ -110,8 +122,8 @@ export const dashboard = defineStore({
                 case 0:
                     position.top    = this.orientation == "portrait" ? 0 : 0
                     position.left   = this.orientation == "portrait" ? 0 : 0
-                    position.width  = this.orientation == "portrait" ? width : width-size
-                    position.height = this.orientation == "portrait" ? height-size : height
+                    position.width  = this.orientation == "portrait" ? width : width - this.cellSize * parseInt(grid.split("x")[0], 10)
+                    position.height = this.orientation == "portrait" ? height - this.cellSize * parseInt(grid.split("x")[1], 10) : height
                     // if (this.activeIndex == 0) {
                     // } else if(this.activeIndex == 1) {
                     //     position.top    = this.orientation == "portrait" ? 0 : 0
@@ -121,10 +133,10 @@ export const dashboard = defineStore({
                     // } 
                     break
                 case 1:
-                    position.top    = this.orientation == "portrait" ? height-size : 0
-                    position.left   = this.orientation == "portrait" ? 0 : width-size
-                    position.width  = this.orientation == "portrait" ? width : size
-                    position.height = this.orientation == "portrait" ? size : height
+                    position.top    = this.orientation == "portrait" ? height - this.cellSize * parseInt(grid.split("x")[1], 10) : 0
+                    position.left   = this.orientation == "portrait" ? 0 : width - this.cellSize * parseInt(grid.split("x")[0], 10)
+                    position.width  = this.orientation == "portrait" ? width : this.cellSize * parseInt(grid.split("x")[0], 10)
+                    position.height = this.orientation == "portrait" ? this.cellSize * parseInt(grid.split("x")[1], 10) : height
 
                     // if (this.activeIndex == 0) {
                     //     position.top    = this.orientation == "portrait" ? height-size : 0

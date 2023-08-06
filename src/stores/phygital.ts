@@ -74,116 +74,133 @@ export const phygitalFace = defineStore({
         model3D: new THREE.Object3D(),
         updating: 0,
         editMode: false,
+        sandbox: {} as {
+            [key: string]: {
+                scene: THREE.Scene;
+                camera: THREE.PerspectiveCamera;
+                renderer: THREE.WebGLRenderer;
+            };
+        }
     }),
     actions: {
         generateSeed() {
             this.seed = "a-" +_.random(0, 100000000).toString()
-            this.updateSurfaces()
         },
         selectSurface(surface: "top" | "bottom" | "left" | "right" |  "front" | "back") {
             this.selectedSurface = surface
         },
         updateSurfaces() {
-            if (!this.seed) {
-                return
-            }
-
-            
-            const surfaces = ["top","left","front"] //first digit is boolean for mirrorX, second digit is boolean for mirrorY
-            const vpgBaseOptions = {
-                symbols: [
-                    {
-                        polylines: [
-                            [ {x:0, y:0},{ x:1, y:0} ]
-                        ],
-                        connectCords: [
-                            { x:0, y:0 },
-                            { x:1, y:0 }
-                        ],
-                        width:2,
-                        height:1
-                    },
-                    {
-                        polylines: [
-                            [ {x:0, y:0},{ x:0, y:1} ]
-                        ],
-                        connectCords: [
-                            { x:0, y:0 },
-                            { x:0, y:1 }
-                        ],
-                        width:1,
-                        height:2
-                    },
-                ],
-                width: 1,
-                height: 1,
-                algorithm: {
-                    type: "polylines",
-                    startPoint: {x:0, y:0},
-                    mirrorX: 1,
-                    mirrorY: 1,
-                    drawConnectLines: true,
+            return new Promise ((resolve, reject) => {
+                    
+                if (!this.seed) {
+                    return reject(new Error("No seed"))
                 }
-            }
 
-            
-            // const mirroringOptionsArray = _.flatten(Array.from({ length: surfaces.length }, () => mirroringOptionValues))
-            // mirroringOptionsArray.length = surfaces.length 
-
-            _.forEach(surfaces, (surface, index) => {
-
-                // Set mirror options
-                const mirroringOptionValues = ["11"] //first digit is boolean for mirrorX, second digit is boolean for mirrorY
-                if (surface === "left") {
-                    mirroringOptionValues.push("10")
-                }
-                if (surface === "back") {
-                    mirroringOptionValues.push("10")
-                }
-                const mirroringOptions = shuffleSeed(mirroringOptionValues, this.seed)
-                const mirroringOption = mirroringOptions[0]
                 
-                
-                // Set starting points
-                const startPoints = []
-                for (let x = 0; x < this.surfaces[surface].width/2; x++) {
-                    for (let y = 0; y < this.surfaces[surface].height/2; y++) {
-                        startPoints.push({x,y})
+                const surfaces = ["top","left","front"] as Array<"top" | "left" | "front">
+                const vpgBaseOptions = {
+                    symbols: [
+                        {
+                            polylines: [
+                                [ {x:0, y:0},{ x:1, y:0} ]
+                            ],
+                            connectCords: [
+                                { x:0, y:0 },
+                                { x:1, y:0 }
+                            ],
+                            width:2,
+                            height:1
+                        },
+                        {
+                            polylines: [
+                                [ {x:0, y:0},{ x:0, y:1} ]
+                            ],
+                            connectCords: [
+                                { x:0, y:0 },
+                                { x:0, y:1 }
+                            ],
+                            width:1,
+                            height:2
+                        },
+                    ],
+                    width: 1,
+                    height: 1,
+                    algorithm: {
+                        type: "polylines",
+                        startPoint: {x:0, y:0},
+                        mirrorX: 1,
+                        mirrorY: 1,
+                        drawConnectLines: true,
                     }
                 }
-                const startPointsFiltered = shuffleSeed(startPoints, this.seed)
-                const startPoint = startPointsFiltered[index % startPointsFiltered.length]
-                
-                const vpgOptions = _.cloneDeep(vpgBaseOptions)
 
-                let seedOffset = 0 as number
-                let oppositeSurface = ""
-                if (surface === "top") { 
-                    seedOffset = 1
-                    oppositeSurface = "bottom"
-                } else if (surface === "left") {
-                    seedOffset = 2
-                    oppositeSurface = "right"
-                } else if (surface === "front") {
-                    seedOffset = 3
-                    oppositeSurface = "back"
-                }
+                
+                // const mirroringOptionsArray = _.flatten(Array.from({ length: surfaces.length }, () => mirroringOptionValues))
+                // mirroringOptionsArray.length = surfaces.length 
+                const promises = []
+                _.forEach(surfaces, (surface, index) => {
+
+                    // Set mirror options
+                    const mirroringOptionValues = ["11"] //first digit is boolean for mirrorX, second digit is boolean for mirrorY
+                    if (surface === "left") {
+                        mirroringOptionValues.push("10")
+                    }
+                    if (surface === "back") {
+                        mirroringOptionValues.push("10")
+                    }
+                    const mirroringOptions = shuffleSeed(mirroringOptionValues, this.seed)
+                    const mirroringOption = mirroringOptions[0]
                     
-                vpgOptions.seed = this.seed+"-"+seedOffset
-                vpgOptions.width = this.surfaces[surface].width
-                vpgOptions.height = this.surfaces[surface].height
-                vpgOptions.algorithm.mirrorX = parseInt(mirroringOption[0], 10)
-                vpgOptions.algorithm.mirrorY = parseInt(mirroringOption[1], 10)
-                vpgOptions.algorithm.startPoint = startPoint
+                    
+                    // Set starting points
+                    const startPoints = []
+                    for (let x = 0; x < this.surfaces[surface].width/2; x++) {
+                        for (let y = 0; y < this.surfaces[surface].height/2; y++) {
+                            startPoints.push({x,y})
+                        }
+                    }
+                    const startPointsFiltered = shuffleSeed(startPoints, this.seed)
+                    const startPoint = startPointsFiltered[index % startPointsFiltered.length]
+                    
+                    const vpgOptions = _.cloneDeep(vpgBaseOptions)
 
-                this.surfaces[surface].polylines = Algorithm(vpgOptions).polylines
-                this.surfaces[oppositeSurface].polylines = _.cloneDeep(this.surfaces[surface].polylines)
-                
-                this.update3DSurface(surface)
-                this.update3DSurface(oppositeSurface)
+                    let seedOffset = "" as string
+                    if (surface === "top") { 
+                        seedOffset = ".A"
+                    } else if (surface === "left") {
+                        seedOffset = ".B"
+                    } else if (surface === "front") {
+                        seedOffset = ".C"
+                    }
+                        
+                    vpgOptions.seed = this.seed+"-"+seedOffset
+                    vpgOptions.width = this.surfaces[surface].width
+                    vpgOptions.height = this.surfaces[surface].height
+                    vpgOptions.algorithm.mirrorX = parseInt(mirroringOption[0], 10)
+                    vpgOptions.algorithm.mirrorY = parseInt(mirroringOption[1], 10)
+                    vpgOptions.algorithm.startPoint = startPoint
+
+                    promises.push(this.generatePolylines(vpgOptions))
+                })
+
+                Promise.all(promises).then((polylines) => {
+                    _.each(surfaces, (surface, index) => {
+                        const oppositeSurface = this.getOppositeSurface(surface)
+                        this.surfaces[surface].polylines = polylines[index]
+                        this.surfaces[oppositeSurface].polylines = _.cloneDeep(this.surfaces[surface].polylines)
+                    })
+                    resolve(true)
+                })
                 
             })
-
+        },
+        async generatePolylines(vpgOptions) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve(Algorithm(vpgOptions).polylines)
+                }, 0)
+                    
+            })
         },
         update3DSurface(surfaceSide: "top" | "bottom" | "left" | "right" |  "front" | "back") {
             const diameter = .5
@@ -199,17 +216,22 @@ export const phygitalFace = defineStore({
                 color: "#777",
                 tubeThickness: .0125,
             })
+            const mergedObject = new THREE.Group()
             
-            let mergedObject = pattern3D[0]
-            for (let i = 1; i < pattern3D.length; i++) {
-                mergedObject = CSG.toMesh(CSG.fromMesh(mergedObject).union(CSG.fromMesh(pattern3D[i])), mergedObject.matrix)
-            }
+            pattern3D.forEach((mesh, i) => {
+                mesh.name = `${surfaceSide}-${i}`
+                mergedObject.add(mesh)
+            })
+              
+            // for (let i = 1; i < pattern3D.length; i++) {
+            //     mergedObject = CSG.toMesh(CSG.fromMesh(mergedObject).union(CSG.fromMesh(pattern3D[i])), mergedObject.matrix)
+            // }
             
             
 
             
             if (surfaceSide === "top") {
-                mergedObject.material = pattern3D[0].material
+                // mergedObject.material = pattern3D[0].material
                 // mergedObject.material = new THREE.MeshLambertMaterial( { color: "#f00" })
                 mergedObject.name = "face-top"
                 mergedObject.position.z = - diameter/2
@@ -218,7 +240,7 @@ export const phygitalFace = defineStore({
                 this.surfaces.top.model3D = mergedObject
             }
             if (surfaceSide === "bottom") {
-                mergedObject.material = pattern3D[0].material
+                // mergedObject.material = pattern3D[0].material
                 // mergedObject.material = new THREE.MeshLambertMaterial( { color: "#ff0" })
                 mergedObject.name = "face-bottom"
                 mergedObject.position.z = - diameter/2 
@@ -229,7 +251,7 @@ export const phygitalFace = defineStore({
             }
             
             if (surfaceSide === "front") {
-                mergedObject.material = pattern3D[0].material
+                // mergedObject.material = pattern3D[0].material
                 // mergedObject.material = new THREE.MeshLambertMaterial( { color: "#0f0" })
                 mergedObject.name = "face-front"
                 mergedObject.rotateX(Math.PI/180* 90)
@@ -241,7 +263,7 @@ export const phygitalFace = defineStore({
             }
             
             if (surfaceSide === "back") {
-                mergedObject.material = pattern3D[0].material
+                // mergedObject.material = pattern3D[0].material
                 // mergedObject.material = new THREE.MeshLambertMaterial( { color: "#0ff" })
                 mergedObject.name = "face-back"
                 mergedObject.rotateX(Math.PI/180* 90)
@@ -255,7 +277,7 @@ export const phygitalFace = defineStore({
             }
 
             if (surfaceSide === "left") {
-                mergedObject.material = pattern3D[0].material
+                // mergedObject.material = pattern3D[0].material
                 // mergedObject.material = new THREE.MeshLambertMaterial( { color: "#00f" })
                 mergedObject.name = "face-left"
                 mergedObject.rotateY(Math.PI/180* 180)
@@ -270,7 +292,7 @@ export const phygitalFace = defineStore({
             }
             
             if (surfaceSide === "right") {
-                mergedObject.material = pattern3D[0].material
+                // mergedObject.material = pattern3D[0].material
                 // mergedObject.material = new THREE.MeshLambertMaterial( { color: "#f0f" })
                 mergedObject.name = "face-right"
                 mergedObject.rotateX(Math.PI/180* 90)
@@ -281,28 +303,30 @@ export const phygitalFace = defineStore({
                 mergedObject.updateMatrix()
                 this.surfaces.right.model3D = mergedObject
             }
-
+            mergedObject.name = `${mergedObject.name}-${Math.ceil(Math.random()*1000)}`
             this.surfaces[surfaceSide].update3D++
         },
+        getOppositeSurface(surface: "top" | "bottom" | "left" | "right" |  "front" | "back") {
+            if (surface == "top") {
+                return "bottom"
+            } else if (surface == "bottom") {
+                return "top"
+            } else if (surface == "left") {
+                return "right"
+            } else if (surface == "right") {
+                return "left"
+            } else if (surface == "front") {
+                return "back"
+            } else if (surface == "back") {
+                return "front"
+            } else {
+                console.error("getOppositeSurface: Invalid input")
+            }
+        },
         updateSurface(surface: "top" | "bottom" | "left" | "right" |  "front" | "back", value: number) {
-            let oppositeSurface = ""
+            const oppositeSurface = this.getOppositeSurface(surface)
             const side1 = {surface: "", dimension: ""}
             const side2 = {surface: "", dimension: ""}
-
-            // First define opposite surface
-            if (surface == "top") {
-                oppositeSurface = "bottom"
-            } else if (surface == "bottom") {
-                oppositeSurface = "top"
-            } else if (surface == "left") {
-                oppositeSurface = "right"
-            } else if (surface == "right") {
-                oppositeSurface = "left"
-            } else if (surface == "front") {
-                oppositeSurface = "back"
-            } else if (surface == "back") {
-                oppositeSurface = "front"
-            }
 
             // Than define side surfaces
             if (surface == "top" || surface == "bottom") {
@@ -352,15 +376,12 @@ export const phygitalFace = defineStore({
             clearTimeout(this.updating)
             
             this.updating = setTimeout(() => {
-                this.phygital.updateSurfaces()
                 this.phygital.update3DSurface(surface)
                 this.phygital.update3DSurface(oppositeSurface)
             }, 100)
         },
         downloadSTL(filename: string) { 
-            return new Promise((resolve, reject)=> {
-                console.log(this.model3D.children.length)
-                
+            return new Promise((resolve, reject)=> {                
                 let mergedObject = this.model3D.children[0]
                 if (!mergedObject) {
                     console.error("No object available")

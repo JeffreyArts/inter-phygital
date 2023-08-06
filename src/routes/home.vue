@@ -3,34 +3,34 @@
         <dashboard>
             <main class="main __isActive">
                 <section class="main-section">
-                    <section-cube3d v-if="dashboard.activeComponent === 'cube-3d'"/>
+                    <section-cube3d v-if="dashboard.activeComponent === 'cube-3d'" name="main"/>
                     <main-cube-faces v-if="dashboard.activeComponent === 'cube-faces'"/>
                 </section>
             </main>
             <aside class="sidebar">
-                <!-- <section ratio="1x1" @click="select('cube-faces')">
+                <!-- <section @click="select('cube-faces')">
                     <main-cube-faces/>
                 </section> -->
-                <section ratio="2x1">
-                    <section-surfaces/>
-                </section>
-                <section ratio="1x1" @click="select('cube-3d')" @mousedown="setSelection" @mousemove="cancelSelection">
-                    <section-cube3d  />
-                </section>
-                <section ratio="4x1">
+                <section id="s-seed">
                     <section-seed/>
                 </section>
-                <section ratio="4x1">
+                <section id="s-surfaces">
+                    <section-surfaces/>
+                </section>
+                <section id="s-dimensions">
+                    <section-meta-dimensions />
+                </section>
+                <section id="s-cube3d" @click="select('cube-3d')" @mousedown="setSelection" @mousemove="cancelSelection">
+                    <section-cube3d name="sidebar" />
+                </section>
+                <section id="s-download">
                     <section-download/>
                 </section>
-                <section ratio="4x1">
-                    <section-meta-dimensions />
+                <section id="s-view-edit" v-if="dashboard.activeComponent === 'cube-faces'">
+                    <section-view-edit-button />
                 </section>
             </aside>
             <!-- <aside class="sidebar">
-                <section ratio="2x2" v-if="dashboard.activeComponent === 'cube-faces'">
-                    <section-view-edit-button />
-                </section>
             </aside> -->
         </dashboard>
     </div>
@@ -65,6 +65,11 @@ export default defineComponent ({
             selection: {x: 0, y:0}
         }
     },
+    mounted() {
+        setTimeout(() => {
+            window.dispatchEvent(new Event("resize"))
+        })
+    },
     methods: {
         setSelection(event:MouseEvent) {
             this.selection.x = event.clientX
@@ -97,6 +102,12 @@ export default defineComponent ({
         height: calc(100vh - 64px);
         width: calc(100vw - 64px);
         overflow: hidden;
+        &[data-grid="3x6"] {
+            .sidebar {
+                grid-template-columns: 1fr 2fr;
+                grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
+            }
+        }
     }
     .layout-modifiers {
         position: absolute;
@@ -159,5 +170,45 @@ export default defineComponent ({
         grid-template-columns: 1fr 1fr;
         gap: 8px;
     }
+}
+
+.home .dashboard[data-grid="3x6"] {
+    .sidebar {
+        grid-template-columns: calc(100% / 3) calc(100% / 3 * 2);
+        grid-template-rows: calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6);
+    }
+
+    #s-seed {
+        grid-column: 2;
+        grid-row: 1/2;
+    }
+    #s-surfaces {
+        grid-column: 2;
+        grid-row: 2/4;
+    }
+    #s-dimensions {
+        grid-column: 2;
+        grid-row: 4/5;
+    }
+    
+    #s-cube3d {
+        grid-column: 2;
+        grid-row: 5/7;
+    }
+    
+    #s-download {
+        grid-column: 2;
+        grid-row: 5/6;
+        display: none;
+    }
+    #s-view-edit {
+        grid-column: 1;
+        grid-row:6/7;
+    }
+    @media (min-height: 632px){ 
+        
+        
+    }
+
 }
 </style>

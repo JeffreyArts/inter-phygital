@@ -27,7 +27,7 @@ const view3D  = {
 
         const scene             = new THREE.Scene()
         const camera            = new THREE.PerspectiveCamera( 35, 1, 0.1, 1000 )
-        camera.position.set( 16, 20, 0)
+        camera.position.set( 0, 8, 0)
         camera.lookAt( 0, 0, 0)
 
         const cameraHelper = new THREE.CameraHelper(camera)

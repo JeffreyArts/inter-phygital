@@ -37,33 +37,14 @@ export default defineComponent({
     mounted() {
         // const observer = new MutationObserver(this.updateDashboard)
         if (this.$refs["container"] instanceof HTMLElement) {
+            // Clean up old container (only required for hot reload)
+            if (this.dashboard.container instanceof HTMLElement) {
+                this.dashboard.container.remove()
+                this.dashboard.container = null
+            }
             this.dashboard.setContainer(this.$refs["container"] as HTMLElement)
-            // observer.observe(this.$refs["container"], {
-            //     childList: true,
-            //     subtree: true 
-            // })
-            // this.observer = observer
         }
-
-        this.updateDashboard()
-        // window.addEventListener("resize", this.updateDashboard)
     },
-    beforeUnmount() {
-        // window.removeEventListener("resize", this.updateDashboard)
-        // this.dashboard.container = null 
-        // if (this.observer) {
-        //     this.observer.disconnect()
-        // }
-    },
-    methods: {
-        updateDashboard() {
-            this.dashboard.updatePositions()
-            // setTimeout(() => {
-            //     window.dispatchEvent(new Event("resize"))
-            // }, 800)
-        },
-        
-    }
 })
 </script>
 
@@ -71,8 +52,8 @@ export default defineComponent({
 @import "./../assets/scss/variables.scss";
 .dashboard {
     position: relative;
-    > * {
-        position: absolute;
-    }
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 </style>

@@ -130,15 +130,15 @@ export default defineComponent({
     grid-template-columns: repeat(3, 1fr);
     text-align: center;
 }
+
 .cube-surfaces-container {
-    padding: 0 8px;
+    padding: 0 1px;
     width: 100%;
-}
-.cube-surfaces-footer {
-    padding-top: 16px;
-}
-.cube-surfaces-header {
-    padding-bottom: 16px;
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-around;
+    align-items: flex-end;
 }
 
 .cube-surfaces-grid {
