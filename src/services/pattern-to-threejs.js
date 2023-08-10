@@ -298,6 +298,29 @@ const mergePattern = (pattern, map) => {
     })
 }
 
+const validateGeometryMesh = (mesh, meshes) => {
+
+    const existingMesh = _.find(meshes, (otherMesh) => {
+        if (mesh.width == otherMesh.width && mesh.length == otherMesh.length && mesh.height == otherMesh.height) {
+            return otherMesh
+        }
+    })
+    // console.log(existingMesh)
+    if (existingMesh) return existingMesh
+
+    const newMesh = {
+        width: mesh.width,
+        length: mesh.length,
+        height: mesh.height,
+        thickness: mesh.thickness,
+        geometry: new THREE.BoxGeometry(mesh.width, mesh.length, mesh.height),
+        cuttingGeometry: new THREE.BoxGeometry(mesh.width-mesh.thickness, mesh.length, mesh.height-mesh.thickness)
+    }
+    meshes.push(newMesh)
+
+    return newMesh
+}
+
 const patternToThreejsService = (pattern, options = {
     width: 10,
     height: 10,
@@ -310,13 +333,13 @@ const patternToThreejsService = (pattern, options = {
     segments: 16,       // type=cylinder specific
     diameter: .1        // type=cylinder specific
 }) => {
-
     const type      = _.isUndefined(options.type) ? "cylinder" : options.type
     const parts     = []
+    const meshes    = []
     let   radius    = 0
 
-    if (type.indexOf["box", "cylinder"] == -1) {
-        return console.error("Provide correct type ('box' or 'cylinder')")
+    if (["box", "cylinder"].indexOf(type) == -1) {
+        return new Error("Provide correct type ('box' or 'cylinder')")
     }
 
     if (type == "cylinder") {
@@ -373,8 +396,15 @@ const patternToThreejsService = (pattern, options = {
                     var cuttingGeometry = new THREE.CylinderGeometry(radius-options.tubeThickness, radius-options.tubeThickness , length, segments)
                 } else if (type == "box") {
                     length -= options.beamWidth
-                    var geometry = new THREE.BoxGeometry(options.beamWidth, length, options.beamHeight)
-                    var cuttingGeometry = new THREE.BoxGeometry(options.beamWidth-options.tubeThickness, length, options.beamHeight-options.tubeThickness)
+                        
+                    const o = validateGeometryMesh({
+                        length: length,
+                        width: options.beamWidth,
+                        height: options.beamHeight,
+                        thickness: options.tubeThickness
+                    }, meshes)
+                    var geometry = o.geometry.clone()
+                    var cuttingGeometry = o.cuttingGeometry.clone()
                 }
                 geometry.rotateX(Math.PI/180*90)
                 cuttingGeometry.rotateX(Math.PI/180*90)
@@ -395,8 +425,14 @@ const patternToThreejsService = (pattern, options = {
                     var cuttingGeometry = new THREE.CylinderGeometry(radius-options.tubeThickness, radius-options.tubeThickness , length, segments)
                 } else if (type == "box") {
                     length -= options.beamWidth
-                    var geometry = new THREE.BoxGeometry(options.beamWidth, length, options.beamHeight)
-                    var cuttingGeometry = new THREE.BoxGeometry(options.beamWidth-options.tubeThickness, length, options.beamHeight-options.tubeThickness)
+                    const o = validateGeometryMesh({
+                        length: length,
+                        width: options.beamWidth,
+                        height: options.beamHeight,
+                        thickness: options.tubeThickness
+                    }, meshes)
+                    var geometry = o.geometry.clone()
+                    var cuttingGeometry = o.cuttingGeometry.clone()
                 }
 
                 geometry.rotateZ(Math.PI/180*90)

@@ -19,7 +19,7 @@ export const phygitalFace = defineStore({
                 height: 3,
                 polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
-                model3D: null as null | THREE.Mesh
+                model3D: null as null | THREE.Group
             },
             bottom: {
                 mirrorX: 0,
@@ -28,7 +28,7 @@ export const phygitalFace = defineStore({
                 height: 3,
                 polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
-                model3D: null as null | THREE.Mesh
+                model3D: null as null | THREE.Group
             },
             left: {
                 mirrorX: 0,
@@ -37,7 +37,7 @@ export const phygitalFace = defineStore({
                 height: 7,
                 polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
-                model3D: null as null | THREE.Mesh
+                model3D: null as null | THREE.Group
             },
             right: {
                 mirrorX: 0,
@@ -46,7 +46,7 @@ export const phygitalFace = defineStore({
                 height: 7,
                 polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
-                model3D: null as null | THREE.Mesh
+                model3D: null as null | THREE.Group
             },
             front: {
                 mirrorX: 0,
@@ -55,7 +55,7 @@ export const phygitalFace = defineStore({
                 height: 7,
                 polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
-                model3D: null as null | THREE.Mesh
+                model3D: null as null | THREE.Group
             },
             back: {
                 mirrorX: 0,
@@ -64,7 +64,7 @@ export const phygitalFace = defineStore({
                 height: 7,
                 polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
-                model3D: null as null | THREE.Mesh
+                model3D: null as null | THREE.Group
             }
         },
         selectedSurface: "top" as "top" | "bottom" | "left" | "right" | "front" | "back",
@@ -90,6 +90,7 @@ export const phygitalFace = defineStore({
             this.selectedSurface = surface
         },
         updateSurfaces() {
+
             return new Promise ((resolve, reject) => {
                     
                 if (!this.seed) {
@@ -189,6 +190,7 @@ export const phygitalFace = defineStore({
                         this.surfaces[surface].polylines = polylines[index]
                         this.surfaces[oppositeSurface].polylines = _.cloneDeep(this.surfaces[surface].polylines)
                     })
+
                     resolve(true)
                 })
                 

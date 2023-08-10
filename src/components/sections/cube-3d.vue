@@ -82,23 +82,6 @@ export default defineComponent({
         "phygital.surfaces.front.update3D":     { handler() { this.update3DModel("front") } },
         "phygital.surfaces.back.update3D":      { handler() { this.update3DModel("back") } },
     },
-    mounted() {
-        setTimeout(() => {
-            this.update3DModel("top")
-            this.update3DModel("bottom")
-            this.update3DModel("left")
-            this.update3DModel("right")
-            this.update3DModel("front")
-            this.update3DModel("back")
-        })
-        // if (this.$el.parentElement) {
-        //     if (this.$el.parentElement.classList.contains( "main-section")) {
-        //         this.name = "main"
-        //     } else {
-        //         this.name = "sidebar"
-        //     }
-        // }
-    },
     methods: {
         cameraUpdate(camera : THREE.PerspectiveCamera) {
             this.camera = camera
