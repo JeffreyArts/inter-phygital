@@ -1,6 +1,6 @@
 <template>
     <div class="cube-3d-container" :class="[mouseDown ? '__mouseDown' : '']" ref="container">
-        <sandbox-view :name="name" v-bind:datamodel="pattern3D" :model-changed="pattern3D.update" @active:camera="cameraUpdate" @mousedown="mouseDown = true" @mouseup="mouseDown = false"></sandbox-view>
+        <sandbox-view :name="name" v-bind:datamodel="pattern3D" :model-changed="updatePattern" @active:camera="cameraUpdate" @mousedown="mouseDown = true" @mouseup="mouseDown = false"></sandbox-view>
     </div>
 </template>
 
@@ -57,6 +57,8 @@ export default defineComponent({
         return {
             pattern3D: new THREE.Object3D(),
             mouseDown: false,
+            updatePattern: 0,
+            updateTimeout: 0,
             cube: {
                 top: new THREE.Object3D(),
                 bottom: new THREE.Object3D(),
@@ -75,12 +77,12 @@ export default defineComponent({
         }
     },
     watch: {
-        "phygital.surfaces.top.update3D":       { handler() { this.update3DModel("top") } },
-        "phygital.surfaces.bottom.update3D":    { handler() { this.update3DModel("bottom")} },
-        "phygital.surfaces.left.update3D":      { handler() { this.update3DModel("left") } },
-        "phygital.surfaces.right.update3D":     { handler() { this.update3DModel("right") } },
-        "phygital.surfaces.front.update3D":     { handler() { this.update3DModel("front") } },
-        "phygital.surfaces.back.update3D":      { handler() { this.update3DModel("back") } },
+        "phygital.surfaces.top.update3D":       { handler() { this.update3DModel("top") }, immediate: true },
+        "phygital.surfaces.bottom.update3D":    { handler() { this.update3DModel("bottom")}, immediate: true },
+        "phygital.surfaces.left.update3D":      { handler() { this.update3DModel("left") }, immediate: true },
+        "phygital.surfaces.right.update3D":     { handler() { this.update3DModel("right") }, immediate: true },
+        "phygital.surfaces.front.update3D":     { handler() { this.update3DModel("front") }, immediate: true },
+        "phygital.surfaces.back.update3D":      { handler() { this.update3DModel("back") }, immediate: true },
     },
     methods: {
         cameraUpdate(camera : THREE.PerspectiveCamera) {
@@ -90,6 +92,7 @@ export default defineComponent({
             this.camera.updateProjectionMatrix()
         },
         update3DModel(side: "top" | "bottom" | "left" | "right" | "front" | "back"){
+            clearTimeout(this.updateTimeout)
             _.remove(this.pattern3D.children, childObject => {
                 if (childObject.name == "innerCube") {
                     removeObject(childObject)
@@ -118,15 +121,10 @@ export default defineComponent({
                 this.pattern3D.add(mesh)   
             }
             
-            this.pattern3D.add(_.cloneDeep(this.phygital.surfaces[side].model3D))
-            if (_.isUndefined(this.pattern3D.update)) {
-                this.pattern3D.update = 0
-            } else {
-                this.pattern3D.update ++
-            }
-
-            this.phygital.model3D = _.cloneDeep(this.pattern3D)
-
+            this.pattern3D.add(this.phygital.surfaces[side].model3D.clone())
+            this.updateTimeout = setTimeout(() => {
+                this.updatePattern ++
+            }, 100)
         },
         oppositeSurface(side: "top" | "bottom" | "left" | "right" | "front" | "back") {
             switch (side) {

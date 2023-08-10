@@ -39,10 +39,9 @@ export default {
             },
         },
     },
-
     mounted() {
-        this.container.width = this.$el.clientWidth
-        this.container.height = this.$el.clientWidth
+        this.container.width = this.$el.parentElement.clientWidth
+        this.container.height = this.$el.parentElement.clientWidth
 
         var o = threeDView.init({orbitControls: true})
         // Update the controls target to the origin point
@@ -53,16 +52,15 @@ export default {
         this.$emit("active:camera", this.camera)
 
         
-        setTimeout(() => {
-            if (this.name) {
-                this.phygital.sandbox[this.name] = o
-            }
-        })
+        if (this.name) {
+            this.phygital.sandbox[this.name] = o
+        }
+        
         this.$el.append( this.renderer.domElement )
         window.addEventListener("resize", this.updateCanvasSize)
-        setTimeout(() => {
-            window.dispatchEvent(new Event("resize"))
-        })
+    },
+    beforeUnmount() {
+        window.removeEventListener("resize", this.updateCanvasSize)
     },
     methods: {
         removeObject(object) {
@@ -83,9 +81,11 @@ export default {
             this.scene.remove(object)
         },
         updateCanvasSize() {
-            let size = this.$el.clientWidth
-            if (size < this.$el.clientHeight) {
-                size = this.$el.clientHeight
+            const el = this.$el.parentElement
+            
+            let size = el.clientWidth
+            if (size < el.clientHeight) {
+                size = el.clientHeight
             }
             this.container.width = size
             this.container.height = size
@@ -96,6 +96,8 @@ export default {
             if (this.datamodel.children.length <= 0){
                 return // Can not update model if there is no model
             }
+
+            this.updateCanvasSize()
 
 
             _.each(this.scene.children, childObject => {
