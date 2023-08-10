@@ -383,17 +383,40 @@ export const phygitalFace = defineStore({
             }, 100)
         },
         downloadSTL(filename: string) { 
-            return new Promise((resolve, reject)=> {                
-                let mergedObject = this.model3D.children[0]
+            return new Promise((resolve, reject)=> {       
+                let mergedObject = null
+                
+                _.each(this.surfaces, (surface) => {
+                    if (surface.model3D) {
+                        surface.model3D.updateMatrix()
+                        _.each(surface.model3D.children, (child) => {
+                            const newMesh = child.clone()
+
+                            newMesh.position.x += surface.model3D.position.x
+                            newMesh.position.y += surface.model3D.position.y
+                            newMesh.position.z += surface.model3D.position.z
+
+                            newMesh.rotateX(surface.model3D.rotation.x)
+                            newMesh.rotateY(surface.model3D.rotation.y)
+                            newMesh.rotateZ(surface.model3D.rotation.z)
+
+                            newMesh.updateMatrix()
+
+
+                            if (!mergedObject) {
+                                mergedObject = newMesh
+                                return
+                            }
+                            mergedObject.updateMatrix()
+                            mergedObject = CSG.toMesh(CSG.fromMesh(mergedObject).union(CSG.fromMesh(newMesh)), mergedObject.matrix)
+                        })
+                    }
+                })
+                
                 if (!mergedObject) {
                     console.error("No object available")
                     return new Error("noObjectAvailable")
                 }
-                this.model3D.children.forEach((child, i) => {
-                    
-                    mergedObject.updateMatrix()
-                    mergedObject = CSG.toMesh(CSG.fromMesh(mergedObject).union(CSG.fromMesh(child)), mergedObject.matrix)
-                })
             
                 const buffer = exportSTL.fromMesh(mergedObject)
                 const blob = new Blob([buffer], { type: exportSTL.mimeType })

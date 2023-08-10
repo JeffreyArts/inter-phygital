@@ -66,8 +66,7 @@ export default defineComponent({
             if (seedDom) {
                 filename = seedDom.innerText
             }
-            alert (filename) // Broken cause of change from Mesh to Group of meshes
-            // this.phygital.downloadSTL(filename)
+            this.phygital.downloadSTL(filename)
         },
     }
 })
