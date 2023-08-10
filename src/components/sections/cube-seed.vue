@@ -44,7 +44,7 @@ export default defineComponent({
         return {
             regenerating: false,
             seed: "a-61892379",
-            slots: 8
+            slots: 4
         }
     },
     computed: {
@@ -117,12 +117,10 @@ export default defineComponent({
             currentTarget.classList.add("__isGenerating")
             const target = currentTarget.querySelector("g")
             
-            const slotsAnimation = gsap.fromTo(this, {
-                slots: 8,
-            },{
-                duration: 6.4,
+            const slotsAnimation = gsap.to(this, {
+                duration: 2.2,
                 ease: "power2.out",
-                slots: 14,
+                slots: 6,
             })
 
 
@@ -152,7 +150,7 @@ export default defineComponent({
                     slotsAnimation.kill()
 
                     gsap.to(this, {
-                        slots: 8,
+                        slots: 2,
                         duration: .8,
                     })
                     this.regenerating = false
@@ -320,21 +318,22 @@ export default defineComponent({
 }
 
 .seed-value {
-    width: calc(100% - 48px); 
+    width: calc(100% - 32px);
     font-size: 14px;
     text-align: left;
     position: relative;
 }
 
+
 .seed-button {
     // height: 100%;
     // height: 52px;
     // width: 88px;
-    width: 48px;
-    translate: 8px 0px;
+    width: 32px;
+    // translate: 8px 0px;
     cursor: pointer;
     .icon-svg {
-        height: 32px;
+        height: 24px;
     }
     svg {
         display: inline-block;
@@ -373,33 +372,54 @@ export default defineComponent({
 
 @container seed-section-container (min-height: 44px) {
     .seed-value {
-        font-size: 16px;
-    }
-}
-@container seed-section-container (min-height: 52px) {
-    .seed-value {
-        font-size: 18px;
-    }
-}
-
-@container seed-section-container (min-height: 56px) {
-    .seed-value {
-        text-align: right;
-    }
-    .seed-label-container {
-        display: block;
+        font-size: 10px;
     }
 }
 
 @container seed-section-container (min-height: 60px) {
-    .seed-label-container {
-        margin: 4px;
+    .seed-value {
+        font-size: 12px;
     }
 }
 
-@container seed-section-container (min-height: 64px) {
+@container seed-section-container (min-height: 70px) {
+    .seed-value {
+        font-size: 14px;
+        width: calc(100% - 32px); 
+    }
+    .seed-button {
+        width: 32px;
+        .icon-svg {
+            height: 24px;
+        }
+    }
+}
+
+@container seed-section-container (min-height: 76px) {
+    .seed-value {
+        text-align: right;
+        font-size: 16px;
+    }
     .seed-label-container {
-        margin: 8px;
+        display: block;
+    }
+    .seed-button {
+        translate: 0 -8px;
+    }
+}
+
+@container seed-section-container (min-height: 84px) {
+    .seed-label-container {
+        margin-top: 4px;
+    }
+    .seed-value {
+        // font-size: 18px;
+    }
+}
+
+@container seed-section-container (min-height: 96px) {
+    .seed-label-container {
+        margin-top: 8px;
     }
     .seed-value {
         margin-top: 12px;
@@ -408,8 +428,10 @@ export default defineComponent({
     .seed-button {
         height: 48px;
         width: 88px; 
+        translate: 0 0;
+
         .icon-svg {
-            height: 48px;
+            height: 36px;
         }
         .icon-label {
             display: block;

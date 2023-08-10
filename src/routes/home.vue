@@ -102,10 +102,16 @@ export default defineComponent ({
         height: calc(100vh - 64px);
         width: calc(100vw - 64px);
         overflow: hidden;
+        &[data-grid="3x8"] {
+            .sidebar {
+                grid-template-columns: calc(100% / 3) calc(100% / 3 * 2);
+                grid-template-rows: calc(100% / 8) calc(100% / 8) calc(100% / 8) calc(100% / 8) calc(100% / 8) calc(100% / 8) calc(100% / 8) calc(100% / 8);
+            }
+        }
         &[data-grid="3x6"] {
             .sidebar {
-                grid-template-columns: 1fr 2fr;
-                grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
+                grid-template-columns: calc(100% / 3) calc(100% / 3 * 2);
+                grid-template-rows: calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6);
             }
         }
     }
@@ -173,11 +179,6 @@ export default defineComponent ({
 }
 
 .home .dashboard[data-grid="3x6"] {
-    .sidebar {
-        grid-template-columns: calc(100% / 3) calc(100% / 3 * 2);
-        grid-template-rows: calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6);
-    }
-
     #s-seed {
         grid-column: 2;
         grid-row: 1/2;
@@ -205,10 +206,35 @@ export default defineComponent ({
         grid-column: 1;
         grid-row:6/7;
     }
-    @media (min-height: 632px){ 
-        
-        
+}
+.home .dashboard[data-grid="3x8"] {
+    #s-surfaces {
+        grid-column: 2/3;
+        grid-row: 2/4;
+    }
+    #s-dimensions {
+        grid-column: 2/3;
+        grid-row: 4/5;
+    }
+    
+    #s-cube3d {
+        grid-column: 2/3;
+        grid-row: 5/7;
     }
 
+    #s-seed {
+        grid-column: 2/3;
+        grid-row: 1/2;
+    }
+    
+    #s-download {
+        grid-column: 2/3;
+        grid-row: 7/8;
+    }
+
+    #s-view-edit {
+        grid-column: 1/2;
+        grid-row:8/9;
+    }
 }
 </style>

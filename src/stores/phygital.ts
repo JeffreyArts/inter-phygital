@@ -70,7 +70,7 @@ export const phygitalFace = defineStore({
         selectedSurface: "top" as "top" | "bottom" | "left" | "right" | "front" | "back",
         openCube: true,
         seed: null as null | string,
-        blockSize: 1, // in cm
+        blockSize: 4, // in cm
         model3D: new THREE.Object3D(),
         updating: 0,
         editMode: false,

@@ -13,7 +13,7 @@ export const dashboard = defineStore({
         inTransition: false,
         activeIndex: 0 as null | number,
         activeElement: null as null | HTMLElement,
-        animationDuration: .8,
+        animationDuration: 0,
         cellSize:128,
         animationEasing: "elastic.out(1.1, 0.9)",
     }),
@@ -50,7 +50,6 @@ export const dashboard = defineStore({
             if (this.elements.length == 2) {
                 this.update2ElementsDashboard()
             }
-
         },
         focusElement(event: MouseEvent) {
             if (this.inTransition) {
@@ -95,7 +94,7 @@ export const dashboard = defineStore({
                 return
             }
 
-            let grid = "3x6"
+            let grid = "3x8"
             if (this.orientation == "portrait") {
                 grid = "6x4"
                 this.cellSize = Math.floor(width/parseInt(grid.split("x")[0], 10))

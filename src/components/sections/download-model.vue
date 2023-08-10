@@ -78,7 +78,6 @@ export default defineComponent({
     position: relative;
     display: flex;
     flex-flow: row;
-    padding: 0 8px;
     justify-content: center;
     width: 100%;
     height: 100%;
@@ -91,8 +90,8 @@ export default defineComponent({
     width: 100%;
     display: flex;
     flex-flow: row;
-    gap: 8px;
     font-size: 14px;
+    gap: 8px;
     justify-content: start;
     align-items: center;
     font-family: $accentFont;
