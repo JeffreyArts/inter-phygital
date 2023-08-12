@@ -41,6 +41,10 @@ export default defineComponent({
             type: Object,
             required: true,
         },
+        updatePattern: {
+            type: Number,
+            required: false,
+        },
     },
     setup() {
         const phygital = Phygital()
@@ -67,6 +71,21 @@ export default defineComponent({
         }
     },
     watch: {
+        "updatePattern": {
+            // redraw the pattern when the updatePattern prop changes
+            handler() {
+                this.svg.clear()
+                this.defineGrid()
+                this.defineSurface()
+                this.defineGridPoints()
+
+                this.svg.viewbox(0,0, this.cellSize * this.horizontalLines,  this.cellSize * this.verticalLines)
+                this.svg.attr({
+                    width: Math.round(this.cellSize * this.horizontalLines),
+                    height: Math.round(this.cellSize * this.verticalLines)
+                })
+            }
+        },
         "phygital.editMode": {
             handler(editMode) {
                 this.surfaceInTransition = true
@@ -199,13 +218,18 @@ export default defineComponent({
             this.verticalLines = this.vpgPattern.height + 2
             this.cellSize = this.$el.clientHeight/this.verticalLines
             this.horizontalLines = Math.ceil(this.$el.clientWidth  / this.cellSize)
+
+            if (this.horizontalLines < this.vpgPattern.width + 2) {
+                this.horizontalLines = this.vpgPattern.width + 2
+            } 
             if ((this.vpgPattern.width % 2 != 0 && this.horizontalLines % 2 == 0) ||
                 (this.vpgPattern.width % 2 == 0 && this.horizontalLines % 2 != 0))
             {
                 this.horizontalLines += 1
             }
+            this.offset.x = Math.floor(this.horizontalLines/2 - this.vpgPattern.width/2)
+
             this.cellSize = this.$el.clientWidth/this.horizontalLines
-            this.offset.x = Math.floor(this.horizontalLines / 2) - 1
             
             this.grid = []
             for (let y = 0; y < this.verticalLines; y++) {
@@ -585,6 +609,7 @@ export default defineComponent({
         updateSVG() {
             const svgContainer = this.$refs["vpgSVG"] as HTMLElement
             if (!svgContainer) return
+            
             const children =  svgContainer.querySelectorAll(".vpg-line, .grid-point")
             if (children.length > 0) {
                 for (let i = 0; i < children.length; i++) {

@@ -29,6 +29,9 @@
                 <section id="s-view-edit" v-if="dashboard.activeComponent === 'cube-faces'">
                     <section-view-edit-button />
                 </section>
+                <section id="s-surface-dimensions" v-if="dashboard.activeComponent === 'cube-faces'">
+                    <sectionSurfaceDimensions />
+                </section>
             </aside>
             <!-- <aside class="sidebar">
             </aside> -->
@@ -42,6 +45,7 @@ import {defineComponent} from "vue"
 import DashboardStore from "@/stores/dashboard"
 import MainCubeFaces from "@/components/sections/main-cube-faces.vue"
 import sectionMetaDimensions from "@/components/sections/meta-dimensions.vue"
+import sectionSurfaceDimensions from "@/components/sections/surface-dimensions.vue"
 import sectionCube3d from "@/components/sections/cube-3d.vue"
 import sectionSurfaces from "@/components/sections/surfaces-grid.vue"
 import sectionViewEditButton from "@/components/sections/view-edit-button.vue"
@@ -52,7 +56,17 @@ import _ from "lodash"
 
 export default defineComponent ({ 
     name: "homePage",
-    components: {Dashboard, MainCubeFaces, sectionMetaDimensions, sectionCube3d, sectionSurfaces, sectionViewEditButton, sectionDownload, sectionSeed},
+    components: {
+        Dashboard,
+        MainCubeFaces,
+        sectionMetaDimensions,
+        sectionCube3d,
+        sectionSurfaces,
+        sectionViewEditButton,
+        sectionDownload,
+        sectionSeed,
+        sectionSurfaceDimensions,
+    },
     props: [],
     setup() {
         const dashboard = DashboardStore()
@@ -235,6 +249,10 @@ export default defineComponent ({
     #s-view-edit {
         grid-column: 1/2;
         grid-row:8/9;
+    }
+    #s-surface-dimensions {
+        grid-column: 1/2;
+        grid-row: 2/3;
     }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
     <div class="cube-faces-container" ref="container">
-        <vpg-svg-editable class="svg-container" :vpg-pattern="phygital.surfaces[selectedSurface]" v-if="phygital.surfaces[selectedSurface]" @update:vpgPattern="updateVpgPattern"/>
+        <vpg-svg-editable class="svg-container" :updatePattern="phygital.changed" :vpg-pattern="phygital.surfaces[selectedSurface]" v-if="phygital.surfaces[selectedSurface]" @update:vpgPattern="updateVpgPattern" />
     </div>
 </template>
 

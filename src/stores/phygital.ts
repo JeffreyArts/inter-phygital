@@ -73,6 +73,7 @@ export const phygitalFace = defineStore({
         blockSize: 4, // in cm
         model3D: new THREE.Object3D(),
         updating: 0,
+        changed: 0,
         editMode: false,
         sandbox: {} as {
             [key: string]: {
