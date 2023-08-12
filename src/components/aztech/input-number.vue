@@ -1,8 +1,8 @@
 <template>
     <div class="aztech-input-number" :class="[isDisabled ? '__isDisabled' : '']">
-        <svg class="aztech-input-number-svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"  viewBox="0 0 8 20" xml:space="preserve">
-            <polygon class="aztech-input-number-down" @click="decrease()" points="8,12 4,20 0,12 8,12 "/>
-            <polygon class="aztech-input-number-up" @click="increase()" points="0,8 4,0 8,8 0,8 "/>
+        <svg class="aztech-input-number-svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"  viewBox="0 0 8 20" xml:space="preserve" @click="onClick">
+            <polygon class="aztech-input-number-down" points="8,12 4,20 0,12 8,12 "/>
+            <polygon class="aztech-input-number-up" points="0,8 4,0 8,8 0,8 "/>
         </svg>
         <div class="aztec-input-number-text-container">
             <label class="aztech-input-number-text-label">{{ label }}</label>
@@ -64,9 +64,20 @@ export default defineComponent({
         }
     },
     methods: {
+        onClick(event:MouseEvent) {
+            const svgEl = event.currentTarget
+            if (!svgEl) return
+            const d = svgEl.getClientRects()[0]
+            const height = d.height
+            const yPos = event.clientY - d.top
+            if (yPos < height/2) {
+                this.increase()
+            } else {
+                this.decrease()
+            }
+        },
         increase() {
             if (this.disabled) return
-
             this.$emit("increase", this.modelValue + 1)
             // this.modelValue++
         },
