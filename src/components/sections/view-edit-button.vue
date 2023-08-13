@@ -113,6 +113,9 @@ export default defineComponent({
 
             // kill any existing tweens
             gsap.killTweensOf("#hand")
+            gsap.killTweensOf(".view-edit-deco-bottom-right #fill > *")
+            gsap.killTweensOf(".view-edit-deco-top-left #fill > *")
+            
             
             // Animate text
             if (this.editMode) {
@@ -132,7 +135,13 @@ export default defineComponent({
                 })
             } else {
                 // gsap.set("#hand", {morphSVG: "#eye-closed"})
-                gsap.to("#hand", {morphSVG: "#eye-open", duration: 0.3})
+                gsap.to("#hand", {
+                    morphSVG: "#eye-closed", 
+                    duration: 0.3, 
+                    onComplete: () => {
+                        gsap.to("#hand", {morphSVG: "#eye-open", duration: 0.3, delay:.08})
+                    }
+                })
                 this.animateText(viewEl, editEl)
                 gsap.to(".view-edit-deco-bottom-right #fill > *", {
                     fill: "transparent",

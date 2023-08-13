@@ -65,14 +65,16 @@ export default defineComponent({
         "phygital.seed"(value) {
             if (value == "custom" && this.seed != "custom") {
                 this.seed = "custom"
+            } else {
+                this.seed = value
             }
         }
     },
     mounted() {
         this.phygital.generateSeed()
         
+        this.phygital.generateDimensions()
         this.updateSurfaces()
-
         this.seed = this.phygital.seed + ""
 
         this.mountedAnimations()
@@ -250,7 +252,7 @@ export default defineComponent({
             })
         },
         updateSurfaces() {
-            this.phygital.updateSurfaces().then(() => {
+            this.phygital.processSeed().then(() => {
                 this.phygital.update3DSurface("top")
                 this.phygital.update3DSurface("bottom")
 

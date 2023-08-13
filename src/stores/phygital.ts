@@ -90,11 +90,51 @@ export const phygitalFace = defineStore({
         selectSurface(surface: "top" | "bottom" | "left" | "right" |  "front" | "back") {
             this.selectedSurface = surface
         },
-        updateSurfaces() {
+        generateDimensions() {
+            const surfaces = ["top","left","front"] as Array<"top" | "left" | "front">
+            const dimensions = [
+                "3x3x3",
+                "3x3x5",
+                "5x5x3",
+                "3x3x7",
+            ] 
 
+            
+            _.each(surfaces, (surface, index) => {
+                if ((typeof this.seed == "undefined" || this.seed == null)) {
+                    return new Error("No seed")
+                }
+                
+                const d = shuffleSeed(dimensions, this.seed)[0].split("x") 
+                const oppositeSurface = this.getOppositeSurface(surface)
+                if (!oppositeSurface) { 
+                    return reject(new Error("No opposite surface (invalid surface input)"))
+                }
+
+                if (surface == "top") {
+                    this.surfaces[surface].width = parseInt(d[0], 10)
+                    this.surfaces[surface].height = parseInt(d[1], 10)
+                    this.surfaces[oppositeSurface].width = parseInt(d[0], 10)
+                    this.surfaces[oppositeSurface].height = parseInt(d[1], 10)
+                } else if (surface == "left") {
+                    this.surfaces[surface].width = parseInt(d[1], 10)
+                    this.surfaces[surface].height = parseInt(d[2], 10)
+                    this.surfaces[oppositeSurface].width = parseInt(d[1], 10)
+                    this.surfaces[oppositeSurface].height = parseInt(d[2], 10)
+                } else if (surface == "front") {
+                    this.surfaces[surface].width = parseInt(d[0], 10)
+                    this.surfaces[surface].height = parseInt(d[2], 10)
+                    this.surfaces[oppositeSurface].width = parseInt(d[0], 10)
+                    this.surfaces[oppositeSurface].height = parseInt(d[2], 10)
+                }
+
+            })
+
+        },
+        processSeed() {
             return new Promise ((resolve, reject) => {
                     
-                if (!this.seed) {
+                if (!this.seed || _.isNull(this.seed)) {
                     return reject(new Error("No seed"))
                 }
 
