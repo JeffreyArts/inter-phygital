@@ -3,25 +3,28 @@
         <header class="cube-surfaces-header">
             <span class="cube-surfaces-cell">
                 <aztech-label class="cube-surfaces-label" :class="[
-                    (phygital.selectedSurface == 'top') && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
+                    (phygital.selectedSurface == 'top') && activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == 'top' ? '__isHover': ''
-                    ]">
+                    ]"
+                    @click="selectSurface('top')">
                     top
                 </aztech-label>
             </span>
             <span class="cube-surfaces-cell">
                 <aztech-label class="cube-surfaces-label" :class="[
-                    (phygital.selectedSurface == 'front') && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
+                    (phygital.selectedSurface == 'front') && activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == 'front' ? '__isHover': ''
-                    ]">
+                    ]"
+                    @click="selectSurface('front')" >
                     front
                 </aztech-label>
             </span>
             <span class="cube-surfaces-cell">
                 <aztech-label class="cube-surfaces-label" :class="[
-                    (phygital.selectedSurface == 'left') && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
+                    (phygital.selectedSurface == 'left') && activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == 'left' ? '__isHover': ''
-                    ]">
+                    ]"
+                    @click="selectSurface('left')" >
                     left
                 </aztech-label>
             </span>
@@ -32,7 +35,7 @@
                 :key="k" 
                 class="cube-surfaces-cell"
                 :class="[
-                    (phygital.selectedSurface == s) && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
+                    (phygital.selectedSurface == s) && activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == s && phygital.selectedSurface !== s ? '__isHover' : ''
                 ]" 
                 @click="selectSurface(s)" 
@@ -44,25 +47,28 @@
         <footer class="cube-surfaces-footer">
             <span class="cube-surfaces-cell">
                 <aztech-label class="cube-surfaces-label" :class="[
-                    (phygital.selectedSurface == 'bottom') && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
+                    (phygital.selectedSurface == 'bottom') && activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == 'bottom' ? '__isHover': ''
-                    ]">
+                    ]"
+                    @click="selectSurface('bottom')" >
                     bottom
                 </aztech-label>
             </span>
             <span class="cube-surfaces-cell">
                 <aztech-label class="cube-surfaces-label" :class="[
-                    (phygital.selectedSurface == 'back') && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
+                    (phygital.selectedSurface == 'back') && activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == 'back' ? '__isHover': ''
-                    ]">
+                    ]"
+                    @click="selectSurface('back')" >
                     back
                 </aztech-label>
             </span>
             <span class="cube-surfaces-cell">
                 <aztech-label class="cube-surfaces-label" :class="[
-                    (phygital.selectedSurface == 'right') && dashboard.activeComponent == 'cube-faces' ? '__isSelected' : '',
+                    (phygital.selectedSurface == 'right') && activeComponent == 'cube-faces' ? '__isSelected' : '',
                     surface == 'right' ? '__isHover': ''
-                    ]">
+                    ]"
+                    @click="selectSurface('right')" >
                     right
                 </aztech-label>
             </span>
@@ -75,22 +81,25 @@
 import { defineComponent } from "vue"
 // import icon from "@/components/icon.vue"
 import Phygital from "@/stores/phygital"
-import Dashboard from "@/stores/dashboard"
 import AztechGridCell from "@/components/aztech/grid-cell.vue"
 import AztechLabel from "@/components/aztech/label.vue"
 import VpgSvg from "@/components/vpg-svg.vue"
-import gsap from "gsap"
 
 export default defineComponent({
     name: "pgygital-surfaces-grid",
     components: {
         AztechGridCell, VpgSvg, AztechLabel
     },
+    props: {
+        activeComponent: {
+            type: String,
+            default: ""
+        }
+    },
     setup() {
         const phygital = Phygital()
-        const dashboard = Dashboard()
         return {
-            phygital, dashboard
+            phygital
         }
     },
     data: () => {
@@ -107,7 +116,7 @@ export default defineComponent({
     methods: {
         selectSurface(surface: "top" | "front" | "left" | "bottom" | "back" | "right") {
             this.phygital.selectedSurface = surface
-            this.dashboard.activeComponent = "cube-faces"
+            // this.activeComponent = "cube-faces"
         },
         
         hoverSurface(surface: "top" | "front" | "left" | "bottom" | "back" | "right") {

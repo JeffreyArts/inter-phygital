@@ -3,8 +3,8 @@
         <dashboard>
             <main class="main __isActive">
                 <section class="main-section">
-                    <section-cube3d v-if="dashboard.activeComponent === 'cube-3d'" name="main"/>
-                    <main-cube-faces v-if="dashboard.activeComponent === 'cube-faces'"/>
+                    <section-cube3d v-if="activeComponent === 'cube-3d'" name="main"/>
+                    <main-cube-faces v-if="activeComponent === 'cube-faces'"/>
                 </section>
             </main>
             <aside class="sidebar">
@@ -14,8 +14,8 @@
                 <section id="s-seed">
                     <section-seed/>
                 </section>
-                <section id="s-surfaces">
-                    <section-surfaces/>
+                <section id="s-surfaces" @click="select('cube-faces')" @mousedown="setSelection">
+                    <section-surfaces :activeComponent="activeComponent"/>
                 </section>
                 <section id="s-dimensions">
                     <section-meta-dimensions />
@@ -26,10 +26,10 @@
                 <section id="s-download">
                     <section-download/>
                 </section>
-                <section id="s-view-edit" v-if="dashboard.activeComponent === 'cube-faces'">
+                <section id="s-view-edit" v-if="activeComponent === 'cube-faces'">
                     <section-view-edit-button />
                 </section>
-                <section id="s-surface-dimensions" v-if="dashboard.activeComponent === 'cube-faces'">
+                <section id="s-surface-dimensions" v-if="activeComponent === 'cube-faces'">
                     <sectionSurfaceDimensions />
                 </section>
             </aside>
@@ -42,7 +42,6 @@
 
 <script lang="ts">
 import {defineComponent} from "vue"
-import DashboardStore from "@/stores/dashboard"
 import MainCubeFaces from "@/sections/main-cube-faces.vue"
 import sectionMetaDimensions from "@/sections/meta-dimensions.vue"
 import sectionSurfaceDimensions from "@/sections/surface-dimensions.vue"
@@ -68,15 +67,10 @@ export default defineComponent ({
         sectionSurfaceDimensions,
     },
     props: [],
-    setup() {
-        const dashboard = DashboardStore()
-        return {
-            dashboard
-        }
-    },
     data() {
         return {
-            selection: {x: 0, y:0}
+            selection: {x: 0, y:0},
+            activeComponent: "cube-3d" as "cube-3d" | "cube-faces",
         }
     },
     mounted() {
@@ -91,7 +85,7 @@ export default defineComponent ({
         },
         select(section: "cube-3d" | "cube-faces") {
             if (this.selection.x !== 0 && this.selection.y !== 0) {
-                this.dashboard.activeComponent = section
+                this.activeComponent = section
             }
         },
         cancelSelection(event:MouseEvent) {

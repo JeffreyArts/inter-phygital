@@ -3,7 +3,7 @@ use the .ascii-box-content for styling the content inside the box. Best way is t
  -->
 
 <template>
-    <div class="dashboard" ref="container">
+    <div class="dashboard" ref="container" :data-grid="grid">
         <slot />
     </div>
 </template>
@@ -11,21 +11,20 @@ use the .ascii-box-content for styling the content inside the box. Best way is t
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import Dashboard from "@/stores/dashboard"
+import _ from "lodash"
+import gsap from "gsap"
 
 export default defineComponent({
-    name: "dashboard-hollywood",
-    setup() {
-        const dashboard = Dashboard()
-        
-        return {
-            dashboard
-        }
-    },
+    name: "dashboard-component",
     data: () => {
         return {
-            fontSize: 32,
-            observer: null as null | MutationObserver
+            orientation: "portrait" as "portrait" | "landscape",
+            activeComponent: "cube-3d" as "cube-3d" | "cube-faces",
+            elements: [] as HTMLElement[],
+            activeIndex: 0 as null | number,
+            activeElement: null as null | HTMLElement,
+            cellSize:128,
+            grid: "3x8"
         }
     },
     computed: {
@@ -35,16 +34,78 @@ export default defineComponent({
     
     },
     mounted() {
-        // const observer = new MutationObserver(this.updateDashboard)
-        if (this.$refs["container"] instanceof HTMLElement) {
-            // Clean up old container (only required for hot reload)
-            if (this.dashboard.container instanceof HTMLElement) {
-                this.dashboard.container.remove()
-                this.dashboard.container = null
-            }
-            this.dashboard.setContainer(this.$refs["container"] as HTMLElement)
-        }
+        this.updateDashboard()
     },
+    methods: {
+        updateDashboard() {
+            const container = this.$refs["container"] as HTMLElement
+            if (!container)  return 
+            
+            container.clientHeight > container.clientWidth ? this.orientation = "portrait" : this.orientation = "landscape"
+            this.elements = container.children as unknown as HTMLElement[]
+            
+            if (this.elements.length <= 1) {
+                return
+            } 
+
+            const style = window.getComputedStyle(container)
+            const width = container.clientWidth
+            const height = container.clientHeight
+            
+
+            if (_.isNaN(width) || _.isNaN(height)) {
+                return
+            }
+
+            // Define grid and cell size
+            if (this.orientation == "portrait") {
+                this.grid = "6x4"
+                this.cellSize = Math.floor(width/parseInt(this.grid.split("x")[0], 10))
+            } else if (this.orientation == "landscape") {
+                this.cellSize = Math.floor(height/parseInt(this.grid.split("x")[1], 10))
+            }
+            
+
+            // Calculate positions
+            const positions = _.map(this.elements, (el, index) => {
+                const position = {
+                    width:  0,
+                    height: 0,
+                    left:   0,
+                    top:    0,
+                    unit: "px",
+                    element: el,
+                }
+
+                switch (index) {
+                case 0:
+                    position.top    = this.orientation == "portrait" ? 0 : 0
+                    position.left   = this.orientation == "portrait" ? 0 : 0
+                    position.width  = this.orientation == "portrait" ? width : width - this.cellSize * parseInt(this.grid.split("x")[0], 10)
+                    position.height = this.orientation == "portrait" ? height - this.cellSize * parseInt(this.grid.split("x")[1], 10) : height
+                    break
+                case 1:
+                    position.top    = this.orientation == "portrait" ? height - this.cellSize * parseInt(this.grid.split("x")[1], 10) : 0
+                    position.left   = this.orientation == "portrait" ? 0 : width - this.cellSize * parseInt(this.grid.split("x")[0], 10)
+                    position.width  = this.orientation == "portrait" ? width : this.cellSize * parseInt(this.grid.split("x")[0], 10)
+                    position.height = this.orientation == "portrait" ? this.cellSize * parseInt(this.grid.split("x")[1], 10) : height
+                    break
+                }
+                return position
+            })
+            
+
+            // Set positions
+            _.forEach(positions, (posData) => {
+                gsap.set(posData.element, {
+                    top:    posData.unit == "px" ? `${posData.top}px`   : `${posData.top}%`,
+                    left:   posData.unit == "px" ? `${posData.left}px`  : `${posData.left}%`,
+                    width:  posData.unit == "px" ? `${posData.width}px` : `${posData.width}%`,
+                    height: posData.unit == "px" ? `${posData.height}px`: `${posData.height}%`,
+                })
+            })
+        }
+    }
 })
 </script>
 
