@@ -30,3 +30,4 @@ dist-ssr
 *.ai
 gsap-bonus.tgz
 *.pages
+.env.*

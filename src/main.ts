@@ -1,7 +1,7 @@
 import { createApp } from "vue"
 import { createPinia } from "pinia"
 import router from "./routes"
-document.title = import.meta.env.VITE_PAGE_TITLE
+document.title = "Interphygital"
 
 
 import "./assets/scss/index.scss"

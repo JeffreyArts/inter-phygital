@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 if [ -z "$1" ]; then
   ENVIRONMENT_VAR=$NODE_ENV
@@ -17,26 +17,22 @@ else
   echo "Unknown environment: $ENVIRONMENT_VAR"
   exit 1
 fi
-
-# Load the environment variables from .env.production
+# Load the environment variables from the appropriate .env file
 set -o allexport
-source .env.production
+source $ENV_FILE
 set +o allexport
 
 # Build the application
-yarn run build
-
-# Remove the playground-assets directory
-rm -r dist/playground-assets
+yarn run vue-tsc && vite build || { echo -e "\n   \033[31m!!!!!!!!!!!!!!!!\n     NOT DEPLOYED\n   !!!!!!!!!!!!!!!!\033[0m\n\n🪄  Please fix TypeScript errors before trying again.\n"; exit 1; }
 
 # Zip the dist directory
 zip -r deploy.zip dist
 
-# Check if the deployment path exists and create it if it does not
-ssh $DEPLOYMENT_USER@$DEPLOYMENT_HOST "test -d $DEPLOYMENT_PATH || mkdir -p $DEPLOYMENT_PATH"
-
 # Upload the zip file to the remote server
 scp deploy.zip $DEPLOYMENT_USER@$DEPLOYMENT_HOST:$DEPLOYMENT_PATH/deploy.zip
+
+# Check if the deployment path exists and create it if it does not
+ssh $DEPLOYMENT_USER@$DEPLOYMENT_HOST "test -d $DEPLOYMENT_PATH || mkdir -p $DEPLOYMENT_PATH"
 
 # Check if the current directory exists and backup if it does
 if ssh $DEPLOYMENT_USER@$DEPLOYMENT_HOST test -d "$DEPLOYMENT_PATH/current"; then
@@ -53,7 +49,6 @@ ssh $DEPLOYMENT_USER@$DEPLOYMENT_HOST "\
     rm $DEPLOYMENT_PATH/deploy.zip; \
     $DEPLOYMENT_PATH/deploy.zip; \
     exit"
-    
 # Clean up old backups if there are more than 5
 if ssh $DEPLOYMENT_USER@$DEPLOYMENT_HOST test -d "$DEPLOYMENT_PATH"; then
     num_backups=$(ssh $DEPLOYMENT_USER@$DEPLOYMENT_HOST "ls -d $DEPLOYMENT_PATH/bk_* | wc -l")
