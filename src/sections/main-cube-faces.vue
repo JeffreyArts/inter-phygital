@@ -84,7 +84,7 @@ export default defineComponent({
                     return false
                 })
             }
-            this.phygital.changed ++
+            // this.phygital.changed ++
             this.phygital.update3DSurface(this.selectedSurface)
         }
     }

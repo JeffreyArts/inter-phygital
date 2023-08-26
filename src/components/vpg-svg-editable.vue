@@ -73,6 +73,7 @@ export default defineComponent({
             mouseY: 0,
             mousePosX: 0,
             mousePosY: 0,
+            ignoreAnimation: false,
             newLineEndPos: null as null | {x:number, y:number},
         }
     },
@@ -139,62 +140,20 @@ export default defineComponent({
         },
         "vpgPattern.polylines": {
             handler() {
-                const el = this.$el
-                if (!el) return
-
-                const surfacePolylines = _.cloneDeep(this.vpgPattern.polylines)
-
-                
-                if (this.newLine.length == 1 || this.removableLine) {
-                    if (this.removableLine) {
-                        this.removableLine = null
-                    }
-                    
-                    if (this.newLine.length == 1) {
-                        const newLine = this.surfacePolylines[this.surfacePolylines.length-1]
-                        const cords = [] as Array<{x:number, y:number}>
-                        const coordinates = _.map(newLine, cord => {
-                            cords.push({
-                                x: this.offset.x + cord.x,
-                                y: this.offset.y + cord.y
-                            })
-                            return `${(this.offset.x + cord.x) * this.cellSize + this.cellSize/2},${(this.offset.y + cord.y) * this.cellSize + this.cellSize/2}`
-                        }).join(" ")
-
-                        if (cords.length < 2) {
-                            return
-                        }
-
-                        const polyline = this.svg.polyline(coordinates).attr({
-                            class: "vpg-line",
-                            dataX1: cords[0].x,
-                            dataY1: cords[0].y,
-                            dataX2: cords[1].x,
-                            dataY2: cords[1].y,
-                            style: `stroke-width: 30px;
-                            stroke-linecap: round;
-                            opacity: 1;
-                            stroke: #1c1c1e;`
-                        })
-                        const group = this.svg.findOne(".vpg-pattern")
-                        if (!group) {
-                            console.error("Missing .vpg-pattern group")
-                            return
-                        }
-                        polyline.addTo(group, 0)
-                        this.newLine.length = 0
-                    }
+                if (this.vpgPattern.polylines.length == 0) {
                     return
-                } 
+                }
+                
+                this.surfacePolylines = _.cloneDeep(this.vpgPattern.polylines)
 
                 this.surfaceInTransition = true
-                this.surfacePolylines = surfacePolylines                
-                const promise1 = this.removeGridPoints(true)
-                const promise2 = this.removeSurface(true)
+                
+                const promise1 = this.removeGridPoints(!this.ignoreAnimation)
+                const promise2 = this.removeSurface(!this.ignoreAnimation)
                 Promise.all([promise1, promise2]).then(() => {
                     this.defineGrid()
-                    const p1 = this.defineSurface()
-                    const p2 = this.defineGridPoints()
+                    const p1 = this.defineSurface(!this.ignoreAnimation)
+                    const p2 = this.defineGridPoints(!this.ignoreAnimation)
                     this.svg.viewbox(0,0, Math.round(this.cellSize * this.horizontalLines),  Math.round(this.cellSize * this.verticalLines))   
                     this.svg.attr({
                         width: Math.round(this.cellSize * this.horizontalLines),
@@ -203,6 +162,7 @@ export default defineComponent({
 
                     Promise.all([p1, p2]).then(() => {
                         this.surfaceInTransition = false
+                        this.ignoreAnimation = false
                     })
                 })
             },
@@ -270,7 +230,7 @@ export default defineComponent({
                 }
             }
         },
-        defineSurface() {
+        defineSurface(animate = true as boolean) {
             return new Promise(resolve => {
                 const style = {
                     strokeWidth: Math.round(this.cellSize / 2),
@@ -312,23 +272,31 @@ export default defineComponent({
                     }))
                 })
                 
-
-                gsap.set(".vpg-line", {
-                    strokeWidth: 0,
-                    strokeLinecap: style.strokeLinecap,
-                })
-                gsap.to(".vpg-line", {
-                    strokeWidth: style.strokeWidth,
-                    duration: 1.44,
-                    ease: "power4.out",
-                    onComplete() {
-                        resolve(true)
-                    }
-                })
+                if (animate) {
+                    gsap.set(".vpg-line", {
+                        strokeWidth: 0,
+                        strokeLinecap: style.strokeLinecap,
+                    })
+                    gsap.to(".vpg-line", {
+                        strokeWidth: style.strokeWidth,
+                        duration: 1.44,
+                        ease: "power4.out",
+                        onComplete() {
+                            resolve(true)
+                        }
+                    })
+                } else {
+                    gsap.set(".vpg-line", {
+                        strokeWidth: style.strokeWidth,
+                        strokeLinecap: style.strokeLinecap,
+                        duration: 1.44,
+                    })
+                    resolve(true)
+                }
             })
                 
         },
-        defineGridPoints() {
+        defineGridPoints(animate = true as boolean) {
             return new Promise(resolve => {
                 const gridPointContainer = this.$el.querySelector("#grid-point-container") as SVGElement
                 
@@ -349,7 +317,7 @@ export default defineComponent({
                 
                 this.svg.add(gridPoints)
                 
-                if (this.phygital.editMode)  {
+                if (this.phygital.editMode && animate)  {
                     gsap.to(".grid-point", {
                         opacity: 1,
                         duration: .8,
@@ -359,42 +327,49 @@ export default defineComponent({
                         }
                     })
                 } else {
+                    if (this.phygital.editMode) {
+                        gsap.set(".grid-point", {
+                            opacity: 1,
+                        })
+                    }
                     resolve(true)
                 }
             })
         },
-        removeSurface(hard = true as boolean) {
+        removeSurface(animate = true as boolean) {
             // If hard is true, remove the domElements from the svg, otherwise only hide them
             return new Promise(resolve => {
                 if (this.$el.querySelectorAll(".vpg-line").length == 0) {
                     return resolve(true)
                 }
-
+                
+                
                 const lines = document.querySelectorAll(".vpg-line")
                 const timelines = [] as Array<Promise<boolean>>
+                gsap.killTweensOf(lines)
                 lines.forEach((line, index) => {
                     timelines.push(new Promise((resolve2) => {
                         const tl = gsap.timeline()
                         tl.to(line, {
                             drawSVG: "0.01%",
                             ease: "power2.out",
-                            duration: .48,
-                            delay: index * .08,
+                            duration: animate ? .48 : 0,
+                            delay: animate ? index * .08 : 0,
                         }).to(line, {
                             opacity: 0,
                             strokeWidth:0,
-                            duration: .24,
+                            duration: animate ? .24 : 0,
                             onComplete: () => {
                                 setTimeout(() => {
                                     resolve2(true)
-                                }, 240)
+                                }, animate ? 240 : 0)
                             }
                         })
                     }))
                 })
 
                 Promise.all(timelines).then(() => {
-                    if (!hard) {
+                    if (!animate) {
                         return resolve(true)
                     }
                     const svgContainer = this.$refs["vpgSVG"] as HTMLElement
@@ -412,46 +387,50 @@ export default defineComponent({
                 })
             })
         },
-        removeGridPoints(hard = true as boolean) {
+        removeGridPoints(animate = false as boolean) {
             // If hard is true, remove the domElements from the svg, otherwise only hide them
             return new Promise(resolve => {
 
                 if (this.$el.querySelectorAll(".grid-point").length == 0) {
                     return resolve(true)
                 }
+                
+                gsap.killTweensOf(".grid-point")
 
+                const svgContainer = this.$refs["vpgSVG"] as HTMLElement
+                if (!svgContainer) return
+                const polylines = svgContainer.querySelectorAll(".vpg-line")
+                const gridPoints =  svgContainer.querySelectorAll(".grid-point")
+                let timeout = animate ? 640 + polylines.length * (24/Math.max(this.horizontalLines, this.verticalLines)/128 * 1000) : 0
+
+                setTimeout(() => {
+                    for (let i = 0; i < gridPoints.length; i++) {
+                        const parentNode = gridPoints[i].parentNode
+                        if (parentNode) {
+                            parentNode.removeChild(gridPoints[i])
+                        }
+                    }
+                        
+                    return resolve(true)
+                }, timeout)
+
+                
                 gsap.to(".grid-point", {
                     opacity: 0,
                     duration: .64,
-                    // stagger: {
-                    //     grid: [this.horizontalLines, this.verticalLines],
-                    //     each: 24/Math.max(this.horizontalLines, this.verticalLines)/128,
-                    //     from: "center"
-                    // },
-                    ease: "power4.out",
-                    onComplete:() => {
-                        if (!hard) {
-                            return resolve(true)
-                        }
-
-                        const svgContainer = this.$refs["vpgSVG"] as HTMLElement
-                        if (!svgContainer) return
-                        const children =  svgContainer.querySelectorAll(".grid-point")
-                        if (children.length > 0) {
-                            for (let i = 0; i < children.length; i++) {
-                                const parentNode = children[i].parentNode
-                                if (parentNode) {
-                                    parentNode.removeChild(children[i])
-                                }
-                            }
-                        }
-                        
-                        return resolve(true)
+                    stagger: {
+                        grid: [this.horizontalLines, this.verticalLines],
+                        each: 24/Math.max(this.horizontalLines, this.verticalLines)/32,
+                        from: "center"
                     }
                 })
+                console.log(animate, 640 + polylines.length * 24/Math.max(this.horizontalLines, this.verticalLines)/128 * 1000)
+
             })
         },
         removeLine(target: HTMLElement) {
+            this.ignoreAnimation = true
+            
             const x1 = target.getAttribute("dataX1")
             const x2 = target.getAttribute("dataX2")
             const y1 = target.getAttribute("dataY1")
@@ -488,28 +467,33 @@ export default defineComponent({
             _.forEach(filteredGridPoints, (gridPoint) => {
                 gridPoint.classList.remove("__isActive")
             })
+
+            const polyline = _.remove(this.surfacePolylines, polyline => {
+                if (polyline[0].x == parseInt(target.getAttribute("dataX1"), 10) - this.offset.x &&
+                    polyline[0].y == parseInt(target.getAttribute("dataY1"), 10) - this.offset.y &&
+                    polyline[1].x == parseInt(target.getAttribute("dataX2"), 10) - this.offset.x &&
+                    polyline[1].y == parseInt(target.getAttribute("dataY2"), 10) - this.offset.y
+                ) {
+                    return true
+                } else if (
+                    polyline[0].x == parseInt(target.getAttribute("dataX2"), 10) - this.offset.x &&
+                        polyline[0].y == parseInt(target.getAttribute("dataY2"), 10) - this.offset.y &&
+                        polyline[1].x == parseInt(target.getAttribute("dataX1"), 10) - this.offset.x &&
+                        polyline[1].y == parseInt(target.getAttribute("dataY1"), 10) - this.offset.y
+                ) {
+                    return true
+                } 
+                return false
+            })
+
+            if (polyline.length > 0) {
+                this.$emit("update:vpgPattern", polyline[0], "remove")
+            }
+            
             gsap.to(target, {
                 opacity: 0,
                 duration: .24,
                 onComplete: () => {
-                    const polyline = _.remove(this.surfacePolylines, polyline => {
-                        if (polyline[0].x == parseInt(target.getAttribute("dataX1"), 10) - this.offset.x &&
-                            polyline[0].y == parseInt(target.getAttribute("dataY1"), 10) - this.offset.y &&
-                            polyline[1].x == parseInt(target.getAttribute("dataX2"), 10) - this.offset.x &&
-                            polyline[1].y == parseInt(target.getAttribute("dataY2"), 10) - this.offset.y
-                        ) {
-                            return true
-                        } else if (
-                            polyline[0].x == parseInt(target.getAttribute("dataX2"), 10) - this.offset.x &&
-                                polyline[0].y == parseInt(target.getAttribute("dataY2"), 10) - this.offset.y &&
-                                polyline[1].x == parseInt(target.getAttribute("dataX1"), 10) - this.offset.x &&
-                                polyline[1].y == parseInt(target.getAttribute("dataY1"), 10) - this.offset.y
-                        ) {
-                            return true
-                        } 
-                        return false
-                    })
-                    this.$emit("update:vpgPattern", polyline[0], "remove")
                     target.remove()
                 }
             })
@@ -980,8 +964,9 @@ export default defineComponent({
             })
         },
         completeNewLine() {
+            this.ignoreAnimation = true
             this.removeNewLine = true
-            // const newLineElement = document.querySelector(".new-line")
+            
             if (this.newLineEndPos) {
                 this.newLineEndPos = null
             }
@@ -1110,7 +1095,7 @@ export default defineComponent({
             }
             .outer-ring {
                 stroke: $dark-grey2;
-                stroke-dasharray: 3.2 1.6;
+                stroke-dasharray: 4 2.4;
                 opacity: 0.5;
             }
             &.__isActive {
