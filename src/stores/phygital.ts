@@ -318,11 +318,9 @@ export const phygitalFace = defineStore({
                 // mergedObject.material = new THREE.MeshLambertMaterial( { color: "#0ff" })
                 mergedObject.name = "face-back"
                 mergedObject.rotateX(Math.PI/180* 90)
-                mergedObject.rotateY(Math.PI/180* 180)
-
                 mergedObject.position.z = -diameter
-                mergedObject.position.x = -diameter/2 - 1  + surface.width
-                mergedObject.position.y = 1
+                mergedObject.position.x = -diameter/2
+                mergedObject.position.y = surface.height
                 mergedObject.updateMatrix()
                 this.surfaces.back.model3D = mergedObject
             }
