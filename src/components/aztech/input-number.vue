@@ -65,7 +65,7 @@ export default defineComponent({
     },
     methods: {
         onClick(event:MouseEvent) {
-            const svgEl = event.currentTarget
+            const svgEl = event.currentTarget as HTMLElement
             if (!svgEl) return
             const d = svgEl.getClientRects()[0]
             const height = d.height

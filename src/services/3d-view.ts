@@ -1,9 +1,9 @@
 import * as THREE from "three"
-import { OrbitControls } from "./../../node_modules/three/examples/jsm/controls/OrbitControls.js"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 
 
 const view3D  = {
-    init: (opts = {}) => {
+    init: (opts = {} as any) => {
         const dimensions = {
             width: 36,
             height: 36,
@@ -44,7 +44,7 @@ const view3D  = {
         spotLight.position.y = dimensions.height
         spotLight.position.z = dimensions.depth/2
         spotLight.lookAt(0,0,0)
-        var spotLight2 = spotLight.clone()
+        const spotLight2 = spotLight.clone()
         spotLight.position.x -= dimensions.width*2
         spotLight.position.z -= dimensions.depth
         spotLight.lookAt(0,0,0)
@@ -70,11 +70,22 @@ const view3D  = {
             scene: scene,
             renderer:renderer,
             camera: camera,
+        } as {
+            scene: THREE.Scene,
+            renderer: THREE.WebGLRenderer,
+            camera: THREE.PerspectiveCamera,
+            orbitControls?: any
         }
+        
         if (orbitControls) {
             results.orbitControls = orbitControls
         }
-        return results
+        return results as {
+            scene: THREE.Scene,
+            renderer: THREE.WebGLRenderer,
+            camera: THREE.PerspectiveCamera,
+            orbitControls?: any
+        }
     },
 }
 

@@ -27,7 +27,6 @@ use the .vpg-svg-content for styling the content inside the box. Best way is to 
 import { defineComponent } from "vue"
 import { SVG } from "@svgdotjs/svg.js"
 import gsap from "gsap"
-import objectHash from "object-hash"
 
 import DrawSVGPlugin from "gsap/DrawSVGPlugin"
 import Phygital from "@/stores/phygital"
@@ -469,17 +468,22 @@ export default defineComponent({
             })
 
             const polyline = _.remove(this.surfacePolylines, polyline => {
-                if (polyline[0].x == parseInt(target.getAttribute("dataX1"), 10) - this.offset.x &&
-                    polyline[0].y == parseInt(target.getAttribute("dataY1"), 10) - this.offset.y &&
-                    polyline[1].x == parseInt(target.getAttribute("dataX2"), 10) - this.offset.x &&
-                    polyline[1].y == parseInt(target.getAttribute("dataY2"), 10) - this.offset.y
+                const x1 = parseInt(target.getAttribute("dataX1") + "", 10)
+                const x2 = parseInt(target.getAttribute("dataX2") + "", 10)
+                const y1 = parseInt(target.getAttribute("dataY1") + "", 10)
+                const y2 = parseInt(target.getAttribute("dataY2") + "", 10)
+
+                if (polyline[0].x == x1 - this.offset.x &&
+                    polyline[0].y == y1 - this.offset.y &&
+                    polyline[1].x == x2 - this.offset.x &&
+                    polyline[1].y == y2 - this.offset.y
                 ) {
                     return true
                 } else if (
-                    polyline[0].x == parseInt(target.getAttribute("dataX2"), 10) - this.offset.x &&
-                        polyline[0].y == parseInt(target.getAttribute("dataY2"), 10) - this.offset.y &&
-                        polyline[1].x == parseInt(target.getAttribute("dataX1"), 10) - this.offset.x &&
-                        polyline[1].y == parseInt(target.getAttribute("dataY1"), 10) - this.offset.y
+                    polyline[0].x == x2 - this.offset.x &&
+                        polyline[0].y == y2 - this.offset.y &&
+                        polyline[1].x == x1 - this.offset.x &&
+                        polyline[1].y == y1 - this.offset.y
                 ) {
                     return true
                 } 
@@ -541,11 +545,11 @@ export default defineComponent({
 
             if (!gridPointSource) return console.error("Define gridPointSource")
 
-            const innerRing = SVG(gridPointSource).findOne("#grid-point .inner-ring") 
-            const outerRing = SVG(gridPointSource).findOne("#grid-point .outer-ring") 
-            const centerRing = SVG(gridPointSource).findOne("#grid-point .center_ring") 
-            const lineHorizontal = SVG(gridPointSource).findOne("#grid-point .line-horizontal")
-            const lineVertical = SVG(gridPointSource).findOne("#grid-point .line-vertical")
+            const innerRing = SVG(gridPointSource).findOne("#grid-point .inner-ring") as any
+            const outerRing = SVG(gridPointSource).findOne("#grid-point .outer-ring") as any
+            const centerRing = SVG(gridPointSource).findOne("#grid-point .center_ring") as any
+            const lineHorizontal = SVG(gridPointSource).findOne("#grid-point .line-horizontal") as any
+            const lineVertical = SVG(gridPointSource).findOne("#grid-point .line-vertical") as any
             
             if (!innerRing || !outerRing || !centerRing || !lineHorizontal || !lineVertical) return
             const cellSize = this.cellSize
@@ -818,9 +822,12 @@ export default defineComponent({
                 // get grid point that is at position event.clientX & event.clientY with a radius of this.cellSize/2
                 const gridPoint = this.getGridPoint(this.mousePosX, this.mousePosY)
                 const newLine = this.$el.querySelector(".new-line") as HTMLElement
+                
                 if (gridPoint && gridPoint.classList.contains("__isOption")) {
-                    if (newLine.attributes["x2"].value != `${this.mousePosX}` &&
-                    newLine.attributes["y2"].value != `${this.mousePosY}`) {
+                    if (
+                        newLine.getAttribute("x2") != `${this.mousePosX}` &&
+                        newLine.getAttribute("y2") != `${this.mousePosY}`
+                    ) {
                         this.newLineEndPos = {
                             x: Math.round(this.mousePosX),
                             y: Math.round(this.mousePosY)
@@ -830,8 +837,8 @@ export default defineComponent({
                             opacity: 1,
                             duration: .8,
                             attr: {
-                                x2: parseInt(gridPoint.getAttribute("dataX")) * this.cellSize + this.cellSize/2,
-                                y2: parseInt(gridPoint.getAttribute("dataY")) * this.cellSize + this.cellSize/2
+                                x2: parseInt(gridPoint.getAttribute("dataX") + "", 10) * this.cellSize + this.cellSize/2,
+                                y2: parseInt(gridPoint.getAttribute("dataY") + "", 10) * this.cellSize + this.cellSize/2
                             },
                             ease: "power4.out",
                         })
@@ -928,8 +935,8 @@ export default defineComponent({
             this.newLine.length = 0
             this.removeNewLine = false
             const newLine = this.$el.querySelector(".new-line") as HTMLElement
-            const posX1 = Math.round((parseInt(newLine.getAttribute("x1"))- this.cellSize/2)/this.cellSize)
-            const posY1 = Math.round((parseInt(newLine.getAttribute("y1"))- this.cellSize/2)/this.cellSize)
+            const posX1 = Math.round((parseInt(newLine.getAttribute("x1") + "", 10)- this.cellSize/2)/this.cellSize)
+            const posY1 = Math.round((parseInt(newLine.getAttribute("y1") + "", 10)- this.cellSize/2)/this.cellSize)
 
             const options = []
             options.push(this.$el.querySelector(`g[dataX='${posX1-1}'][dataY='${posY1}']`))

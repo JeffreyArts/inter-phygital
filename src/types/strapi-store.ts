@@ -1,4 +1,6 @@
-export interface StrapiHTTPHeader {
+import { AxiosHeaders } from "axios"
+
+export interface StrapiHTTPHeader extends AxiosHeaders {
     "Content-Type": string;
     "Authorization"?: string;
 }

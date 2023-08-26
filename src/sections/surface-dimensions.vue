@@ -18,6 +18,7 @@ import { defineComponent } from "vue"
 import Phygital from "@/stores/phygital"
 import AztechAlert from "@/components/aztech/alert.vue"
 import AztechInputNumber from "@/components/aztech/input-number.vue"
+import type {AztechAlertOption} from "@/types/aztech-alert"
 import gsap from "gsap"
 
 export default defineComponent({
@@ -41,11 +42,7 @@ export default defineComponent({
     data: () => {
         return {
             alertOpen: false,
-            options: [] as Array<{
-                label: string,
-                type: string,
-                onClick: Function
-            }>
+            options: [] as Array<AztechAlertOption>
         }
     },
     computed: {
@@ -92,24 +89,25 @@ export default defineComponent({
     },
     methods: {
         closeAlert(emitted: boolean) {
-            this.alertOpen = false
+            this.alertOpen = emitted
         },
         validateChange(dimension: "width" | "height", value: number) {
             this.alertOpen = true
             if (dimension == "width") {
                 this.options[0].onClick = () => {
                     this.modifyWidth(value,true)
-                    this.closeAlert()
+                    this.closeAlert(false)
                 }
             } else {
                 this.options[0].onClick = () => {
                     this.modifyHeight(value,true)
-                    this.closeAlert()
+                    this.closeAlert(false)
                 }
             }
         },
         modifyWidth(v:number, skipAlert=false) {
-            const seed = document.querySelectorAll(".seed-value")[0].innerText.split("\n")[0].trim()
+            const seedDom = document.querySelectorAll(".seed-value")[0] as HTMLElement
+            const seed = seedDom.innerText.split("\n")[0].trim()
             if (seed === "custom" && !skipAlert) {
                 return this.validateChange("width",v)
             }
@@ -152,7 +150,8 @@ export default defineComponent({
             this.phygital.changed++
         },
         modifyHeight(v:number, skipAlert=false) {
-            const seed = document.querySelectorAll(".seed-value")[0].innerText.split("\n")[0].trim()
+            const seedDom = document.querySelectorAll(".seed-value")[0] as HTMLElement
+            const seed = seedDom.innerText.split("\n")[0].trim()
             if (seed === "custom" && !skipAlert) {
                 return this.validateChange("height",v)
             }

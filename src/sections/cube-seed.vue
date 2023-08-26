@@ -18,6 +18,7 @@
 import { defineComponent } from "vue"
 import icon from "@/components/icon.vue"
 import Phygital from "@/stores/phygital"
+import * as THREE from "three"
 import AztechUnderline from "@/components/aztech/underline-1.vue"
 import gsap from "gsap"
 import _ from "lodash"
@@ -174,16 +175,19 @@ export default defineComponent({
                 }
 
                 // Create array with all the parts
-                let surfaceObjects = []
+                let surfaceObjects = [] as Array<any>
                 const model3D = _.find(this.phygital.sandbox.main.scene.children, child => {
                     return child.name == "datamodel"
                 })
                 if (model3D && model3D.children.length > 0) {
                     _.each(model3D.children, surface => {
-                        _.each(surface.children, (child, i) => {
+                        _.each(surface.children, (child) => {
+                            if (!(child instanceof THREE.Mesh)) {
+                                return
+                            }
                             child.material.transparent = true
                                 
-                            const material = child.material.clone()
+                            const material = _.clone(child.material)
                             child.material = material
                             surfaceObjects.push (child)
                         })

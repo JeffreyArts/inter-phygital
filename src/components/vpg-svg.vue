@@ -51,7 +51,7 @@ export default defineComponent({
     },
     methods: {
         updateSVG() {
-            var svgContainer = this.$refs["vpgSVG"] as SVGElement
+            var svgContainer = this.$refs["vpgSVG"] as HTMLElement
             this.svg = SVG()
             this.svg.viewbox(0,0,this.width - .5, this.height- .5)
             // this.svg.viewbox(0,0,this.width + 1, this.height+1) // 1 unit bigger than pattern size to create padding

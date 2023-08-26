@@ -8,6 +8,10 @@ import { CSG } from "three-csg-ts"
 import patternToThreejs from "@/services/pattern-to-threejs.js"
 import * as THREE from "three"
 
+interface model3D extends THREE.Group {
+    material: THREE.Material;
+}
+
 export const phygitalFace = defineStore({
     id: "phygital-face",
     state: () => ({
@@ -19,7 +23,7 @@ export const phygitalFace = defineStore({
                 height: 3,
                 polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
-                model3D: null as null | THREE.Group
+                model3D: null as null | model3D
             },
             bottom: {
                 mirrorX: 0,
@@ -28,7 +32,7 @@ export const phygitalFace = defineStore({
                 height: 3,
                 polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
-                model3D: null as null | THREE.Group
+                model3D: null as null | model3D
             },
             left: {
                 mirrorX: 0,
@@ -37,7 +41,7 @@ export const phygitalFace = defineStore({
                 height: 7,
                 polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
-                model3D: null as null | THREE.Group
+                model3D: null as null | model3D
             },
             right: {
                 mirrorX: 0,
@@ -46,7 +50,7 @@ export const phygitalFace = defineStore({
                 height: 7,
                 polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
-                model3D: null as null | THREE.Group
+                model3D: null as null | model3D
             },
             front: {
                 mirrorX: 0,
@@ -55,7 +59,7 @@ export const phygitalFace = defineStore({
                 height: 7,
                 polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
-                model3D: null as null | THREE.Group
+                model3D: null as null | model3D
             },
             back: {
                 mirrorX: 0,
@@ -64,7 +68,7 @@ export const phygitalFace = defineStore({
                 height: 7,
                 polylines: [] as Array<Array<{x:number, y:number}>>,
                 update3D: 0,
-                model3D: null as null | THREE.Group
+                model3D: null as null | model3D
             }
         },
         selectedSurface: "top" as "top" | "bottom" | "left" | "right" | "front" | "back",
@@ -108,7 +112,7 @@ export const phygitalFace = defineStore({
                 const d = shuffleSeed(dimensions, this.seed)[0].split("x") 
                 const oppositeSurface = this.getOppositeSurface(surface)
                 if (!oppositeSurface) { 
-                    return reject(new Error("No opposite surface (invalid surface input)"))
+                    return new Error("No opposite surface (invalid surface input)")
                 }
 
                 if (surface == "top") {
@@ -167,6 +171,7 @@ export const phygitalFace = defineStore({
                     ],
                     width: 1,
                     height: 1,
+                    seed: "",
                     algorithm: {
                         type: "polylines",
                         startPoint: {x:0, y:0},
@@ -179,15 +184,15 @@ export const phygitalFace = defineStore({
                 
                 // const mirroringOptionsArray = _.flatten(Array.from({ length: surfaces.length }, () => mirroringOptionValues))
                 // mirroringOptionsArray.length = surfaces.length 
-                const promises = []
+                const promises = [] as Array<Promise<any>>
                 _.forEach(surfaces, (surface, index) => {
-
+                    if (!this.seed) return
                     // Set mirror options
                     const mirroringOptionValues = ["11"] //first digit is boolean for mirrorX, second digit is boolean for mirrorY
                     if (surface === "left") {
                         mirroringOptionValues.push("10")
                     }
-                    if (surface === "back") {
+                    if (surface === "front") {
                         mirroringOptionValues.push("10")
                     }
                     const mirroringOptions = shuffleSeed(mirroringOptionValues, this.seed)
@@ -228,6 +233,9 @@ export const phygitalFace = defineStore({
                 Promise.all(promises).then((polylines) => {
                     _.each(surfaces, (surface, index) => {
                         const oppositeSurface = this.getOppositeSurface(surface)
+                        if (!oppositeSurface) {
+                            return
+                        }
                         this.surfaces[surface].polylines = polylines[index]
                         this.surfaces[oppositeSurface].polylines = _.cloneDeep(this.surfaces[surface].polylines)
                     })
@@ -237,7 +245,7 @@ export const phygitalFace = defineStore({
                 
             })
         },
-        async generatePolylines(vpgOptions) {
+        async generatePolylines(vpgOptions: any) {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     resolve(Algorithm(vpgOptions).polylines)
@@ -259,9 +267,9 @@ export const phygitalFace = defineStore({
                 color: "#777",
                 tubeThickness: .0125,
             })
-            const mergedObject = new THREE.Group()
+            const mergedObject = new THREE.Group() as model3D
             
-            pattern3D.forEach((mesh, i) => {
+            pattern3D.forEach((mesh: any, i:number) => {
                 mesh.name = `${surfaceSide}-${i}`
                 mergedObject.add(mesh)
             })
@@ -366,73 +374,19 @@ export const phygitalFace = defineStore({
                 console.error("getOppositeSurface: Invalid input")
             }
         },
-        updateSurface(surface: "top" | "bottom" | "left" | "right" |  "front" | "back", value: number) {
-            const oppositeSurface = this.getOppositeSurface(surface)
-            const side1 = {surface: "", dimension: ""}
-            const side2 = {surface: "", dimension: ""}
-
-            // Than define side surfaces
-            if (surface == "top" || surface == "bottom") {
-                if (dimension == "height") {
-                    side1.surface   = "left"
-                    side1.dimension = "width"
-                    side2.surface   = "right"
-                    side2.dimension = "width"
-                } else {
-                    side1.surface   = "front"
-                    side1.dimension = "width"
-                    side2.surface   = "back"
-                    side2.dimension = "width"
-                }
-            } else if (surface == "left" || surface == "right") {
-                if (dimension == "height") {
-                    side1.surface   = "front"
-                    side1.dimension = "height"
-                    side2.surface   = "back"
-                    side2.dimension = "height"
-                } else {
-                    side1.surface   = "top"
-                    side1.dimension = "height"
-                    side2.surface   = "bottom"
-                    side2.dimension = "height"
-                }
-            } else if (surface == "front" || surface == "back") {
-                if (dimension == "height") {
-                    side1.surface   = "left"
-                    side1.dimension = "height"
-                    side2.surface   = "right"
-                    side2.dimension = "height"
-                } else {
-                    side1.surface   = "top"
-                    side1.dimension = "width"
-                    side2.surface   = "bottom"
-                    side2.dimension = "width"
-                }
-            } 
-
-            
-            this.phygital.surfaces[surface][dimension] = value
-            this.phygital.surfaces[oppositeSurface][dimension]     = this.phygital.surfaces[surface][dimension]
-            this.phygital.surfaces[side1.surface][side1.dimension] = this.phygital.surfaces[surface][dimension]
-            this.phygital.surfaces[side2.surface][side2.dimension] = this.phygital.surfaces[surface][dimension]
-            
-            clearTimeout(this.updating)
-            
-            this.updating = setTimeout(() => {
-                this.phygital.update3DSurface(surface)
-                this.phygital.update3DSurface(oppositeSurface)
-            }, 100)
-        },
         downloadSTL(filename: string) { 
             return new Promise((resolve, reject)=> {       
-                let mergedObject = null
+                let mergedObject = null as null | THREE.Mesh | THREE.Mesh<THREE.BufferGeometry<THREE.NormalBufferAttributes>>
                 
                 _.each(this.surfaces, (surface) => {
-                    if (surface.model3D) {
+                    if (!_.isNull(surface.model3D)) {
                         surface.model3D.updateMatrix()
                         _.each(surface.model3D.children, (child) => {
-                            const newMesh = child.clone()
-
+                            const newMesh = child.clone() as THREE.Mesh<THREE.BufferGeometry<THREE.NormalBufferAttributes>>
+                            if (!surface.model3D) {
+                                return
+                            }
+                            
                             newMesh.position.x += surface.model3D.position.x
                             newMesh.position.y += surface.model3D.position.y
                             newMesh.position.z += surface.model3D.position.z
@@ -448,7 +402,8 @@ export const phygitalFace = defineStore({
                                 mergedObject = newMesh
                                 return
                             }
-                            mergedObject.updateMatrix()
+                            if (newMesh)
+                                mergedObject.updateMatrix()
                             mergedObject = CSG.toMesh(CSG.fromMesh(mergedObject).union(CSG.fromMesh(newMesh)), mergedObject.matrix)
                         })
                     }

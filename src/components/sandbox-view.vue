@@ -2,7 +2,7 @@
     <div class="sandbox-view" @mousedown="cancelAnimations"></div>
 </template>
 
-<script>
+<script lang="ts">
 import _ from "lodash"
 import * as THREE from "three"
 import gsap from "gsap" 
@@ -21,15 +21,15 @@ export default {
     },
     data() {
         return {
-            scene: false,
+            scene: null as null | THREE.Scene,
             container: {
                 width: 256,
                 height: 256,
             },
             scale: 6,
-            renderer: null,
-            camera: null,
-            orbitControls: null,
+            renderer: null as null | THREE.WebGLRenderer,
+            camera: null as null | THREE.PerspectiveCamera,
+            orbitControls: null as any,
         }
     },
     watch: {
@@ -55,15 +55,16 @@ export default {
         if (this.name) {
             this.phygital.sandbox[this.name] = o
         }
-        
-        this.$el.append( this.renderer.domElement )
+        if (this.renderer) {
+            this.$el.append( this.renderer.domElement )
+        }
         window.addEventListener("resize", this.updateCanvasSize)
     },
     beforeUnmount() {
         window.removeEventListener("resize", this.updateCanvasSize)
     },
     methods: {
-        removeObject(object) {
+        removeObject(object: any) {
             if (object.children.length > 0) {
                 _.each(object.children, childObject => {
                     this.removeObject(childObject)
@@ -77,8 +78,9 @@ export default {
             if (object.dispose) {
                 object.dispose()
             }
-
-            this.scene.remove(object)
+            if (this.scene) {
+                this.scene.remove(object)
+            }
         },
         updateCanvasSize() {
             const el = this.$el.parentElement
@@ -90,12 +92,17 @@ export default {
             this.container.width = size
             this.container.height = size
 
-            this.renderer.setSize( this.container.width, this.container.height)
+            if (this.renderer) {
+                this.renderer.setSize( this.container.width, this.container.height)
+            }
         },
         updateModel() {
             if (this.datamodel.children.length <= 0){
                 return // Can not update model if there is no model
             }
+
+            if (!this.camera) return
+            if (!this.scene) return
 
             this.updateCanvasSize()
 
@@ -123,11 +130,7 @@ export default {
                 z: this.datamodel.depth * 4,
                 ease: "elastic.out(1, 0.3)"
             })
-
-            // This prevents gsap from throwing warnings:
-            this.camera.lookAt.x = this.camera.lookAt.x
-            this.camera.lookAt.y = this.camera.lookAt.y
-            this.camera.lookAt.z = this.camera.lookAt.z
+            this.camera.lookAt(target.x, target.y, target.z)
 
             // Animate orientation point of camera
             gsap.to(this.camera.lookAt, {
@@ -136,6 +139,8 @@ export default {
                 y: target.y,
                 z: target.z,
                 onUpdate: () => {
+                    if (!this.camera) return
+
                     this.camera.lookAt(target)
                     if (this.orbitControls) {
                         this.orbitControls.target = target
@@ -149,6 +154,7 @@ export default {
             }
         },
         cancelAnimations() {
+            if (!this.camera) return
             gsap.killTweensOf(this.camera.position)
             gsap.killTweensOf(this.camera.lookAt)
         }

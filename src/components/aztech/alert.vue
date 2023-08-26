@@ -40,12 +40,13 @@ import { defineComponent } from "vue"
 import gsap from "gsap"
 import AztechButton from "@/components/aztech/button.vue"
 import warningIcon from  "@/assets/aztech/hand-explanation-mark.svg?raw"
+import type {AztechAlertOption} from "@/types/aztech-alert"
 
 export default defineComponent({
     name: "aztech-alert",
     components: {
         AztechButton,
-        warningIcon
+        // warningIcon
     },
     props: {
         open: {
@@ -54,17 +55,17 @@ export default defineComponent({
             default: false
         },
         options: {
-            type: Array,
+            type: Array as () => Array<AztechAlertOption> | Array<AztechAlertOption>,
             required: true,
-            default: function() {
-                return [
-                    {
-                        label: "DEFAULT",
-                        type: "primary",
-                        onClick: () => { console.log("SPECIFY OPTIONS ATTRIBUTE") }
-                    }
-                ]
-            }
+            default: () => [
+                {
+                    label: "DEFAULT",
+                    type: "primary", // Set the correct type value
+                    onClick: () => {
+                        console.log("SPECIFY OPTIONS ATTRIBUTE")
+                    },
+                },
+            ],
         },
     },
     data: () => {

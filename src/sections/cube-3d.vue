@@ -9,11 +9,11 @@
 import { defineComponent } from "vue"
 import Phygital from "@/stores/phygital"
 import * as THREE from "three"
-import objectHash from "object-hash"
+import objectHash from "object-hash" 
 import SandboxView from "@/components/sandbox-view.vue"
 import _ from "lodash"
 
-const removeObject = (object) => {
+const removeObject = (object: any) => {
     if (object.children.length > 0) {
         _.remove(object.children, childObject => {
             return removeObject(childObject)
@@ -29,6 +29,13 @@ const removeObject = (object) => {
     }
     return true
 }
+
+interface Pattern3D extends THREE.Object3D {
+  height: number;
+  width: number;
+  depth: number;
+}
+
 
 export default defineComponent({
     name: "cube-faces",
@@ -55,7 +62,7 @@ export default defineComponent({
     },
     data: () => {
         return {
-            pattern3D: new THREE.Object3D(),
+            pattern3D: new THREE.Object3D() as Pattern3D,
             mouseDown: false,
             updatePattern: 0,
             updateTimeout: 0,
@@ -105,23 +112,29 @@ export default defineComponent({
                 }
             })
 
-            if (!this.phygital.surfaces[side].model3D) {
+            if (!this.phygital.surfaces[side] || !this.phygital.surfaces[side].model3D) {
                 return
             }
 
-            this.pattern3D.name = Math.floor(Math.random()*1000)
+            this.pattern3D.name = Math.floor(Math.random()*1000) + ""
             this.pattern3D.width = this.phygital.surfaces.top.width
             this.pattern3D.depth = this.phygital.surfaces.top.height
             this.pattern3D.height = this.phygital.surfaces.left.height
             if (!this.phygital.openCube) {
                 const box = new THREE.BoxGeometry(this.pattern3D.width-1.5, this.pattern3D.height-1.5, this.pattern3D.depth-1.5)
-                const mesh = new THREE.Mesh(box, this.phygital.surfaces.top.model3D.material)
-                mesh.name = "innerCube"
-                mesh.position.set((this.pattern3D.width-1.5)/2, (this.pattern3D.height-1.5)/2 + 1.25, (this.pattern3D.depth-1.5)/2)
-                this.pattern3D.add(mesh)   
+                if (this.phygital.surfaces.top.model3D) {
+                    const mesh = new THREE.Mesh(box, this.phygital.surfaces.top.model3D.material)
+                    mesh.name = "innerCube"
+                    mesh.position.set((this.pattern3D.width-1.5)/2, (this.pattern3D.height-1.5)/2 + 1.25, (this.pattern3D.depth-1.5)/2)
+                    this.pattern3D.add(mesh)   
+                }
             }
+            let model3D = _.clone(this.phygital.surfaces[side].model3D)
             
-            this.pattern3D.add(this.phygital.surfaces[side].model3D.clone())
+            if (model3D) {
+                this.pattern3D.add(model3D)
+            }
+
             this.updateTimeout = setTimeout(() => {
                 this.updatePattern ++
             }, 100)
@@ -142,7 +155,7 @@ export default defineComponent({
                 return "front"
             }
         },
-        hash (object) {
+        hash (object: any) {
             return objectHash(object)
         },
     },

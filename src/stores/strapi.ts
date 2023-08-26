@@ -107,6 +107,7 @@ export const Strapi = defineStore({
             if (data) {
                 request.data = JSON.stringify(data, null, 2)
             }
+            
             return axios(`${this.url}/${path}`, request)
 
         },
