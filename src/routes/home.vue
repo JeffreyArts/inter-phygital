@@ -3,8 +3,8 @@
         <dashboard>
             <main class="main __isActive">
                 <section class="main-section">
-                    <section-cube3d v-if="dashboard.activeComponent === 'cube-3d'" name="main"/>
-                    <main-cube-faces v-if="dashboard.activeComponent === 'cube-faces'"/>
+                    <section-cube3d v-if="activeComponent === 'cube-3d'" name="main"/>
+                    <main-cube-faces v-if="activeComponent === 'cube-faces'"/>
                 </section>
             </main>
             <aside class="sidebar">
@@ -14,22 +14,26 @@
                 <section id="s-seed">
                     <section-seed/>
                 </section>
-                <section id="s-surfaces">
-                    <section-surfaces/>
+                <section id="s-surfaces" @click="select('cube-faces')" @mousedown="setSelection">
+                    <section-surfaces :activeComponent="activeComponent"/>
                 </section>
                 <section id="s-dimensions">
                     <section-meta-dimensions />
                 </section>
                 <section id="s-cube3d" @click="select('cube-3d')" @mousedown="setSelection" @mousemove="cancelSelection">
                     <section-cube3d name="sidebar" />
+                    <svg :class="activeComponent === 'cube-3d' ? '__isHidden' : ''" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 37 64" xml:space="preserve">
+                        <path d="M30.9,11v18.8h-1.7V4.4h-6.1v25.4h-1.7V0h-6.1v29.8h-1.7V3.3H7.7v35.9H6.1V19.9H0v25.7C0,55.7,8.3,64,18.5,64 C28.7,64,37,55.7,37,45.5V11H30.9z M13.2,41.4H17v-3.9h3.9v3.9h3.9v3.9h-3.9v3.9H17v-3.9h-3.9V41.4z M19,58.4 c-6.4,0-11.7-4.8-12.4-11h3.9c0.7,4.1,4.2,7.2,8.5,7.2c4.3,0,7.8-3.1,8.5-7.2h3.9C30.7,53.6,25.4,58.4,19,58.4z"/>
+                    </svg>
+
                 </section>
                 <section id="s-download">
                     <section-download/>
                 </section>
-                <section id="s-view-edit" v-if="dashboard.activeComponent === 'cube-faces'">
+                <section id="s-view-edit" v-if="activeComponent === 'cube-faces'">
                     <section-view-edit-button />
                 </section>
-                <section id="s-surface-dimensions" v-if="dashboard.activeComponent === 'cube-faces'">
+                <section id="s-surface-dimensions" v-if="activeComponent === 'cube-faces'">
                     <sectionSurfaceDimensions />
                 </section>
             </aside>
@@ -42,15 +46,14 @@
 
 <script lang="ts">
 import {defineComponent} from "vue"
-import DashboardStore from "@/stores/dashboard"
-import MainCubeFaces from "@/components/sections/main-cube-faces.vue"
-import sectionMetaDimensions from "@/components/sections/meta-dimensions.vue"
-import sectionSurfaceDimensions from "@/components/sections/surface-dimensions.vue"
-import sectionCube3d from "@/components/sections/cube-3d.vue"
-import sectionSurfaces from "@/components/sections/surfaces-grid.vue"
-import sectionViewEditButton from "@/components/sections/view-edit-button.vue"
-import sectionDownload from "@/components/sections/download-model.vue"
-import sectionSeed from "@/components/sections/cube-seed.vue"
+import MainCubeFaces from "@/sections/main-cube-faces.vue"
+import sectionMetaDimensions from "@/sections/meta-dimensions.vue"
+import sectionSurfaceDimensions from "@/sections/surface-dimensions.vue"
+import sectionCube3d from "@/sections/cube-3d.vue"
+import sectionSurfaces from "@/sections/surfaces-grid.vue"
+import sectionViewEditButton from "@/sections/view-edit-button.vue"
+import sectionDownload from "@/sections/download-model.vue"
+import sectionSeed from "@/sections/cube-seed.vue"
 import Dashboard from "@/components/dashboard.vue"
 import _ from "lodash"
 
@@ -68,15 +71,10 @@ export default defineComponent ({
         sectionSurfaceDimensions,
     },
     props: [],
-    setup() {
-        const dashboard = DashboardStore()
-        return {
-            dashboard
-        }
-    },
     data() {
         return {
-            selection: {x: 0, y:0}
+            selection: {x: 0, y:0},
+            activeComponent: "cube-3d" as "cube-3d" | "cube-faces",
         }
     },
     mounted() {
@@ -91,7 +89,7 @@ export default defineComponent ({
         },
         select(section: "cube-3d" | "cube-faces") {
             if (this.selection.x !== 0 && this.selection.y !== 0) {
-                this.dashboard.activeComponent = section
+                this.activeComponent = section
             }
         },
         cancelSelection(event:MouseEvent) {
@@ -129,6 +127,25 @@ export default defineComponent ({
             }
         }
     }
+    #s-cube3d {
+        svg {
+            opacity: 0;
+            transition: .24s all ease;
+            position: absolute;
+            right: 16px;
+            bottom: 16px;
+            width: 24px;
+            transform: translateY(180deg);
+            &.__isHidden {
+                opacity: 0 !important;
+            }
+        }
+        &:hover {
+            svg {
+                opacity: 1;
+            }
+        }
+    }
     .layout-modifiers {
         position: absolute;
         left: 50%;
@@ -147,6 +164,7 @@ export default defineComponent ({
         display: flex;
         justify-content: center;
         align-items: center;
+        position: relative;
         background-color: #eee; 
         
         &[ratio="1x1"] {

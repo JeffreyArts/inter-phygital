@@ -121,10 +121,15 @@ export default {
                 x: this.datamodel.width * 4,
                 y: this.datamodel.height * 1.8,
                 z: this.datamodel.depth * 4,
-                // ease: "power1.in"
                 ease: "elastic.out(1, 0.3)"
             })
 
+            // This prevents gsap from throwing warnings:
+            this.camera.lookAt.x = this.camera.lookAt.x
+            this.camera.lookAt.y = this.camera.lookAt.y
+            this.camera.lookAt.z = this.camera.lookAt.z
+
+            // Animate orientation point of camera
             gsap.to(this.camera.lookAt, {
                 duration: 1.28,
                 x: target.x,
