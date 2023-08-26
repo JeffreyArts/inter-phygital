@@ -70,11 +70,6 @@ export default defineComponent({
             if (action == "add") {
                 surface.polylines.push(_.clone(line))
             } else {
-
-                // // console.log("remove line",line,[line[1], line[0]])
-                // _.each(surface.polylines, p => {
-                //     console.log(JSON.stringify(p))
-                // })
                 _.remove(surface.polylines, (polyline) => {
                     if (_.isEqual(polyline, line) || _.isEqual(polyline, [line[1], line[0]])) {
                         const removableLine = document.querySelector(".__isRemovable")
@@ -89,6 +84,7 @@ export default defineComponent({
                     return false
                 })
             }
+            this.phygital.changed ++
             this.phygital.update3DSurface(this.selectedSurface)
         }
     }

@@ -7,7 +7,7 @@ use the .vpg-svg-content for styling the content inside the box. Best way is to 
          phygital.editMode ? '__isEditMode' : '',
          '__isBlock'
         ]">
-        <figure ref="vpgSVG" @mousedown="hasClicked" @mousemove="mouseMove"/>
+        <figure ref="vpgSVG" @mousedown="onClick" @mousemove="mouseMove"/>
         <svg style="display:none;" id="grid-point-container" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 24 24" xml:space="preserve">
             <g class="grid-point" id="grid-point">
                 <circle  class="center_ring"  cx="12.5" cy="12.5" r="4"/>
@@ -66,8 +66,14 @@ export default defineComponent({
             surfacePolylines: [] as Array<Array<{x:number, y:number}>>,
             newLine: [] as Array<{x:number, y:number}>,
             removableLine: null as null | HTMLElement,
+            hoverGridPoint: null as null | HTMLElement,
             removingLine: false,
-            surfaceInTransition: false
+            surfaceInTransition: false,
+            mouseX: 0,
+            mouseY: 0,
+            mousePosX: 0,
+            mousePosY: 0,
+            newLineEndPos: null as null | {x:number, y:number},
         }
     },
     watch: {
@@ -89,6 +95,9 @@ export default defineComponent({
         "phygital.editMode": {
             handler(editMode) {
                 this.surfaceInTransition = true
+                gsap.killTweensOf(".grid-point")
+                gsap.killTweensOf(".vpg-line")
+
                 if (editMode) {
                     gsap.to(".grid-point", {
                         opacity: 1,
@@ -210,7 +219,6 @@ export default defineComponent({
     beforeUnmount() {
         window.removeEventListener("resize", this.updateSVG)
     },
-    
     methods: {
         defineGrid() {  
             this.orientation = this.$el.clientWidth > this.$el.clientHeight ? "landscape" : "portrait"
@@ -484,6 +492,24 @@ export default defineComponent({
                 opacity: 0,
                 duration: .24,
                 onComplete: () => {
+                    const polyline = _.remove(this.surfacePolylines, polyline => {
+                        if (polyline[0].x == parseInt(target.getAttribute("dataX1"), 10) - this.offset.x &&
+                            polyline[0].y == parseInt(target.getAttribute("dataY1"), 10) - this.offset.y &&
+                            polyline[1].x == parseInt(target.getAttribute("dataX2"), 10) - this.offset.x &&
+                            polyline[1].y == parseInt(target.getAttribute("dataY2"), 10) - this.offset.y
+                        ) {
+                            return true
+                        } else if (
+                            polyline[0].x == parseInt(target.getAttribute("dataX2"), 10) - this.offset.x &&
+                                polyline[0].y == parseInt(target.getAttribute("dataY2"), 10) - this.offset.y &&
+                                polyline[1].x == parseInt(target.getAttribute("dataX1"), 10) - this.offset.x &&
+                                polyline[1].y == parseInt(target.getAttribute("dataY1"), 10) - this.offset.y
+                        ) {
+                            return true
+                        } 
+                        return false
+                    })
+                    this.$emit("update:vpgPattern", polyline[0], "remove")
                     target.remove()
                 }
             })
@@ -629,122 +655,206 @@ export default defineComponent({
                 height: Math.round(this.cellSize * this.verticalLines)
             })
         },
-        hasClicked(event: MouseEvent) {
-            const target = event.target as HTMLElement
-            const parentNode = target.parentNode as HTMLElement
+        getGridPoint(x:number,y:number) {
+            // The +/1 is to increase target area, but the way it is currently done is not good enough
+            let target = null
+            if ((Math.round(x) < x + .1) &&
+                (Math.round(x) > x - .1) &&
+                (Math.round(y) < y + .1) &&
+                (Math.round(y) > y - .1)
+            ) {
+                target = this.svg.findOne(`[dataX="${Math.round(x)}"][dataY="${Math.round(y)}"]`)?.node
+            }
+            return target
+        },
+        getLine(posX:number,posY:number) {
+            let target = null as null | Array<{x:number, y:number}>
+            // Match against horizontal lines
+            this.surfacePolylines.forEach((polyline: Array<{x:number, y:number}>) => {
+                if ((Math.round(posY) > posY-.1 && Math.round(posY) < posY+.1) &&
+                    (posX > Math.floor(posX)+.16  && posX < Math.ceil(posX)-.16 )
+                ) {
+                    if (Math.round(posY) == polyline[0].y+this.offset.y && polyline[0].y == polyline[1].y) {
+                        let match = 0
+                        polyline.forEach((point: {x:number, y:number}) => {
+                            if (point.x+this.offset.x == Math.floor(posX) ||
+                                point.x+this.offset.x == Math.ceil(posX)
+                            ) {
+                                match++
+                            }
+                        })
+                        if (match == 2) {
+                            target = polyline
+                        }
+                    }
+                // Match against vertical lines
+                } else if((Math.round(posX) > posX-.1 && Math.round(posX) < posX+.1) &&
+                    (posY > Math.floor(posY)+.16  && posY < Math.ceil(posY)-.16 )) {
+                    if (Math.round(posX) == polyline[0].x+this.offset.x && polyline[0].x == polyline[1].x) {
+                        let match = 0
+                        polyline.forEach((point: {x:number, y:number}) => {
+                            if (point.y+this.offset.y == Math.floor(posY) ||
+                                point.y+this.offset.y == Math.ceil(posY)
+                            ) {
+                                match++
+                            }
+                        })
+                        if (match == 2) {
+                            target = polyline
+                        }
+                    }
+                }
+            })
+
+            if (_.isNull(target)) {
+                return null
+            }
+            return this.$el.querySelector(` 
+                    .vpg-line[dataX1="${target[0].x + this.offset.x}"][dataY1="${target[0].y + this.offset.y}"][dataX2="${target[1].x + this.offset.x}"][dataY2="${target[1].y + this.offset.y}"],
+                    .vpg-line[dataX1="${target[1].x + this.offset.x}"][dataY1="${target[1].y + this.offset.y}"][dataX2="${target[0].x + this.offset.x}"][dataY2="${target[0].y + this.offset.y}"]
+            `)
+        },
+        onClick(event: MouseEvent) {
+            // const target = event.target as HTMLElement
+            // const parentNode = target.parentNode as HTMLElement
             
             if (!this.phygital.editMode) return
-
-            if (this.newLine.length == 0) {
-                // Add start of new line
-                if (parentNode?.classList.contains("grid-point")) {
-                    const x = parentNode.getAttribute("dataX") as string
-                    const y = parentNode.getAttribute("dataY") as string
-                    this.startNewLine(parseInt(x, 10),parseInt(y, 10))
-                }
-                
-                // Remove a line
-                if (target.classList.contains("__isRemovable")) {
-                    const coord = this.pointsToCoord(target.getAttribute("points") as string)
-                    this.removeLine(target)
-                    this.$emit("update:vpgPattern", _.map(coord, (point) => {
-                        return {
-                            x: point.x - this.offset.x,
-                            y: point.y - this.offset.y
+            
+            setTimeout(() => {
+                if (this.newLine.length == 0) {
+                    // Start new line
+                    const gridPoint = this.getGridPoint(this.mousePosX, this.mousePosY) as HTMLElement | null
+                    if (gridPoint) {   
+                        if (gridPoint.classList.contains("__hasHover")) {
+                            this.startNewLine(Math.round(this.mousePosX), Math.round(this.mousePosY))
+                            return
                         }
-                    }), "remove")
-                }
+                    }
                     
-            } else if (this.newLine.length == 1) {
-                this.completeNewLine()
+                    // Remove line
+                    const line = this.getLine(this.mousePosX, this.mousePosY)
+                    if (line) {
+                        this.removeLine(line)
+                        return
+                    }
+                } else if (this.newLine.length == 1) {
+                    
+                    // Cancel new line
+                    if (!this.newLineEndPos) {
+                        this.cancelNewLine()
+                        return
+                    }
+                    
+                    const target = this.getGridPoint(this.newLineEndPos.x, this.newLineEndPos.y) as HTMLElement | null
+                    if (!target) {
+                        this.cancelNewLine()
+                        return
+                    }
+                
+                    const duplicate = this.$el.querySelector(`
+                        .vpg-line[dataX1="${this.newLine[0].x}"][dataY1="${this.newLine[0].y}"][dataX2="${this.newLineEndPos.x}"][dataY2="${this.newLineEndPos.y}"],
+                        .vpg-line[dataX1="${this.newLineEndPos.x}"][dataY1="${this.newLineEndPos.y}"][dataX2="${this.newLine[0].x}"][dataY2="${this.newLine[0].y}"]
+                    `)
+                
+                    if (duplicate) {
+                        this.cancelNewLine()
+                        return
+                    }
+
+                    // Add new line
+                    this.newLine.push({
+                        x: Math.round(this.newLineEndPos.x),
+                        y: Math.round(this.newLineEndPos.y)
+                    })
+
+                    this.completeNewLine()
+                }
+            })
+        },
+        highlightRemovableLine(line: HTMLElement | null) {
+            if (this.removableLine && this.removableLine != line) {
+                gsap.killTweensOf(this.removableLine)
+                gsap.to(this.removableLine, {
+                    duration: .64, 
+                    stroke: "#1c1c1e",
+                    strokeWidth: 30,
+                    opacity: 1,
+                })
+            }
+
+            this.removableLine = line
+
+            if (line){ 
+                const patternGroup = this.$el.querySelector(".vpg-pattern")
+                    
+                if (!patternGroup) return
+                patternGroup.appendChild(this.removableLine)
+                gsap.killTweensOf(line)
+                gsap.to(line, {
+                    duration: .64, 
+                    stroke: "#545760",
+                    strokeWidth: 30,
+                    opacity: .72,
+                })
             }
         },
         mouseMove(event: MouseEvent) {
+
+            // sanitize mouse position to match svg element x &  y
+            const rect = this.svg.node.getBoundingClientRect()
+            this.mouseX = event.clientX - rect.left
+            this.mousePosX = (this.mouseX-this.cellSize/2) / this.cellSize
+            this.mouseY = event.clientY - rect.top
+            this.mousePosY = (this.mouseY-this.cellSize/2) / this.cellSize
+
+
+
+            // Cancel if in transition
             if (this.surfaceInTransition) return
             if (this.removingLine) return
+
+
+            const currentTarget = event.currentTarget as HTMLElement
+            if (!currentTarget) return
             
+            if (!this.mouseX || !this.mouseY) return
+
+            // If no newLine is active, check if we are hovering over a line or gridPoint
             if (this.newLine.length == 0 && this.phygital.editMode) {
-                
-                const target = event.target as HTMLElement
-                if (!target) return
-
-                if (target.classList.contains("vpg-line")) {
-                    if (!target.classList.contains("__isRemovable")) {
-                        const oldLines = this.$el.querySelectorAll(".__isRemovable")
-                        for (let i = 0; i < oldLines.length; i++) {
-                            gsap.to(oldLines[i], {
-                                duration: 3,
-                                stroke: "#1c1c1e", 
-                                opacity: 1, 
-                            })
-                            oldLines[i].classList.remove("__isRemovable")
-                        }
-
-                        target.classList.add("__isRemovable")
-                    }
-
-
-
-                    
-                    this.removableLine = target
-                    // Add this.removableLine to the end of the list
-                    this.removableLine.parentElement?.appendChild(this.removableLine)
-                    
-                    gsap.killTweensOf(target)
-                    gsap.to(target, {
-                        duration: .64, 
-                        stroke: "#545760",
-                        opacity: .72,
-                    })
-
-                    
-                } else {
-                    if (this.removableLine) {
-                        gsap.to(this.removableLine, {
-                            duration: 3,
-                            stroke: "#1c1c1e", 
-                            opacity: 1, 
-                        })
-                        this.removableLine = null
-                    }
-                }
+                const line = this.getLine(this.mousePosX, this.mousePosY)
+                this.highlightRemovableLine(line)
+                if (line) return
+                const gridPoint = this.getGridPoint(this.mousePosX, this.mousePosY) 
             }
 
             if (this.newLine.length == 1 && this.phygital.editMode) {
                 if (this.removeNewLine) return
-                // sanitize mouse position to match svg element x &  y
-                const currentTarget = event.currentTarget as HTMLElement
-                if (!currentTarget) return
-                const rect = this.svg.node.getBoundingClientRect()
-                let mouseX = event.clientX - rect.left
-                let mouseY = event.clientY - rect.top
-                
-                if (!mouseX || !mouseY) return
 
 
                 // get grid point that is at position event.clientX & event.clientY with a radius of this.cellSize/2
-                const gridPoint = this.$el.querySelector(`.grid-point[dataX="${Math.round((mouseX-this.cellSize/2) / this.cellSize)}"][dataY="${Math.round((mouseY-this.cellSize/2) / this.cellSize)}"]`) as HTMLElement
+                const gridPoint = this.getGridPoint(this.mousePosX, this.mousePosY)
                 const newLine = this.$el.querySelector(".new-line") as HTMLElement
                 if (gridPoint && gridPoint.classList.contains("__isOption")) {
-                    const x = gridPoint.getAttribute("dataX")
-                    const y = gridPoint.getAttribute("dataY")
-                    if (x && y) {
-                        if (newLine.attributes["x2"].value != `${parseInt(x) * this.cellSize + this.cellSize/2}` &&
-                            newLine.attributes["y2"].value != `${parseInt(y) * this.cellSize + this.cellSize/2}`) {
-                            gsap.to(newLine, {
-                                opacity: 1,
-                                duration: .8,
-                                attr: {
-                                    x2: parseInt(x) * this.cellSize + this.cellSize/2,
-                                    y2: parseInt(y) * this.cellSize + this.cellSize/2,
-                                },
-                                ease: "power4.out",
-                                
-                            })
+                    if (newLine.attributes["x2"].value != `${this.mousePosX}` &&
+                    newLine.attributes["y2"].value != `${this.mousePosY}`) {
+                        this.newLineEndPos = {
+                            x: Math.round(this.mousePosX),
+                            y: Math.round(this.mousePosY)
                         }
+
+                        gsap.to(newLine, {
+                            opacity: 1,
+                            duration: .8,
+                            attr: {
+                                x2: parseInt(gridPoint.getAttribute("dataX")) * this.cellSize + this.cellSize/2,
+                                y2: parseInt(gridPoint.getAttribute("dataY")) * this.cellSize + this.cellSize/2
+                            },
+                            ease: "power4.out",
+                        })
                     }
                 } else {
                     // Not the most efficent method to do this, but it works
+                    this.newLineEndPos = null
                     gsap.killTweensOf(".new-line")
                     gsap.to(".new-line", {
                         opacity: 0.5,
@@ -752,24 +862,28 @@ export default defineComponent({
                         ease: "power4.out",
                     })
 
-                    newLine.setAttribute("x2", `${mouseX}`)
-                    newLine.setAttribute("y2", `${mouseY}`)
+                    newLine.setAttribute("x2", `${this.mouseX}`)
+                    newLine.setAttribute("y2", `${this.mouseY}`)
                 }
                 
             }
         },
-        startNewLine(x: number, y: number) {
-            const xClean = x - this.offset.x
-            const yClean = y - this.offset.y
+        startNewLine(posX: number, posY: number) {
             let height = 0
             let width = 0
+            
+            const newLineEl = this.$el.querySelector(".new-line") as HTMLElement
+            if (newLineEl) {
+                newLineEl.remove()
+            }
 
-            if (!x || !y) return
-            const gridPoint = this.$el.querySelector(`.grid-point[dataX="${x}"][dataY="${y}"]`) as HTMLElement
-            const topPoint = this.$el.querySelector(`.grid-point[dataX="${x}"][dataY="${parseInt(y) - 1}"]`) as HTMLElement
-            const bottomPoint = this.$el.querySelector(`.grid-point[dataX="${x}"][dataY="${parseInt(y) + 1}"]`) as HTMLElement
-            const leftPoint = this.$el.querySelector(`.grid-point[dataX="${parseInt(x) - 1}"][dataY="${y}"]`) as HTMLElement
-            const rightPoint = this.$el.querySelector(`.grid-point[dataX="${parseInt(x) + 1}"][dataY="${y}"]`) as HTMLElement
+            // posX implementeren en posY
+            if (!posX || !posY) return
+            const gridPoint = this.$el.querySelector(`.grid-point[dataX="${posX}"][dataY="${posY}"]`) as HTMLElement
+            const topPoint = this.$el.querySelector(`.grid-point[dataX="${posX}"][dataY="${posY - 1}"]`) as HTMLElement
+            const bottomPoint = this.$el.querySelector(`.grid-point[dataX="${posX}"][dataY="${posY + 1}"]`) as HTMLElement
+            const leftPoint = this.$el.querySelector(`.grid-point[dataX="${posX - 1}"][dataY="${posY}"]`) as HTMLElement
+            const rightPoint = this.$el.querySelector(`.grid-point[dataX="${posX + 1}"][dataY="${posY}"]`) as HTMLElement
             
 
             if (this.phygital.selectedSurface == "bottom") {
@@ -793,24 +907,24 @@ export default defineComponent({
             }
 
 
-            if (topPoint && yClean > 0) {
+            if (topPoint && posY - this.offset.y > 0) {
                 topPoint.classList.add("__isOption")
             }
-            if (bottomPoint && yClean < height-1) {
+            if (bottomPoint && posY - this.offset.y < height-1) {
                 bottomPoint.classList.add("__isOption")
             }
-            if (leftPoint && xClean > 0) {
+            if (leftPoint && posX - this.offset.x > 0) {
                 leftPoint.classList.add("__isOption")
             }
-            if (rightPoint && xClean < width-1) {
+            if (rightPoint &&  posX - this.offset.x < width-1) {
                 rightPoint.classList.add("__isOption")
             }
             
             const newLine = this.svg.line(
-                x*this.cellSize + this.cellSize/2,
-                y*this.cellSize+ this.cellSize/2,
-                x*this.cellSize + this.cellSize/2,
-                y*this.cellSize+ this.cellSize/2
+                posX*this.cellSize + this.cellSize/2,
+                posY*this.cellSize+ this.cellSize/2,
+                posX*this.cellSize + this.cellSize/2,
+                posY*this.cellSize+ this.cellSize/2
             )
 
             newLine.attr({
@@ -822,91 +936,108 @@ export default defineComponent({
             })
             this.svg.add(newLine)
             // gridPoint.classList.add("__isActive")
-            this.newLine.push({x: parseInt(x), y: parseInt(y)})
+            this.newLine.push({x: posX, y: posY})
+        },
+        cancelNewLine() {
+            const startPoint = this.getGridPoint(this.newLine[0].x, this.newLine[0].y)
+            this.removeNewLine = true
+            this.newLine.length = 0
+            this.removeNewLine = false
+            const newLine = this.$el.querySelector(".new-line") as HTMLElement
+            const posX1 = Math.round((parseInt(newLine.getAttribute("x1"))- this.cellSize/2)/this.cellSize)
+            const posY1 = Math.round((parseInt(newLine.getAttribute("y1"))- this.cellSize/2)/this.cellSize)
+
+            const options = []
+            options.push(this.$el.querySelector(`g[dataX='${posX1-1}'][dataY='${posY1}']`))
+            options.push(this.$el.querySelector(`g[dataX='${posX1+1}'][dataY='${posY1}']`))
+            options.push(this.$el.querySelector(`g[dataX='${posX1}'][dataY='${posY1-1}']`))
+            options.push(this.$el.querySelector(`g[dataX='${posX1}'][dataY='${posY1+1}']`))
+            
+            _.each(_.compact(options), (option) => {
+                option.classList.remove("__isOption")
+                /// Having an animation is great, but it;s not defined properly yet
+                // gsap.to(option, {
+                //     duration: 0.8,
+                //     opacity: 0,
+                //     ease: "power4.out",
+                //     onComplete: () => {
+                //         if (option) {
+                //             option.classList.remove("__isOption")
+                //         }
+                //     }
+                // })
+            })
+
+            gsap.to(".new-line", {
+                opacity: 0,
+                duration: 1.32,
+                ease: "power4.out",
+                onComplete: () => {
+                    if (newLine) {
+                        newLine.remove()
+                    }
+                }
+            })
         },
         completeNewLine() {
             this.removeNewLine = true
-            const newLineElement = document.querySelector(".new-line")
-            if (!newLineElement) return
-
-            const x = parseInt(newLineElement.attributes["x2"].value, 10)
-            const y = parseInt(newLineElement.attributes["y2"].value, 10)
-            const endPosition = {
-                x: Math.round((x - this.cellSize/2) / this.cellSize),
-                y: Math.round((y - this.cellSize/2) / this.cellSize)
+            // const newLineElement = document.querySelector(".new-line")
+            if (this.newLineEndPos) {
+                this.newLineEndPos = null
             }
-            const targetPoint = this.$el.querySelector(`.grid-point[dataX="${endPosition.x}"][dataY="${endPosition.y}"]`) as HTMLElement
 
+            if (this.newLine.length != 2) {
+                console.error("Invalid length for newLine")
+                return
+            }
             
-            
-            // Cancel new-line animation
-            gsap.to(".new-line", {
-                opacity: 0,
-                duration: .8,
-                ease: "power4.out",
-                onComplete: () => {
-                    this.$el.querySelector(".new-line").remove()
-                    this.$el.querySelectorAll(".__isOption").forEach((el) => {
-                        el.classList.remove("__isOption")
-                    })
-                    
-                    // Update related variables
-                    this.newLine.length = 0
-                    this.removeNewLine = false
-                }
-            })
+            // const targetPoint = this.getGridPoint(xPos, yPos)
+
+            const startPoint = this.getGridPoint(this.newLine[0].x, this.newLine[0].y)
+            const endPoint = this.getGridPoint(this.newLine[1].x, this.newLine[1].y)
+
+            if (!startPoint || !endPoint) {
+                console.error("Invalid start or end point")
+                return
+            }
 
             // Add new-line
-            if (targetPoint.classList.contains("__isOption")) {
-                
-                const newLine = [
-                    {x: this.newLine[0].x - this.offset.x, y: this.newLine[0].y- this.offset.y},
-                    {x: endPosition.x - this.offset.x, y: endPosition.y- this.offset.y}
-                ]
+            const newLine = [
+                {x: this.newLine[0].x - this.offset.x, y: this.newLine[0].y - this.offset.y},
+                {x: this.newLine[1].x - this.offset.x, y: this.newLine[1].y - this.offset.y}
+            ]
 
-                const duplicate = this.$el.querySelector(`
-                .vpg-line[dataX1="${newLine[0].x + this.offset.x}"][dataY1="${newLine[0].y + this.offset.y}"][dataX2="${newLine[1].x + this.offset.x}"][dataY2="${newLine[1].y + this.offset.y}"],
-                .vpg-line[dataX1="${newLine[1].x + this.offset.x}"][dataY1="${newLine[1].y + this.offset.y}"][dataX2="${newLine[0].x + this.offset.x}"][dataY2="${newLine[0].y + this.offset.y}"]
-                `)
-                if (duplicate) {
-                    return
-                }
 
-                this.surfacePolylines.push(_.cloneDeep(newLine))
-                this.$emit("update:vpgPattern", _.cloneDeep(newLine), "add")
+            if (!startPoint.classList.contains("__isActive")) {
+                startPoint.classList.add("__isActive")
+            } 
 
-                const otherTargetPoint = this.$el.querySelector(`.grid-point[dataX="${this.newLine[0].x}"][dataY="${this.newLine[0].y}"]`) as HTMLElement
-                if (!targetPoint.classList.contains("__isActive")) {
-                    targetPoint.classList.add("__isActive")
-                } 
-                if (!otherTargetPoint.classList.contains("__isActive")) {
-                    otherTargetPoint.classList.add("__isActive")
-                } 
+            if (!endPoint.classList.contains("__isActive")) {
+                endPoint.classList.add("__isActive")
+            } 
 
-                // Update related variables
-                this.removeNewLine = false
-            }
-
-            this.$el.querySelectorAll(".__isOption").forEach((el) => {
+            this.$el.querySelectorAll(".__isOption").forEach((el: HTMLElement) => {
                 el.classList.remove("__isOption")
             })
-
             
-            
-
-
+            this.removeNewLine = false
+            this.newLine.length = 0
+            this.surfacePolylines.push(newLine)
+            this.$el.querySelector(".new-line").remove()
+            this.$emit("update:vpgPattern", _.clone(newLine), "add")
         }
         
     }
 })
 </script>
 
-<style lang="scss" >
+<style lang="scss">
 @import "./../assets/scss/variables.scss";
 .vpg-svg-editable {
     width: 100%;
     height: 100%;
     display: flex;
+    flex-flow: column nowrap;
     justify-content: center;
     align-items: center;
     &.__isEditMode {
