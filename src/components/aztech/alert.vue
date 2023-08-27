@@ -192,7 +192,6 @@ export default defineComponent({
             })
 
         },
-
         updateSize() {
             const dialogContainer = this.$refs.dialogContainer as HTMLElement
             if (!dialogContainer) return null

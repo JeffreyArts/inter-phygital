@@ -79,29 +79,31 @@ export default defineComponent({
         this.options.push( {
             label: "Continue",
             type: "primary",
-            onClick: () => {alert("asdf")}
+            onClick: () => {/* will be set in this.validateChange()  */}
         })
         this.options.push( {
             label: "Cancel",
             type: "",
-            onClick: this.closeAlert
+            onClick: () => {
+                this.closeAlert()
+            }
         })
     },
     methods: {
-        closeAlert(emitted: boolean) {
-            this.alertOpen = emitted
+        closeAlert() {
+            this.alertOpen = false
         },
         validateChange(dimension: "width" | "height", value: number) {
             this.alertOpen = true
             if (dimension == "width") {
                 this.options[0].onClick = () => {
                     this.modifyWidth(value,true)
-                    this.closeAlert(false)
+                    this.closeAlert()
                 }
             } else {
                 this.options[0].onClick = () => {
                     this.modifyHeight(value,true)
-                    this.closeAlert(false)
+                    this.closeAlert()
                 }
             }
         },
