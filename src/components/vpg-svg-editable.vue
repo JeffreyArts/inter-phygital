@@ -17,6 +17,8 @@ use the .vpg-svg-content for styling the content inside the box. Best way is to 
                 <line class="line-vertical" x1="16.5" y1="12.5" x2="8.5" y2="12.5"/>
             </g>
         </svg>
+
+        {{ strokeWidth }}
     </div>
 
 
@@ -72,6 +74,7 @@ export default defineComponent({
             mouseY: 0,
             mousePosX: 0,
             mousePosY: 0,
+            strokeWidth: 30,
             ignoreAnimation: false,
             newLineEndPos: null as null | {x:number, y:number},
         }
@@ -110,7 +113,7 @@ export default defineComponent({
                         }
                     })
                     gsap.to(".vpg-line", {
-                        strokeWidth: 30,
+                        strokeWidth: this.strokeWidth,
                         strokeLinecap: "round",
                         duration: 0.8,
                         ease: "back.out(3.2)",
@@ -170,6 +173,11 @@ export default defineComponent({
         
     },
     mounted() {
+        if (window.innerWidth < 640) {
+            this.strokeWidth = 14
+        } else {
+            this.strokeWidth = 30
+        }
         gsap.registerPlugin(DrawSVGPlugin)
         this.surfacePolylines = _.cloneDeep(this.vpgPattern.polylines)
         this.initialiseSVG()
@@ -237,7 +245,7 @@ export default defineComponent({
                 }
 
                 if (this.phygital.editMode) {
-                    style.strokeWidth = 30
+                    style.strokeWidth = this.strokeWidth
                     style.strokeLinecap = "round"
                 }
 
@@ -601,6 +609,16 @@ export default defineComponent({
                 y2: y*cellSize + cellSize/2 + 4,
                 style: `transform-origin: ${x*cellSize + cellSize/2}px ${y*cellSize + cellSize/2}px;`
             })
+
+            if (window.innerWidth < 640) {
+
+                _.forEach([r1, r2, r3], (r) => {
+                    r.attr({
+                        r: parseInt(r.node.getAttribute("r"), 10)/2,
+                    })
+                })
+            }
+
             gridPoint.add(r3)
             gridPoint.add(r2)
             gridPoint.add(r1)
@@ -621,6 +639,12 @@ export default defineComponent({
             return gridPoint
         },
         updateSVG() {
+            if (window.innerWidth < 640) {
+                this.strokeWidth = 14
+            } else {
+                this.strokeWidth = 30
+            }
+            
             const svgContainer = this.$refs["vpgSVG"] as HTMLElement
             if (!svgContainer) return
             
@@ -765,7 +789,7 @@ export default defineComponent({
                 gsap.to(this.removableLine, {
                     duration: .64, 
                     stroke: "#1c1c1e",
-                    strokeWidth: 30,
+                    strokeWidth: this.strokeWidth,
                     opacity: 1,
                 })
             }
@@ -781,7 +805,7 @@ export default defineComponent({
                 gsap.to(line, {
                     duration: .64, 
                     stroke: "#545760",
-                    strokeWidth: 30,
+                    strokeWidth: this.strokeWidth,
                     opacity: .72,
                 })
             }
@@ -920,7 +944,7 @@ export default defineComponent({
 
             newLine.attr({
                 class: "new-line",
-                style: `stroke-width: 30px;
+                style: `stroke-width: ${this.strokeWidth}px;
                         stroke-linecap: round;
                         opacity: 0.5;
                         stroke: #1c1c1e;`
