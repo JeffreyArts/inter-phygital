@@ -123,7 +123,7 @@ export default defineComponent({
             const slotsAnimation = gsap.to(this, {
                 duration: 2.2,
                 ease: "power2.out",
-                slots: 6,
+                slots: 8,
             })
 
 
@@ -153,7 +153,7 @@ export default defineComponent({
                     slotsAnimation.kill()
 
                     gsap.to(this, {
-                        slots: 2,
+                        slots: 4,
                         duration: .8,
                     })
                     this.regenerating = false

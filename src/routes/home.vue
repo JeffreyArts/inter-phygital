@@ -113,7 +113,10 @@ export default defineComponent ({
         margin: 32px;
         height: calc(100vh - 64px);
         width: calc(100vw - 64px);
-        overflow: hidden;
+        // overflow: hidden;
+        &[data-grid="6x6"] {
+            flex-flow: column;
+        }
         &[data-grid="3x8"] {
             .sidebar {
                 grid-template-columns: calc(100% / 3) calc(100% / 3 * 2);
@@ -124,6 +127,12 @@ export default defineComponent ({
             .sidebar {
                 grid-template-columns: calc(100% / 3) calc(100% / 3 * 2);
                 grid-template-rows: calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6);
+            }
+        }
+        &[data-grid="6x6"] {
+            .sidebar {
+                grid-template-columns: calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6) calc(100% / 6);
+                grid-template-rows: 25% 25% 25% 25%;
             }
         }
     }
@@ -166,39 +175,6 @@ export default defineComponent ({
         align-items: center;
         position: relative;
         background-color: #eee; 
-        
-        &[ratio="1x1"] {
-            aspect-ratio: 1 / 1;
-            width: 100%;
-        }
-        &[ratio="2x1"] {
-            aspect-ratio: 2 / 1;
-            width: 100%;
-        }
-        &[ratio="3x1"] {
-            aspect-ratio: 3 / 1;
-            width: 100%;
-        }
-        &[ratio="4x1"] {
-            aspect-ratio: 4 / 1;
-            width: 100%;
-        }
-        &[ratio="2x2"] {
-            aspect-ratio: 1/ 1;
-            width: 50%;
-        }
-        &[ratio="4x4"] {
-            aspect-ratio: 1/ 1;
-            width: 25%;
-        }
-        &[ratio="4x2"] {
-            aspect-ratio: 2/ 1;
-            width: 25%;
-        }
-        &[ratio="2x4"] {
-            aspect-ratio: 1/ 2;
-            width: 50%;
-        }
     }
 }
 
@@ -271,6 +247,41 @@ export default defineComponent ({
     #s-surface-dimensions {
         grid-column: 1/2;
         grid-row: 2/3;
+    }
+}
+
+
+.home .dashboard[data-grid="6x6"] {
+    #s-seed {
+        grid-column: 3/7;
+        grid-row: 2/3;
+    }
+    #s-surfaces {
+        grid-column: 3/7;
+        grid-row: 3/5;
+    }
+    
+    #s-cube3d {
+        grid-column: 1/3;
+        grid-row: 3/4;
+    }
+    
+    #s-dimensions {
+        display: none;
+    }
+    
+    #s-download {
+        grid-column: 1/3;
+        grid-row: 4/5;
+    }
+    
+    #s-view-edit {
+        grid-column: 5/7;
+        grid-row:1/2;
+    }
+    #s-surface-dimensions {
+        grid-column: 3/5;
+        grid-row: 1/2;
     }
 }
 </style>

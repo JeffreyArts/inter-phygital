@@ -64,7 +64,6 @@ export default defineComponent({
 
 .aztech-label-content {
     display: inline-block;
-    position: relative;
     z-index: 1;
     position: absolute;
     text-align: center;
@@ -74,6 +73,7 @@ export default defineComponent({
     bottom: 0;
     line-height: 16px;
     translate: 0 -1px;
+    padding: 0 4px;
     font-size: inherit;
 }
 
@@ -88,6 +88,8 @@ export default defineComponent({
     opacity: 0;
     pointer-events: none;
     position: absolute;
+    top: 0;
+    left: 0;
     font-size: inherit;
     padding: 0 4px;
 }

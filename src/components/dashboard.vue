@@ -59,7 +59,7 @@ export default defineComponent({
 
             // Define grid and cell size
             if (this.orientation == "portrait") {
-                this.grid = "6x4"
+                this.grid = "6x6"
                 this.cellSize = Math.floor(width/parseInt(this.grid.split("x")[0], 10))
             } else if (this.orientation == "landscape") {
                 this.cellSize = Math.floor(height/parseInt(this.grid.split("x")[1], 10))

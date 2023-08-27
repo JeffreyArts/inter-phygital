@@ -136,12 +136,12 @@ export default defineComponent({
 .cube-surfaces-header {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, calc(100%/3));
     text-align: center;
 }
 
 .cube-surfaces-container {
-    padding: 0 1px;
+    padding: 4px 1px;
     width: 100%;
     height: 100%;
     display: flex;
@@ -149,11 +149,17 @@ export default defineComponent({
     justify-content: space-around;
     align-items: flex-end;
 }
+.cube-surfaces-header {
+    .cube-surfaces-cell {
+        @media (orientation: portrait) {
+            padding: 4px 0;
+        }
+    }
+}
 
 .cube-surfaces-grid {
     .cube-surfaces-cell {
         padding: 8px;
-
         transition: .24s ease all;
         &.__isSelected {
             background-color: #fff;
@@ -196,6 +202,7 @@ export default defineComponent({
     &.aztech-label {
         color: $black;
         transition: .24s linear;
+        font-size: 12px;
         .aztech-label-svg {
             transition: .24s linear;
             fill: transparent;

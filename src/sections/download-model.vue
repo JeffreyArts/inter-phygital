@@ -79,8 +79,10 @@ export default defineComponent({
     display: flex;
     flex-flow: row;
     justify-content: center;
+    align-items: center;
     width: 100%;
     height: 100%;
+    text-align: center;
     container-type: size;
     container-name: download-model-section;
 }
@@ -89,7 +91,7 @@ export default defineComponent({
 .download-container {
     width: 100%;
     display: flex;
-    flex-flow: row;
+    flex-flow: column;
     font-size: 14px;
     gap: 8px;
     justify-content: start;
@@ -120,25 +122,31 @@ export default defineComponent({
 
 .download-label {
     transition: ease .24s all;
-    transform-origin: left center;
+    transform-origin: top center;
     cursor: pointer;
     font-size: 12px;
+    line-height: 1;
 }
 
-@container download-model-section (min-height: 40px) {
+@container download-model-section (min-width: 180px) {
     .download-container {
+        flex-flow: row;
+        text-align: left;
+
         .icon {
             height: 40px;
         }
         
         .download-label {
-            font-size: 14px;
+            font-size: 18px;
             padding-left: 4px;
+
+            transform-origin: left center;
         }
     }
 }
 
-@container download-model-section (min-height: 48px) {
+@container download-model-section (min-width: 480px) {
     .download-container {
         .download-label {
             font-size: 16px;
@@ -146,7 +154,7 @@ export default defineComponent({
         }
     }
 }
-@container download-model-section (min-height: 56px) {
+@container download-model-section (min-width: 560px) {
     .download-container {
         .icon {
             height: 48px;
@@ -157,7 +165,7 @@ export default defineComponent({
         }
     }
 }
-@container download-model-section (min-height: 64px) {
+@container download-model-section (min-width: 640px) {
     .download-container {
         .download-label {
             font-size: 18px;
