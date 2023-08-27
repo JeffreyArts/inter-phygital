@@ -17,11 +17,7 @@ use the .vpg-svg-content for styling the content inside the box. Best way is to 
                 <line class="line-vertical" x1="16.5" y1="12.5" x2="8.5" y2="12.5"/>
             </g>
         </svg>
-
-        {{ strokeWidth }}
     </div>
-
-
 </template>
 
 
@@ -202,8 +198,8 @@ export default defineComponent({
             {
                 this.horizontalLines += 1
             }
-            this.offset.x = Math.floor(this.horizontalLines/2 - this.vpgPattern.width/2)
 
+            this.offset.x = Math.floor(this.horizontalLines/2 - this.vpgPattern.width/2)
             this.cellSize = this.$el.clientWidth/this.horizontalLines
             
             this.grid = []
@@ -431,8 +427,6 @@ export default defineComponent({
                         from: "center"
                     }
                 })
-                console.log(animate, 640 + polylines.length * 24/Math.max(this.horizontalLines, this.verticalLines)/128 * 1000)
-
             })
         },
         removeLine(target: HTMLElement) {
@@ -611,7 +605,6 @@ export default defineComponent({
             })
 
             if (window.innerWidth < 640) {
-
                 _.forEach([r1, r2, r3], (r) => {
                     r.attr({
                         r: parseInt(r.node.getAttribute("r"), 10)/2,
@@ -632,7 +625,6 @@ export default defineComponent({
             ) {
                 gridPoint.addClass("__hasHover")
             }
-            
 
             gsap.set(gridPoint, {opacity: 0})
 
@@ -1057,13 +1049,6 @@ export default defineComponent({
     justify-content: center;
     align-items: center;
     &.__isEditMode {
-        svg {
-            // .vpg-line {
-            //     stroke-width: 30px;
-            //     stroke-linecap: round;
-            // }
-        }
-
         .grid-point {
             &.__hasHover {
                 pointer-events: all;
