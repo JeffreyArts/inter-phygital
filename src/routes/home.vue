@@ -1,5 +1,6 @@
 <template>
     <div class="home">
+        <dashboard-overlay />
         <dashboard>
             <main class="main __isActive">
                 <section class="main-section">
@@ -55,12 +56,14 @@ import sectionViewEditButton from "@/sections/view-edit-button.vue"
 import sectionDownload from "@/sections/download-model.vue"
 import sectionSeed from "@/sections/cube-seed.vue"
 import Dashboard from "@/components/dashboard.vue"
+import DashboardOverlay from "@/components/dashboard-overlay.vue"
 import _ from "lodash"
 
 export default defineComponent ({ 
     name: "homePage",
     components: {
         Dashboard,
+        DashboardOverlay,
         MainCubeFaces,
         sectionMetaDimensions,
         sectionCube3d,
