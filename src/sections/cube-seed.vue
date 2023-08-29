@@ -44,7 +44,7 @@ export default defineComponent({
     data: () => {
         return {
             regenerating: false,
-            seed: "a-61892379",
+            seed: "a-618929",
             slots: 4
         }
     },
@@ -129,7 +129,7 @@ export default defineComponent({
 
 
             const randomSeedInterval = setInterval(() => {
-                this.seed = "a-" +_.random(0, 100000000).toString()
+                this.seed = "a-" +_.random(0, 1000000).toString()
             }, 64)
 
             gsap.to(target, {

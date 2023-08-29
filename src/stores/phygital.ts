@@ -89,7 +89,7 @@ export const phygitalFace = defineStore({
     }),
     actions: {
         generateSeed() {
-            this.seed = "a-" +_.random(0, 100000000).toString()
+            this.seed = "a-" +_.random(0, 1000000).toString()
         },
         selectSurface(surface: "top" | "bottom" | "left" | "right" |  "front" | "back") {
             this.selectedSurface = surface
