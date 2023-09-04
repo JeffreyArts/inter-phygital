@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "deploy": "bash deploy.sh staging",
+    "deploy": "bash deploy.sh production",
     "preview": "vite preview"
   },
   "dependencies": {

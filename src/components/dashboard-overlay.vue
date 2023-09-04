@@ -32,7 +32,7 @@ use the .ascii-box-content for styling the content inside the box. Best way is t
                 </g>
             </svg>
 
-            <footer class="dashboard-overlay-footer">Jeffrey Arts</footer>
+            <a class="dashboard-overlay-footer" target="_blank" href="https://www.jeffreyarts.nl">Jeffrey Arts</a>
         </section>
     </div>
 </template>
@@ -144,11 +144,13 @@ export default defineComponent({
                 gsap.to(".do-c line", {
                     duration: 1.08,
                     strokeDashoffset: 128,
+                    strokeWidth: 32,
                     ease: "power2.out"
                 })
                 gsap.to(".do-c polyline", {
                     duration: 1.44,
                     strokeDashoffset: 390,
+                    strokeWidth: 32,
                     ease: "power4.out"
                 })
             }
@@ -179,9 +181,15 @@ export default defineComponent({
                 duration: 1.44,
                 width: 64,
                 height: 64,
-                padding: 8,
+                padding: 4,
                 delay: -1.28,
                 strokeDashoffset: 390,
+                ease: "power4.out"
+            })
+            timeline.to(".do-c polyline, .do-c line", {
+                duration: 1.44,
+                strokeWidth: 24,
+                delay: -1.28,
                 ease: "power4.out"
             })
             timeline.to(".dashboard-overlay", {
@@ -285,6 +293,13 @@ export default defineComponent({
     height:1em;
     display: inline-block;
     line-height:1;
+    pointer-events: all;
+    text-decoration: none;
+    color: $black;
+    cursor: pointer;
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 </style>

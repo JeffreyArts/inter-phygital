@@ -19,10 +19,9 @@ import Phygital from "@/stores/phygital"
 import AztechAlert from "@/components/aztech/alert.vue"
 import AztechInputNumber from "@/components/aztech/input-number.vue"
 import type {AztechAlertOption} from "@/types/aztech-alert"
-import gsap from "gsap"
 
 export default defineComponent({
-    name: "cube-config",
+    name: "surface-dimensions",
     components: {
         AztechAlert, AztechInputNumber
     },
