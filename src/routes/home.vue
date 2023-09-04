@@ -31,6 +31,9 @@
                 <section id="s-download">
                     <section-download/>
                 </section>
+                <section id="s-links">
+                    <section-links/>
+                </section>
                 <section id="s-view-edit" v-if="activeComponent === 'cube-faces'">
                     <section-view-edit-button />
                 </section>
@@ -54,6 +57,7 @@ import sectionCube3d from "@/sections/cube-3d.vue"
 import sectionSurfaces from "@/sections/surfaces-grid.vue"
 import sectionViewEditButton from "@/sections/view-edit-button.vue"
 import sectionDownload from "@/sections/download-model.vue"
+import sectionLinks from "@/sections/links.vue"
 import sectionSeed from "@/sections/cube-seed.vue"
 import Dashboard from "@/components/dashboard.vue"
 import DashboardOverlay from "@/components/dashboard-overlay.vue"
@@ -70,6 +74,7 @@ export default defineComponent ({
         sectionSurfaces,
         sectionViewEditButton,
         sectionDownload,
+        sectionLinks,
         sectionSeed,
         sectionSurfaceDimensions,
     },
@@ -241,6 +246,11 @@ export default defineComponent ({
     #s-download {
         grid-column: 2/3;
         grid-row: 7/8;
+    }
+
+    #s-links {
+        grid-column: 2/3;
+        grid-row: 8/9;
     }
 
     #s-view-edit {

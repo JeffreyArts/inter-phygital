@@ -40,13 +40,13 @@ export default defineComponent({
     },
     computed: {
         width() {
-            return this.phygital.surfaces.top.width * this.phygital.blockSize
+            return (this.phygital.surfaces.top.width*2-1) * this.phygital.blockSize
         },
         height() {
-            return this.phygital.surfaces.left.height * this.phygital.blockSize
+            return (this.phygital.surfaces.left.height*2-1) * this.phygital.blockSize
         },
         depth() {
-            return this.phygital.surfaces.top.height * this.phygital.blockSize
+            return (this.phygital.surfaces.top.height*2-1) * this.phygital.blockSize
         }
     },
     mounted() {
