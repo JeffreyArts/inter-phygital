@@ -1,7 +1,7 @@
 <template>
     <div class="aztech-monitor" :style="height > 32 ? `height:${height}px` : ``" ref="container">
         <svg class="aztech-monitor-svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" :viewBox="`0 0 ${width} ${height}`" xml:space="preserve">
-            <rect class="aztech-monitor-bg" ref="content" x="0" y="8" :width="width" :height="height - 8 * 2"/>
+            <rect class="aztech-monitor-bg" x="0" y="8" :width="width" :height="height - 8 * 2"/>
             <polygon ref="left" :points="`
                 0, ${height / 2 - 16 - 6 }
                 6, ${height / 2 - 16}
@@ -66,7 +66,7 @@
             </g>
         </svg>
         
-        <span class="aztech-monitor-content" :style="height >= 32 ? `height:${height}px` : ``">
+        <span class="aztech-monitor-content" ref="content" :style="height >= 32 ? `height:${height}px` : ``">
             <slot />
         </span>
     </div>
@@ -106,6 +106,9 @@ export default defineComponent({
         const container = this.$refs.container as HTMLElement
         this.height = container.clientHeight
         this.finalHeight = container.clientHeight
+        gsap.set(".aztech-monitor-content", {
+            opacity: 0
+        })
         
         window.addEventListener("resize", this.updateMonitor)    
     },
@@ -114,7 +117,6 @@ export default defineComponent({
     },
     methods: {
         updateMonitor() {
-            console.log("updateMonitor")
             const container = this.$refs.container as HTMLElement
             const contentElement = this.$refs.content as HTMLElement
             const topSection = this.$refs.top as HTMLElement
@@ -128,7 +130,6 @@ export default defineComponent({
             this.height = container.clientHeight
         },
         closeMonitor() {
-            console.log("Close monitor")
             gsap.killTweensOf(this)
 
             gsap.to(this, {
@@ -144,21 +145,23 @@ export default defineComponent({
         },
         openMonitor() {
             // this.height = 32
+            const contentElement = this.$refs.content as HTMLElement
+
+            gsap.set(contentElement, {
+                opacity: 0
+            })
             gsap.fromTo(this, {
                 height: 32,
-                opacity: 1,
             }, {
                 height: this.finalHeight,
-                opacity: 1,
                 duration: 0.64,
                 ease: "power2.out",
             })
 
-            gsap.fromTo(".aztech-monitor-content", {
-                opacity: 0
-            }, {
+            gsap.to(contentElement, {
                 opacity: 1,
-                delay: .16,
+                duration: .4,
+                delay: .4,
                 ease: "power2.out",
             })
         }
@@ -179,6 +182,7 @@ export default defineComponent({
     padding: 16px 24px;
     display: block;
     position: relative;
+    opacity: 0;
     overflow: hidden;
 }
 
@@ -193,5 +197,6 @@ export default defineComponent({
     circle {
         fill: #eee;
     }
+    fill: $dark-grey;
 }
 </style>
