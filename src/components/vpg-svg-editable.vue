@@ -345,6 +345,10 @@ export default defineComponent({
                 if (this.$el.querySelectorAll(".vpg-line").length == 0) {
                     return resolve(true)
                 }
+                if (!animate) {
+                    return resolve(true)
+                }
+                
                 
                 
                 const lines = document.querySelectorAll(".vpg-line")
@@ -372,9 +376,6 @@ export default defineComponent({
                 })
 
                 Promise.all(timelines).then(() => {
-                    if (!animate) {
-                        return resolve(true)
-                    }
                     const svgContainer = this.$refs["vpgSVG"] as HTMLElement
                     if (!svgContainer) return
                     const children =  svgContainer.querySelectorAll(".vpg-line")
@@ -404,29 +405,40 @@ export default defineComponent({
                 if (!svgContainer) return
                 const polylines = svgContainer.querySelectorAll(".vpg-line")
                 const gridPoints =  svgContainer.querySelectorAll(".grid-point")
-                let timeout = animate ? 640 + polylines.length * (24/Math.max(this.horizontalLines, this.verticalLines)/128 * 1000) : 0
+                let timeout = 640 + polylines.length * (24/Math.max(this.horizontalLines, this.verticalLines)/128 * 1000)
 
-                setTimeout(() => {
+                if (animate) {
+                    setTimeout(() => {
+                        for (let i = 0; i < gridPoints.length; i++) {
+                            const parentNode = gridPoints[i].parentNode
+                            if (parentNode) {
+                                parentNode.removeChild(gridPoints[i])
+                            }
+                        }
+                                            
+                        return resolve(true)
+                    }, timeout)
+
+                    gsap.to(".grid-point", {
+                        opacity: 0,
+                        duration: .64,
+                        stagger: {
+                            grid: [this.horizontalLines, this.verticalLines],
+                            each: 24/Math.max(this.horizontalLines, this.verticalLines)/32,
+                            from: "center"
+                        }
+                    })
+                } else {
                     for (let i = 0; i < gridPoints.length; i++) {
                         const parentNode = gridPoints[i].parentNode
                         if (parentNode) {
                             parentNode.removeChild(gridPoints[i])
                         }
                     }
-                        
                     return resolve(true)
-                }, timeout)
+                }
 
                 
-                gsap.to(".grid-point", {
-                    opacity: 0,
-                    duration: .64,
-                    stagger: {
-                        grid: [this.horizontalLines, this.verticalLines],
-                        each: 24/Math.max(this.horizontalLines, this.verticalLines)/32,
-                        from: "center"
-                    }
-                })
             })
         },
         removeLine(target: HTMLElement) {
