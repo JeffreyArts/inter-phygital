@@ -1082,6 +1082,9 @@ export default defineComponent({
             .inner-ring {
                 opacity: 1;
             }
+            .outer-ring {
+                opacity: 1;
+            }
         }
         &.__hasHover:hover {
             
@@ -1103,6 +1106,7 @@ export default defineComponent({
             .outer-ring {
                 stroke: $dark-grey;
                 stroke-width: 1px;
+                opacity: 1;
             }
         }
         &.__isOption {
@@ -1113,6 +1117,7 @@ export default defineComponent({
                 stroke: $dark-grey2;
                 stroke-dasharray: 4 2.4;
                 opacity: 0.5;
+                opacity: 1;
             }
             &.__isActive {
                 .outer-ring {
@@ -1148,6 +1153,7 @@ export default defineComponent({
         stroke-width: 2px;
         fill: transparent;
         transition: .32s all ease;
+        opacity:.48;
     }
     .inner-ring {
         stroke: #ced1db;

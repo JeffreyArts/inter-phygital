@@ -3,7 +3,7 @@ use the .ascii-box-content for styling the content inside the box. Best way is t
  -->
 
 <template>
-    <div class="dashboard-overlay" ref="container" @click="fadeOut(true)">
+    <div class="dashboard-overlay" ref="container" @click="fadeOut(true)" v-if="!isDev">
         <svg class="do-c" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 320 320" style="enable-background:new 0 0 320 320;" xml:space="preserve">
             <polyline points="288,32 288,288 160,288 32,288 32,32 160,32 "/>
             <line x1="160" y1="288" x2="160" y2="160"/>
@@ -52,6 +52,11 @@ export default defineComponent({
     },
     computed: {
         
+    },
+    computed: {
+        isDev() {
+            return import.meta.env.DEV
+        }
     },
     watch: {
     
