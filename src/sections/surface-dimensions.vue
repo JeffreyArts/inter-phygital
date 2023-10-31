@@ -2,8 +2,8 @@
     <div class="surface-dimensions-section" ref="container">
 
         <div class="surface-dimensions">
-            <aztech-input-number v-model="width" label="width" unit="cm" @increase="modifyWidth" @decrease="modifyWidth"/>
-            <aztech-input-number v-model="height" label="height" unit="cm"  @increase="modifyHeight" @decrease="modifyHeight"/>
+            <aztech-input-number v-model="width" label="width" @increase="modifyWidth" @decrease="modifyWidth"/>
+            <aztech-input-number v-model="height" label="height"  @increase="modifyHeight" @decrease="modifyHeight"/>
         </div>
 
         <aztech-alert :options="options" :open="alertOpen" @close="closeAlert" >

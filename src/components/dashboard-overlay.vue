@@ -51,9 +51,6 @@ export default defineComponent({
         }
     },
     computed: {
-        
-    },
-    computed: {
         isDev() {
             return import.meta.env.DEV
         }
