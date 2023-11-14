@@ -66,6 +66,7 @@ export default defineComponent({
             hoverGridPoint: null as null | HTMLElement,
             removingLine: false,
             surfaceInTransition: false,
+            firstLoad: true,
             mouseX: 0,
             mouseY: 0,
             mousePosX: 0,
@@ -143,12 +144,20 @@ export default defineComponent({
                 }
                 
                 this.surfacePolylines = _.cloneDeep(this.vpgPattern.polylines)
-
-                this.surfaceInTransition = true
                 
-                const promise1 = this.removeGridPoints(!this.ignoreAnimation)
-                const promise2 = this.removeSurface(!this.ignoreAnimation)
-                Promise.all([promise1, promise2]).then(() => {
+                this.surfaceInTransition = true
+                const promises = []
+                
+                if (this.phygital.editMode) {
+                    promises.push(this.removeGridPoints(!this.ignoreAnimation))
+                }
+
+                if (!this.firstLoad) {
+                    promises.push(this.removeSurface(!this.ignoreAnimation))
+                }
+
+                Promise.all(promises).then(() => {
+                    this.firstLoad = false
                     this.defineGrid()
                     const p1 = this.defineSurface(!this.ignoreAnimation)
                     const p2 = this.defineGridPoints(!this.ignoreAnimation)

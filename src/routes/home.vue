@@ -62,6 +62,7 @@ import sectionSeed from "@/sections/cube-seed.vue"
 import Dashboard from "@/components/dashboard.vue"
 import DashboardOverlay from "@/components/dashboard-overlay.vue"
 import _ from "lodash"
+import gsap from "gsap"
 
 export default defineComponent ({ 
     name: "homePage",
@@ -97,7 +98,32 @@ export default defineComponent ({
         },
         select(section: "cube-3d" | "cube-faces") {
             if (this.selection.x !== 0 && this.selection.y !== 0) {
-                this.activeComponent = section
+                if (this.activeComponent === "cube-faces" && section === "cube-3d") {
+                    gsap.to(".vpg-svg-editable polyline", {
+                        duration: .8,
+                        strokeWidth: 24,
+                        ease: "power2.inOut",
+                    })
+                    gsap.to(".vpg-svg-editable", {
+                        duration: .96,
+                        opacity: 0,
+                        ease: "power4.inOut",
+                    })
+                    setTimeout(() => {
+                        this.activeComponent = section
+                    }, 1140)
+                    
+                } else if (this.activeComponent === "cube-3d" && section === "cube-faces") {
+                    gsap.to(".main canvas", {
+                        duration: .48,
+                        scale: .48,
+                        y: "+64",
+                        opacity: 0,
+                    })
+                    setTimeout(() => {
+                        this.activeComponent = section
+                    }, 480)
+                }
             }
         },
         cancelSelection(event:MouseEvent) {
