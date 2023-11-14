@@ -83,13 +83,25 @@ export default defineComponent ({
     data() {
         return {
             selection: {x: 0, y:0},
-            activeComponent: "cube-3d" as "cube-3d" | "cube-faces",
+            activeComponent: "cube-faces" as "cube-3d" | "cube-faces",
+        }
+    },
+    computed: {
+        isDev() {
+            return import.meta.env.DEV
         }
     },
     mounted() {
         setTimeout(() => {
             window.dispatchEvent(new Event("resize"))
         })
+        if (!this.isDev) {
+            setTimeout(() => {
+                this.selection.x = 1024
+                this.selection.y = 1024
+                this.select("cube-3d")
+            }, 2400)
+        }
     },
     methods: {
         setSelection(event:MouseEvent) {

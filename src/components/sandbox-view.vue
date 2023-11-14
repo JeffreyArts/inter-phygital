@@ -125,9 +125,9 @@ export default {
             // Animate camera position and lookAt using GSAP
             gsap.to(this.camera.position, {
                 duration: 1.28, // Duration in seconds
-                x: this.datamodel.width * 6,
-                y: this.datamodel.height * 2.4,
-                z: this.datamodel.depth * 6,
+                x: this.datamodel.width * 2.8,
+                y: this.datamodel.height * 1.6,
+                z: this.datamodel.height * 2.8,
                 ease: "power1.inOut",
             })
             this.camera.lookAt(target.x, target.y, target.z)

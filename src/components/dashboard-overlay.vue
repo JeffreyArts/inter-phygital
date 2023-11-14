@@ -59,7 +59,7 @@ export default defineComponent({
     
     },
     mounted() {
-        if (import.meta.env.DEV) {
+        if (this.isDev) {
 
             gsap.set(".dashboard-overlay", {
                 opacity: 0,
@@ -86,7 +86,7 @@ export default defineComponent({
                 ease: "linear"
             })
 
-            gsap.fromTo(".dashboard-overlay-container svg",{
+            gsap.fromTo(".dashboard-overlay-by",{
                 scale: .3,
             },{
                 scale: 1,
@@ -158,8 +158,17 @@ export default defineComponent({
             }
 
 
+            gsap.to(".dashboard-overlay-by", {
+                scale: 0.3,
+                opacity: 0,
+                duration: .96,
+                delay: 2.28,
+                ease: "power4.inOut"
+            })
+
             timeline.to(".dashboard-overlay-container", {
                 height: "100vh",
+                delay: .16,
                 duration: 1.28,
                 fontSize: 16,
                 paddingTop: 8,
@@ -171,13 +180,6 @@ export default defineComponent({
                 duration: 1.28,
                 delay: -1.28,
                 ease: "power2.out"
-            })
-            timeline.to(".dashboard-overlay-container svg", {
-                scale: 0,
-                opacity: 0,
-                duration: .24,
-                delay: -1.28,
-                ease: "liner"
             })
             timeline.to(".do-c", {
                 duration: 1.44,
